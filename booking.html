@@ -237,6 +237,9 @@ input.invalid,select.invalid{border-color:#C04040;}
       <div id="insurerWarning" style="display:none;margin-top:10px;padding:12px 16px;background:#FEF9EC;border:1px solid var(--champagne);border-radius:8px;font-size:14px;color:var(--ink-soft);line-height:1.5;">
         ⚠️ We accept PPO plans for this insurance, but are not formally contracted. Please confirm your plan type before booking.
       </div>
+      <div id="insurerOtherGroup" style="display:none;margin-top:12px;">
+        <input type="text" id="insurerOther" placeholder="Please enter your insurance carrier…">
+      </div>
     </div>
       <div class="form-group"><label for="npInsId">Member ID</label><input type="text" id="npInsId" placeholder="Insurance member ID"></div>
     </div>
@@ -346,7 +349,7 @@ input.invalid,select.invalid{border-color:#C04040;}
 
 <script>
 // CONFIGURATION — replace with your deployed Apps Script URL
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxS7b06t34epLzgRSlT16nJXltMwfe0QtQCtmgq4yYifqcqj91jrA6A9MOKAzlm-AAEg/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw3IB8ezEErhGQww0MRRHr8P2eqlLL9AH3wHoCj_xK0Ie9_9sLtSK9s9jqfs80Ll0ejzg/exec';
 
 var state = {
   patientType: null,
@@ -490,12 +493,12 @@ var allSlots = [];
 
 function handleInsurerChange(sel) {
   var warning = document.getElementById('insurerWarning');
+  var otherGroup = document.getElementById('insurerOtherGroup');
   var opt = sel.options[sel.selectedIndex];
-  if (opt && opt.getAttribute('data-warning') === 'true') {
-    warning.style.display = 'block';
-  } else {
-    warning.style.display = 'none';
-  }
+  var val = sel.value;
+  warning.style.display = (opt && opt.getAttribute('data-warning') === 'true') ? 'block' : 'none';
+  otherGroup.style.display = (val === 'Other') ? 'block' : 'none';
+  if (val !== 'Other') document.getElementById('insurerOther').value = '';
 }
 
 function renderSlots(slots) {
@@ -658,7 +661,7 @@ function goToStep4() {
               '<b>Date of birth:</b> ' + document.getElementById('npDob').value + '<br>' +
               '<b>Phone:</b> ' + document.getElementById('npPhone').value + '<br>' +
               '<b>Email:</b> ' + document.getElementById('npEmail').value + '<br>' +
-              '<b>Insurance:</b> ' + (document.getElementById('npInsurer').value || 'Not provided') + ' · ' + (document.getElementById('npInsId').value || 'Not provided') + '<br>' +
+              '<b>Insurance:</b> ' + (document.getElementById('npInsurer').value === 'Other' ? (document.getElementById('insurerOther').value.trim() || 'Other') : (document.getElementById('npInsurer').value || 'Not provided')) + ' · ' + (document.getElementById('npInsId').value || 'Not provided') + '<br>' +
               '<b>Concerns:</b> ' + reasonStr + (primaryNote ? '<br><b>Notes:</b> ' + primaryNote : '') + '<br>' +
               '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
               '<b>Type:</b> New patient (45 min)';
@@ -682,7 +685,8 @@ function submitBooking() {
     payload.dob = document.getElementById('npDob').value;
     payload.phone = document.getElementById('npPhone').value.trim();
     payload.email = document.getElementById('npEmail').value.trim();
-    payload.insurer = document.getElementById('npInsurer').value.trim();
+    var insurerVal = document.getElementById('npInsurer').value.trim();
+    payload.insurer = (insurerVal === 'Other') ? (document.getElementById('insurerOther').value.trim() || 'Other') : insurerVal;
     payload.insId = document.getElementById('npInsId').value.trim();
     var checkedVals = Array.from(document.querySelectorAll('input[name="npReasons"]:checked')).map(function(cb) { return cb.value; });
     payload.reason = checkedVals.join(', ');
