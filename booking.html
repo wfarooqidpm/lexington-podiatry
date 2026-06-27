@@ -107,6 +107,35 @@ footer .fl{display:flex;gap:24px;flex-wrap:wrap;}
 .sc-tel{display:block;margin-top:16px;font-weight:600;font-size:16px;color:var(--brass);text-decoration:none;}
 .sc-tel:hover{color:var(--brass-deep);}
 input.invalid,select.invalid{border-color:#C04040;}
+/* SLOT HYBRID: CALENDAR + COLLAPSIBLE */
+.slot-layout { display: grid; grid-template-columns: 1fr 200px; gap: 24px; align-items: start; }
+.slot-days { }
+.day-group { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+.day-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; cursor: pointer; background: var(--ivory);
+  font-weight: 600; font-size: 15px; transition: background .15s;
+  user-select: none;
+}
+.day-header:hover { background: var(--stone); }
+.day-header.active { background: var(--stone); color: var(--brass); }
+.day-header .day-arrow { font-size: 12px; transition: transform .2s; color: var(--ink-soft); }
+.day-header.active .day-arrow { transform: rotate(180deg); }
+.day-slots { display: none; padding: 12px 14px 14px; border-top: 1px solid var(--line-soft); }
+.day-slots.open { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.mini-cal { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; position: sticky; top: 100px; }
+.mini-cal-header { background: var(--walnut); color: var(--ivory); padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
+.mini-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); background: var(--ivory); }
+.mini-cal-dow { text-align: center; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); padding: 8px 0 4px; }
+.mini-cal-day { text-align: center; font-size: 13px; padding: 6px 2px; cursor: default; border-radius: 6px; margin: 2px; }
+.mini-cal-day.available { cursor: pointer; font-weight: 600; color: var(--brass); background: var(--stone); }
+.mini-cal-day.available:hover { background: var(--champagne-soft); }
+.mini-cal-day.selected-day { background: var(--brass); color: var(--ivory) !important; }
+.mini-cal-day.today { border: 1px solid var(--champagne); }
+.mini-cal-day.empty { color: transparent; }
+.mini-cal-day.past { color: var(--line); }
+@media(max-width:640px) { .slot-layout { grid-template-columns: 1fr; } .mini-cal { position: static; order: -1; } .day-slots.open { grid-template-columns: repeat(2,1fr); } }
+
 @media(max-width:860px){.booking-grid{grid-template-columns:1fr;gap:48px;}.booking-sidebar{order:-1;}}
 @media(max-width:767px){.mobile-bar{display:flex;}nav.links{display:none;}nav.links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:var(--ivory);border-bottom:1px solid var(--line);padding:20px 32px;gap:16px;}.menu-toggle{display:block;}body{padding-bottom:72px;}.brand .sub{display:none;}.mobile-bar .btn{flex:1;text-align:center;padding:14px;}}
 @media(max-width:560px){.type-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.slot-grid{grid-template-columns:repeat(2,1fr);}}
@@ -125,7 +154,7 @@ input.invalid,select.invalid{border-color:#C04040;}
 <div class="booking-hero"><div class="wrap">
   <p class="eyebrow">Request an appointment</p>
   <h1>Book your visit with<br><em>Dr. Farooqi</em></h1>
-  <p class="lede">Same-week appointments usually available. Most visits are covered by in-network insurance.</p>
+  <p class="lede">Same-day appointments available with 2 hours notice.</p>
 </div></div>
 
 <div class="booking-main"><div class="wrap"><div class="booking-grid">
@@ -169,7 +198,26 @@ input.invalid,select.invalid{border-color:#C04040;}
     </div>
     <div class="form-group"><label for="npEmail">Email address</label><input type="email" id="npEmail" autocomplete="email" placeholder="jane@example.com"></div>
     <div class="form-row">
-      <div class="form-group"><label for="npInsurer">Insurance carrier</label><input type="text" id="npInsurer" placeholder="e.g. Aetna, Cigna, Medicare"></div>
+      <div class="form-group">
+      <label for="npInsurer">Insurance carrier</label>
+      <select id="npInsurer" onchange="handleInsurerChange(this)">
+        <option value="">Select your insurance…</option>
+        <option value="Aetna">Aetna</option>
+        <option value="Cigna">Cigna</option>
+        <option value="1199 SEIU">1199 SEIU</option>
+        <option value="Medicare">Medicare</option>
+        <option value="Medicare Advantage">Medicare Advantage</option>
+        <option value="Anthem BCBS" data-warning="true">Anthem BCBS</option>
+        <option value="UnitedHealthcare" data-warning="true">UnitedHealthcare</option>
+        <option value="No insurance - self pay">No insurance – self pay</option>
+        <option value="No-Fault">No-Fault</option>
+        <option value="Workers Compensation">Workers' Compensation</option>
+        <option value="Other">Other</option>
+      </select>
+      <div id="insurerWarning" style="display:none;margin-top:10px;padding:12px 16px;background:#FEF9EC;border:1px solid var(--champagne);border-radius:8px;font-size:14px;color:var(--ink-soft);line-height:1.5;">
+        ⚠️ We accept PPO plans for this insurance, but are not formally contracted. Please confirm your plan type before booking.
+      </div>
+    </div>
       <div class="form-group"><label for="npInsId">Member ID</label><input type="text" id="npInsId" placeholder="Insurance member ID"></div>
     </div>
     <div class="form-group"><label for="npReason">Reason for visit</label>
@@ -378,26 +426,136 @@ function loadSlots() {
     });
 }
 
+// All slots stored globally for calendar sync
+var allSlots = [];
+
+function handleInsurerChange(sel) {
+  var warning = document.getElementById('insurerWarning');
+  var opt = sel.options[sel.selectedIndex];
+  if (opt && opt.getAttribute('data-warning') === 'true') {
+    warning.style.display = 'block';
+  } else {
+    warning.style.display = 'none';
+  }
+}
+
 function renderSlots(slots) {
   var container = document.getElementById('slotContainer');
-  if (!slots || slots.length === 0) {
+  allSlots = slots || [];
+
+  if (!allSlots.length) {
     container.innerHTML = '<p class="no-slots">No online slots available in the next 2 weeks. Please call us at <a href="tel:+12125108665">(212) 510-8665</a>.</p>';
     return;
   }
+
+  // Group by date
   var byDate = {};
-  slots.forEach(function(s) {
-    if (!byDate[s.dateLabel]) byDate[s.dateLabel] = [];
+  var dateOrder = [];
+  allSlots.forEach(function(s) {
+    if (!byDate[s.dateLabel]) { byDate[s.dateLabel] = []; dateOrder.push(s.dateLabel); }
     byDate[s.dateLabel].push(s);
   });
-  var html = '';
-  Object.keys(byDate).forEach(function(date) {
-    html += '<div class="slot-date-header">' + date + '</div><div class="slot-grid">';
+
+  // Build layout: collapsible days on left, mini calendar on right
+  var daysHtml = '<div class="slot-days">';
+  dateOrder.forEach(function(date, idx) {
+    var safeid = 'day-' + idx;
+    daysHtml += '<div class="day-group" id="grp-' + safeid + '">';
+    daysHtml += '<div class="day-header' + (idx === 0 ? ' active' : '') + '" onclick="toggleDay('' + safeid + '')" id="hdr-' + safeid + '">';
+    daysHtml += '<span>' + date + '</span><span class="day-arrow">▼</span></div>';
+    daysHtml += '<div class="day-slots' + (idx === 0 ? ' open' : '') + '" id="slots-' + safeid + '">';
     byDate[date].forEach(function(s) {
-      html += '<button class="slot-btn" data-iso="' + s.iso + '" data-label="' + s.dateLabel + ' at ' + s.timeLabel + '" onclick="selectSlot(this)">' + s.timeLabel + '</button>';
+      daysHtml += '<button class="slot-btn" data-iso="' + s.iso + '" data-label="' + s.dateLabel + ' at ' + s.timeLabel + '" data-dayid="' + safeid + '" onclick="selectSlot(this)">' + s.timeLabel + '</button>';
     });
-    html += '</div>';
+    daysHtml += '</div></div>';
   });
-  container.innerHTML = html;
+  daysHtml += '</div>';
+
+  // Build mini calendar
+  var calHtml = buildMiniCal(dateOrder);
+
+  container.innerHTML = '<div class="slot-layout">' + daysHtml + calHtml + '</div>';
+}
+
+function toggleDay(id) {
+  var hdr = document.getElementById('hdr-' + id);
+  var slots = document.getElementById('slots-' + id);
+  var isOpen = slots.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.day-slots').forEach(function(el) { el.classList.remove('open'); });
+  document.querySelectorAll('.day-header').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.mini-cal-day').forEach(function(el) { el.classList.remove('selected-day'); });
+  if (!isOpen) {
+    slots.classList.add('open');
+    hdr.classList.add('active');
+    // Highlight on mini cal
+    var calDay = document.querySelector('.mini-cal-day[data-dayid="' + id + '"]');
+    if (calDay) calDay.classList.add('selected-day');
+  }
+}
+
+function jumpToDay(id) {
+  // Close all, open this one
+  document.querySelectorAll('.day-slots').forEach(function(el) { el.classList.remove('open'); });
+  document.querySelectorAll('.day-header').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.mini-cal-day').forEach(function(el) { el.classList.remove('selected-day'); });
+  var slots = document.getElementById('slots-' + id);
+  var hdr = document.getElementById('hdr-' + id);
+  if (slots) { slots.classList.add('open'); hdr.classList.add('active'); }
+  var calDay = document.querySelector('.mini-cal-day[data-dayid="' + id + '"]');
+  if (calDay) calDay.classList.add('selected-day');
+  // Scroll to day group
+  var grp = document.getElementById('grp-' + id);
+  if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildMiniCal(availableDateLabels) {
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = now.getMonth();
+
+  // Build a set of available day numbers for quick lookup
+  // dateLabel format: "Monday, Jun 28"
+  var availMap = {};
+  availableDateLabels.forEach(function(label, idx) {
+    // Parse day number from label e.g. "Monday, Jun 28" -> 28
+    var parts = label.split(' ');
+    var dayNum = parseInt(parts[parts.length - 1]);
+    var monStr = parts[parts.length - 2];
+    availMap[monStr + '-' + dayNum] = 'day-' + idx;
+  });
+
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var monthName = months[month];
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
+  var firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+
+  var html = '<div class="mini-cal">';
+  html += '<div class="mini-cal-header"><span>' + monthName + ' ' + year + '</span></div>';
+  html += '<div class="mini-cal-grid">';
+  // Day of week headers
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(function(d) {
+    html += '<div class="mini-cal-dow">' + d + '</div>';
+  });
+  // Empty cells before first day
+  for (var e = 0; e < firstDow; e++) {
+    html += '<div class="mini-cal-day empty"></div>';
+  }
+  // Day cells
+  for (var d = 1; d <= daysInMonth; d++) {
+    var key = monthName + '-' + d;
+    var isToday = (d === now.getDate());
+    var isPast = (d < now.getDate());
+    var dayId = availMap[key];
+    var cls = 'mini-cal-day';
+    var onclick = '';
+    if (dayId) { cls += ' available'; onclick = ' onclick="jumpToDay('' + dayId + '')"'; }
+    else if (isPast) { cls += ' past'; }
+    if (isToday) { cls += ' today'; }
+    html += '<div class="' + cls + '"' + onclick + '>' + d + '</div>';
+  }
+  html += '</div></div>';
+  return html;
 }
 
 function selectSlot(btn) {
