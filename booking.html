@@ -133,7 +133,10 @@ input.invalid,select.invalid{border-color:#C04040;}
 .day-slots { display: none; padding: 12px 14px 14px; border-top: 1px solid var(--line-soft); }
 .day-slots.open { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
 .mini-cal { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; position: sticky; top: 100px; }
-.mini-cal-header { background: var(--walnut); color: var(--ivory); padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
+.mini-cal-header { background: var(--walnut); color: var(--ivory); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
+.cal-nav-btn { background: none; border: none; color: var(--ivory); font-size: 18px; cursor: pointer; padding: 0 6px; line-height: 1; opacity: .8; transition: opacity .15s; }
+.cal-nav-btn:hover { opacity: 1; }
+.cal-nav-btn:disabled { opacity: .25; cursor: not-allowed; }
 .mini-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); background: var(--ivory); }
 .mini-cal-dow { text-align: center; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); padding: 8px 0 4px; }
 .mini-cal-day { text-align: center; font-size: 13px; padding: 6px 2px; cursor: default; border-radius: 6px; margin: 2px; }
@@ -462,6 +465,7 @@ function goToStep3Returning() {
 }
 
 function loadSlots() {
+  calViewYear = null; calViewMonth = null;
   var container = document.getElementById('slotContainer');
   container.innerHTML = '<p class="loading-slots">Loading available times…</p>';
   var duration = state.patientType === 'new' ? 45 : 30;
@@ -556,16 +560,33 @@ function jumpToDay(id) {
   if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function buildMiniCal(availableDateLabels) {
-  var now = new Date();
-  var year = now.getFullYear();
-  var month = now.getMonth();
+// Track which month the mini-cal is showing
+var calViewYear = null;
+var calViewMonth = null;
+var calAvailableLabels = [];
 
-  // Build a set of available day numbers for quick lookup
-  // dateLabel format: "Monday, Jun 28"
+function buildMiniCal(availableDateLabels) {
+  calAvailableLabels = availableDateLabels;
+  var now = new Date();
+  if (calViewYear === null) { calViewYear = now.getFullYear(); calViewMonth = now.getMonth(); }
+  return renderMiniCal(now);
+}
+
+function navCal(dir) {
+  calViewMonth += dir;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
+  var calEl = document.querySelector('.mini-cal');
+  if (calEl) calEl.outerHTML = renderMiniCal(new Date());
+}
+
+function renderMiniCal(now) {
+  var year = calViewYear;
+  var month = calViewMonth;
+
+  // Build availMap from stored labels
   var availMap = {};
-  availableDateLabels.forEach(function(label, idx) {
-    // Parse day number from label e.g. "Monday, Jun 28" -> 28
+  calAvailableLabels.forEach(function(label, idx) {
     var parts = label.split(' ');
     var dayNum = parseInt(parts[parts.length - 1]);
     var monStr = parts[parts.length - 2];
@@ -575,24 +596,28 @@ function buildMiniCal(availableDateLabels) {
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var monthName = months[month];
   var daysInMonth = new Date(year, month + 1, 0).getDate();
-  var firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+  var firstDow = new Date(year, month, 1).getDay();
+
+  // Disable prev button if we're already at current month
+  var isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
 
   var html = '<div class="mini-cal">';
-  html += '<div class="mini-cal-header"><span>' + monthName + ' ' + year + '</span></div>';
+  html += '<div class="mini-cal-header">';
+  html += '<button class="cal-nav-btn" onclick="navCal(-1)"' + (isCurrentMonth ? ' disabled' : '') + '>‹</button>';
+  html += '<span>' + monthName + ' ' + year + '</span>';
+  html += '<button class="cal-nav-btn" onclick="navCal(1)">›</button>';
+  html += '</div>';
   html += '<div class="mini-cal-grid">';
-  // Day of week headers
   ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(function(d) {
     html += '<div class="mini-cal-dow">' + d + '</div>';
   });
-  // Empty cells before first day
   for (var e = 0; e < firstDow; e++) {
     html += '<div class="mini-cal-day empty"></div>';
   }
-  // Day cells
   for (var d = 1; d <= daysInMonth; d++) {
     var key = monthName + '-' + d;
-    var isToday = (d === now.getDate());
-    var isPast = (d < now.getDate());
+    var isToday = (d === now.getDate() && isCurrentMonth);
+    var isPast = isCurrentMonth && (d < now.getDate());
     var dayId = availMap[key];
     var cls = 'mini-cal-day';
     var onclick = '';
