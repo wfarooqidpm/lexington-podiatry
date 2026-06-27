@@ -107,6 +107,15 @@ footer .fl{display:flex;gap:24px;flex-wrap:wrap;}
 .sc-tel{display:block;margin-top:16px;font-weight:600;font-size:16px;color:var(--brass);text-decoration:none;}
 .sc-tel:hover{color:var(--brass-deep);}
 input.invalid,select.invalid{border-color:#C04040;}
+/* REASON CHECKBOXES */
+.reason-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.reason-cb { display: flex; align-items: center; padding: 10px 16px; border: 1.5px solid var(--line); border-radius: 999px; cursor: pointer; transition: border-color .15s, background .15s, color .15s; font-size: 14.5px; color: var(--ink-soft); user-select: none; text-transform: none; letter-spacing: 0; font-weight: 400; }
+.reason-cb:hover { border-color: var(--champagne); background: var(--stone); color: var(--ink); }
+.reason-cb input[type="checkbox"] { display: none; }
+.reason-cb span { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 14.5px; }
+.reason-cb:has(input:checked) { border-color: var(--brass); background: var(--stone); color: var(--brass); font-weight: 600; }
+@media(max-width:480px) { .reason-grid { grid-template-columns: 1fr; } }
+
 /* SLOT HYBRID: CALENDAR + COLLAPSIBLE */
 .slot-layout { display: grid; grid-template-columns: 1fr 200px; gap: 24px; align-items: start; }
 .slot-days { }
@@ -170,12 +179,12 @@ input.invalid,select.invalid{border-color:#C04040;}
   <div class="panel active" id="panel1">
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:24px;">Are you a new patient or have you visited Lexington Podiatry before?</p>
     <div class="type-grid">
-      <button class="type-card" id="cardNew" onclick="selectType('new')">
+      <button class="type-card" id="cardNew" onclick="selectType(this)"  data-type="new">
         <div class="tc-title">New patient</div>
         <div class="tc-desc">First visit to Lexington Podiatry</div>
         <span class="tc-time">45 min appointment</span>
       </button>
-      <button class="type-card" id="cardReturning" onclick="selectType('returning')">
+      <button class="type-card" id="cardReturning" onclick="selectType(this)" data-type="returning">
         <div class="tc-title">Returning patient</div>
         <div class="tc-desc">You've seen Dr. Farooqi before</div>
         <span class="tc-time">30 min appointment</span>
@@ -220,8 +229,28 @@ input.invalid,select.invalid{border-color:#C04040;}
     </div>
       <div class="form-group"><label for="npInsId">Member ID</label><input type="text" id="npInsId" placeholder="Insurance member ID"></div>
     </div>
-    <div class="form-group"><label for="npReason">Reason for visit</label>
-      <select id="npReason"><option value="">Select a reason…</option><option>Bunion / foot deformity</option><option>Heel pain / plantar fasciitis</option><option>Ingrown or fungal nail</option><option>Wart treatment</option><option>Sports injury / ankle sprain</option><option>Custom orthotics</option><option>Diabetic foot care</option><option>General foot pain</option><option>Other</option></select>
+    <div class="form-group">
+      <label>reason for visit <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-soft);font-size:13px;">(select all that apply)</span></label>
+      <div class="reason-grid" id="npReasonGrid">
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="General foot consult" onchange="updatePrimaryOptions()"><span>general foot consult</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Foot pain" onchange="updatePrimaryOptions()"><span>foot pain</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Bunion" onchange="updatePrimaryOptions()"><span>bunion</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Hammer toe" onchange="updatePrimaryOptions()"><span>hammer toe</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Heel pain" onchange="updatePrimaryOptions()"><span>heel pain</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Ingrown toenail" onchange="updatePrimaryOptions()"><span>ingrown toenail</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Fungal toenail" onchange="updatePrimaryOptions()"><span>fungal toenail</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Wart treatment" onchange="updatePrimaryOptions()"><span>wart treatment</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Painful callus" onchange="updatePrimaryOptions()"><span>painful callus</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Sports injury" onchange="updatePrimaryOptions()"><span>sports injury</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Ankle sprain" onchange="updatePrimaryOptions()"><span>ankle sprain</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Custom orthotics" onchange="updatePrimaryOptions()"><span>custom orthotics</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Diabetic foot care" onchange="updatePrimaryOptions()"><span>diabetic foot care</span></label>
+        <label class="reason-cb"><input type="checkbox" name="npReasons" value="Other" onchange="updatePrimaryOptions()"><span>other</span></label>
+      </div>
+    </div>
+    <div class="form-group" id="primaryConcernGroup" style="display:none;">
+      <label for="npPrimary">Anything else you'd like Dr. Farooqi to know?</label>
+      <textarea id="npPrimary" rows="3" placeholder="Tell us more about your main concern, how long you've had it, or anything else that would help…" style="resize:vertical;"></textarea>
     </div>
     <div class="form-nav"><button class="btn btn-ink" onclick="goToStep3New()">Choose a time</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
   </div>
@@ -332,7 +361,15 @@ function setStep(n) {
   state.currentStep = n;
 }
 
-function selectType(type) {
+function updatePrimaryOptions() {
+  var checked = document.querySelectorAll('input[name="npReasons"]:checked');
+  var group = document.getElementById('primaryConcernGroup');
+  group.style.display = checked.length > 0 ? 'block' : 'none';
+}
+
+function selectType(el) {
+  var type = el ? el.getAttribute('data-type') : null;
+  if (!type) return;
   state.patientType = type;
   document.getElementById('cardNew').classList.toggle('selected', type === 'new');
   document.getElementById('cardReturning').classList.toggle('selected', type === 'returning');
@@ -350,13 +387,23 @@ function goToStep2() {
 }
 
 function goToStep3New() {
-  var fields = ['npFirst','npLast','npDob','npPhone','npEmail','npReason'];
+  var fields = ['npFirst','npLast','npDob','npPhone','npEmail'];
   var valid = true;
   fields.forEach(function(id) {
     var el = document.getElementById(id);
     el.classList.remove('invalid');
     if (!el.value.trim()) { el.classList.add('invalid'); valid = false; }
   });
+  // At least one reason required
+  var checked = document.querySelectorAll('input[name="npReasons"]:checked');
+  var reasonGrid = document.getElementById('npReasonGrid');
+  reasonGrid.style.outline = 'none';
+  if (checked.length === 0) {
+    reasonGrid.style.outline = '2px solid #C04040';
+    reasonGrid.style.borderRadius = '8px';
+    valid = false;
+  }
+  // Primary concern note is optional
   if (!valid) { return; }
   setStep(3);
   document.getElementById('panel3').classList.add('active');
@@ -461,7 +508,7 @@ function renderSlots(slots) {
   dateOrder.forEach(function(date, idx) {
     var safeid = 'day-' + idx;
     daysHtml += '<div class="day-group" id="grp-' + safeid + '">';
-    daysHtml += '<div class="day-header' + (idx === 0 ? ' active' : '') + '" onclick="toggleDay('' + safeid + '')" id="hdr-' + safeid + '">';
+    daysHtml += '<div class="day-header' + (idx === 0 ? ' active' : '') + '" onclick="toggleDay(\'' + safeid + '\')" id="hdr-' + safeid + '">';
     daysHtml += '<span>' + date + '</span><span class="day-arrow">▼</span></div>';
     daysHtml += '<div class="day-slots' + (idx === 0 ? ' open' : '') + '" id="slots-' + safeid + '">';
     byDate[date].forEach(function(s) {
@@ -549,7 +596,7 @@ function buildMiniCal(availableDateLabels) {
     var dayId = availMap[key];
     var cls = 'mini-cal-day';
     var onclick = '';
-    if (dayId) { cls += ' available'; onclick = ' onclick="jumpToDay('' + dayId + '')"'; }
+    if (dayId) { cls += ' available'; onclick = ' onclick="jumpToDay(\'' + dayId + '\')"'; }
     else if (isPast) { cls += ' past'; }
     if (isToday) { cls += ' today'; }
     html += '<div class="' + cls + '"' + onclick + '>' + d + '</div>';
@@ -571,12 +618,15 @@ function goToStep4() {
   document.getElementById('panel4').classList.add('active');
   var summary = '';
   if (state.patientType === 'new') {
+    var checkedReasons = Array.from(document.querySelectorAll('input[name="npReasons"]:checked')).map(function(cb) { return cb.value; });
+    var primaryNote = document.getElementById('npPrimary').value.trim();
+    var reasonStr = checkedReasons.join(', ');
     summary = '<b>Name:</b> ' + document.getElementById('npFirst').value + ' ' + document.getElementById('npLast').value + '<br>' +
               '<b>Date of birth:</b> ' + document.getElementById('npDob').value + '<br>' +
               '<b>Phone:</b> ' + document.getElementById('npPhone').value + '<br>' +
               '<b>Email:</b> ' + document.getElementById('npEmail').value + '<br>' +
               '<b>Insurance:</b> ' + (document.getElementById('npInsurer').value || 'Not provided') + ' · ' + (document.getElementById('npInsId').value || 'Not provided') + '<br>' +
-              '<b>Reason:</b> ' + document.getElementById('npReason').value + '<br>' +
+              '<b>Concerns:</b> ' + reasonStr + (primaryNote ? '<br><b>Notes:</b> ' + primaryNote : '') + '<br>' +
               '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
               '<b>Type:</b> New patient (45 min)';
   } else {
@@ -601,7 +651,9 @@ function submitBooking() {
     payload.email = document.getElementById('npEmail').value.trim();
     payload.insurer = document.getElementById('npInsurer').value.trim();
     payload.insId = document.getElementById('npInsId').value.trim();
-    payload.reason = document.getElementById('npReason').value;
+    var checkedVals = Array.from(document.querySelectorAll('input[name="npReasons"]:checked')).map(function(cb) { return cb.value; });
+    payload.reason = checkedVals.join(', ');
+    payload.notes = document.getElementById('npPrimary').value.trim();
   } else {
     payload.firstName = state.verifiedName.split(' ')[0];
     payload.lastName = state.verifiedName.split(' ').slice(1).join(' ');
