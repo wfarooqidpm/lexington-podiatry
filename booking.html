@@ -295,7 +295,7 @@ input.invalid,select.invalid{border-color:#C04040;}
         </div>
         <div class="form-group"><label for="npInsId">Member ID</label><input type="text" id="npInsId" placeholder="Insurance member ID"></div>
       </div>
-      <div class="secure-badge">🔒 Encrypted &amp; protected</div>
+      <div class="secure-badge">🔒 Encrypted in transit</div>
     </div>
     <div class="form-group">
       <label>reason for visit <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-soft);font-size:13px;">(select all that apply)</span></label>
@@ -334,6 +334,7 @@ input.invalid,select.invalid{border-color:#C04040;}
       </div>
       <div class="form-group"><label for="rpLast4">Last 4 digits of phone</label><input type="text" id="rpLast4" maxlength="4" inputmode="numeric" placeholder="e.g. 4087"><div class="form-note">The number you used when booking before</div></div>
       <div id="verifyResult"></div>
+      <div class="secure-badge" style="margin:24px 0 0;border-top:none;border-radius:8px;">🔒 Encrypted in transit</div>
       <div class="form-nav"><button class="btn btn-ink" onclick="verifyReturning()" id="btnVerify">Find my record</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
     </div>
   </div>
@@ -383,15 +384,14 @@ input.invalid,select.invalid{border-color:#C04040;}
     <div class="sc-row"><span class="sc-day">Wednesday</span><span>8:00 AM – 5:00 PM</span></div>
     <div class="sc-row"><span class="sc-day">Thursday</span><span>11:00 AM – 7:00 PM</span></div>
     <div class="sc-row"><span class="sc-day">Friday</span><span>9:00 AM – 1:00 PM · Virtual only</span></div>
-    <p class="sc-note">Same-week appointments usually available.</p>
     <a class="sc-tel" href="tel:+12125108665">(212) 510-8665</a>
   </div>
   <div class="sidebar-card"><h3>In-network insurance</h3>
     <p style="font-size:14.5px;color:var(--ink-soft);line-height:1.6;">Aetna · Cigna · 1199 SEIU · Medicare</p>
     <p class="sc-note">Self-pay and Workers' Comp also accepted.</p>
   </div>
-  <div class="sidebar-card"><h3>353 Lexington Ave</h3>
-    <p style="font-size:14.5px;color:var(--ink-soft);line-height:1.6;">Room 1502, 15th floor<br>At 40th St — 2 blocks from Grand Central</p>
+  <div class="sidebar-card"><h3>353 Lexington Ave, Rm 1502</h3>
+    <p style="font-size:14.5px;color:var(--ink-soft);line-height:1.6;">15th floor<br>Corner of 40th and Lexington Ave, 2 blocks south of Grand Central Station</p>
     <a href="https://maps.google.com/?q=353+Lexington+Ave+New+York+NY+10016" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;font-size:14px;color:var(--brass);font-weight:600;text-decoration:none;">Get directions ↗</a>
   </div>
 </aside>
