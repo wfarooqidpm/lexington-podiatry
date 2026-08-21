@@ -92,6 +92,22 @@ details{border-top:1px solid var(--line-soft);padding-top:11px;margin-top:12px}s
 footer{border-top:1px solid var(--line);padding:27px 0 36px;color:var(--ink-soft);font-size:13px}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .invalid{border-color:var(--bad)!important;background:var(--bad-bg)!important}
+
+.pharm-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+.pharm-search-row .btn{border-radius:10px;min-height:48px;padding:10px 17px}
+.pharmacy-results{display:grid;gap:8px;margin-top:10px}
+.pharmacy-result{width:100%;text-align:left;border:1.5px solid var(--line);background:var(--ivory);border-radius:10px;padding:11px 13px;cursor:pointer;color:var(--ink)}
+.pharmacy-result:hover{border-color:var(--brass);background:var(--stone)}
+.pharmacy-result strong{display:block;font-size:14px}
+.pharmacy-result span{display:block;font-size:12px;color:var(--ink-soft);margin-top:2px}
+.pharmacy-selected{border:1px solid #bbd7c4;background:var(--good-bg);border-radius:10px;padding:11px 13px;margin-top:9px;font-size:13px}
+.agreement-box{border:1.5px solid var(--brass);background:var(--paper);border-radius:16px;padding:22px;margin:20px 0}
+.agreement-box details{border-top:0;margin-top:0;padding-top:0}
+.agreement-copy{max-height:420px;overflow:auto;border-top:1px solid var(--line-soft);margin-top:13px;padding-top:12px;padding-right:8px}
+.agreement-copy h4{font-family:var(--serif);font-size:18px;font-weight:400;margin:18px 0 5px}
+.agreement-copy p{font-size:13px;line-height:1.55;color:var(--ink-soft);margin:0 0 8px}
+.agreement-version{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:5px}
+.consent-subchoice{margin-top:12px;padding-top:12px;border-top:1px solid var(--line-soft)}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;display:grid;grid-template-columns:1fr 1fr;gap:14px}.side-card{margin:0}}
 @media(max-width:680px){.wrap{padding:0 18px}.topbar .wrap{display:block;text-align:center;padding:8px 18px}.topbar .wrap span:first-child{display:none}.secure-chip{display:none}.hero{padding:38px 0 30px}.main{padding-top:28px}.progress{overflow-x:auto;grid-template-columns:repeat(6,88px)}.progress button{font-size:9px}.grid2,.grid3{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr 1fr}.section{padding:19px}.sidebar{grid-template-columns:1fr}.nav-actions .btn{width:100%}.save-state{width:100%;text-align:center}}
 @media(max-width:420px){.check-grid{grid-template-columns:1fr}}
@@ -262,23 +278,47 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         <label class="check" style="margin-bottom:13px"><input id="noKnownAllergies" type="checkbox"><span>No known allergies</span></label>
         <div class="field" id="allergyField"><label for="allergies">Allergies</label><textarea id="allergies" placeholder="Medication, food, adhesive, latex, or other allergies"></textarea></div>
         <div class="field"><label for="medications">Current medications</label><textarea id="medications" placeholder="One medication per line is fine. Include dose if known."></textarea></div>
-        <div class="field"><label for="pharmacy">Preferred pharmacy</label><input id="pharmacy" type="text" placeholder="Pharmacy name and location"></div>
+        <div class="field">
+          <label for="pharmacySearch">Preferred pharmacy</label>
+          <div class="pharm-search-row">
+            <input id="pharmacySearch" type="text" placeholder="CVS, Walgreens, Duane Reade, or pharmacy name">
+            <button class="btn secondary" type="button" id="pharmacySearchBtn">Find pharmacy</button>
+          </div>
+          <p class="note">Searches the CMS/NPPES pharmacy directory using the address/ZIP you entered. If your pharmacy is not listed, type it manually below.</p>
+          <div id="pharmacyResults" class="pharmacy-results"></div>
+          <div id="pharmacySelected" class="pharmacy-selected hidden"></div>
+          <input id="pharmacy" type="text" placeholder="Or type pharmacy name and street/location manually" style="margin-top:10px">
+          <input id="pharmacyNpi" type="hidden"><input id="pharmacyPhone" type="hidden"><input id="pharmacyAddress" type="hidden">
+        </div>
       </div>
 
       <div class="section">
         <div class="section-title">Medical history</div>
         <div class="check-grid" id="historyChecks">
+          <label class="check"><input type="checkbox" value="Hypertension"><span>High blood pressure (hypertension)</span></label>
+          <label class="check"><input type="checkbox" value="Hyperlipidemia"><span>High cholesterol (hyperlipidemia)</span></label>
+          <label class="check"><input type="checkbox" value="Diabetes Mellitus Type 1"><span>Diabetes mellitus - Type 1</span></label>
+          <label class="check"><input type="checkbox" value="Diabetes Mellitus Type 2"><span>Diabetes mellitus - Type 2</span></label>
+          <label class="check"><input type="checkbox" value="Prediabetes"><span>Prediabetes</span></label>
+          <label class="check"><input type="checkbox" value="Heart Disease"><span>Heart disease / coronary artery disease</span></label>
+          <label class="check"><input type="checkbox" value="Stroke or TIA"><span>Stroke / TIA</span></label>
+          <label class="check"><input type="checkbox" value="Peripheral Arterial Disease"><span>Peripheral arterial disease (PAD/PVD)</span></label>
+          <label class="check"><input type="checkbox" value="Peripheral Neuropathy"><span>Peripheral neuropathy</span></label>
+          <label class="check"><input type="checkbox" value="Blood Clot DVT PE"><span>Blood clot / DVT / pulmonary embolism</span></label>
+          <label class="check"><input type="checkbox" value="Bleeding Disorder"><span>Bleeding / clotting disorder</span></label>
+          <label class="check"><input type="checkbox" value="Kidney Disease"><span>Kidney disease</span></label>
+          <label class="check"><input type="checkbox" value="Liver Disease"><span>Liver disease</span></label>
+          <label class="check"><input type="checkbox" value="Thyroid Disease"><span>Thyroid disease</span></label>
+          <label class="check"><input type="checkbox" value="Gout"><span>Gout</span></label>
+          <label class="check"><input type="checkbox" value="Rheumatoid Arthritis"><span>Rheumatoid arthritis</span></label>
+          <label class="check"><input type="checkbox" value="Osteoarthritis"><span>Osteoarthritis</span></label>
+          <label class="check"><input type="checkbox" value="Osteoporosis"><span>Osteoporosis</span></label>
           <label class="check"><input type="checkbox" value="Asthma"><span>Asthma</span></label>
-          <label class="check"><input type="checkbox" value="Allergic Rhinitis"><span>Allergic rhinitis</span></label>
-          <label class="check"><input type="checkbox" value="Hives"><span>Hives</span></label>
-          <label class="check"><input type="checkbox" value="Food Allergy"><span>Food allergy</span></label>
-          <label class="check"><input type="checkbox" value="Heart Disease"><span>Heart disease</span></label>
-          <label class="check"><input type="checkbox" value="Stroke"><span>Stroke</span></label>
-          <label class="check"><input type="checkbox" value="High Blood Pressure"><span>High blood pressure</span></label>
-          <label class="check"><input type="checkbox" value="Diabetes"><span>Diabetes</span></label>
+          <label class="check"><input type="checkbox" value="COPD"><span>COPD / emphysema</span></label>
+          <label class="check"><input type="checkbox" value="Sleep Apnea"><span>Sleep apnea</span></label>
           <label class="check"><input type="checkbox" value="Cancer"><span>Cancer</span></label>
-          <label class="check"><input type="checkbox" value="Bleeding Disorder"><span>Bleeding disorder</span></label>
-          <label class="check"><input type="checkbox" value="Pacemaker"><span>Pacemaker</span></label>
+          <label class="check"><input type="checkbox" value="Pacemaker or Defibrillator"><span>Pacemaker / defibrillator</span></label>
+          <label class="check"><input type="checkbox" value="Seizure Disorder"><span>Seizure disorder</span></label>
         </div>
         <div class="field" style="margin-top:16px"><label for="medicalOther">Other medical conditions</label><input id="medicalOther" type="text"></div>
         <div class="field"><label for="surgicalHistory">Surgical history</label><textarea id="surgicalHistory" placeholder="Previous operations and approximate dates, if known"></textarea></div>
@@ -329,8 +369,21 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
     <div class="policy-card">
       <h3>Consent to treatment</h3>
-      <p>I consent to podiatric evaluation and routine treatment. Specific procedures that require separate consent will be discussed with me when appropriate.</p>
-      <label class="ack"><input id="treatmentConsent" type="checkbox"><span>I consent to evaluation and treatment by Lexington Podiatry.</span></label>
+      <p>I consent to podiatric evaluation and treatment by <strong>Dr. Wiqar Farooqi</strong> and authorized clinical staff acting under his direction at WAF Podiatry P.C. (Lexington Podiatry). Procedures that require separate consent will be discussed when appropriate.</p>
+      <label class="ack"><input id="treatmentConsent" type="checkbox"><span>I consent to evaluation and treatment by Dr. Wiqar Farooqi and authorized clinical staff under his direction.</span></label>
+
+      <div class="consent-subchoice">
+        <strong style="font-size:14px">Medication history</strong>
+        <p class="note" style="margin:5px 0 9px">Choose one. You may authorize an electronic medication-history lookup, or provide your medication list yourself.</p>
+        <div class="choice-list">
+          <label class="choice"><input type="radio" name="medicationHistoryChoice" value="authorize"><span><strong>Authorize electronic medication-history lookup</strong><span>I authorize Dr. Wiqar Farooqi, WAF Podiatry P.C., and authorized staff to obtain medication history and prescription benefit information from permitted pharmacy/e-prescribing sources for treatment and medication reconciliation.</span></span></label>
+          <label class="choice"><input type="radio" name="medicationHistoryChoice" value="manual"><span><strong>I prefer to provide my medication list myself</strong><span>Do not retrieve my medication history electronically for this authorization.</span></span></label>
+        </div>
+      </div>
+
+      <div class="consent-subchoice">
+        <label class="ack" style="border-top:0;padding-top:0"><input id="telemedicineConsent" type="checkbox"><span><strong>Telemedicine standing consent (optional).</strong> If I choose or agree to receive a remote visit, I consent to telemedicine and understand that an in-person evaluation may still be recommended when clinically appropriate.</span></label>
+      </div>
     </div>
 
     <div class="nav-actions">
@@ -354,6 +407,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div id="estimatePending" class="callout warn">
       <strong>An exact estimate is not available yet.</strong>
       We may have verified coverage without having enough information to calculate an exact amount. Your final responsibility can include applicable copays, deductibles, coinsurance, or non-covered services assigned by your health plan.
+    </div>
+
+    <div class="policy-card">
+      <h3>Insurance billing & assignment of benefits</h3>
+      <p>I authorize WAF Podiatry P.C. to bill my health plan or other responsible payer for services rendered and to submit information reasonably necessary for payment. To the extent permitted by my plan and applicable law, I assign payable insurance benefits to WAF Podiatry P.C. and authorize direct payment to the practice.</p>
+      <label class="ack"><input id="billingAuthorizationAccepted" type="checkbox"><span>I authorize WAF Podiatry P.C. to bill for services rendered and accept the assignment/direct-payment authorization described above.</span></label>
     </div>
 
     <div class="policy-card">
@@ -384,9 +443,18 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       If you no longer plan to attend, please cancel the booking through Zocdoc instead of confirming here.
     </div>
 
+    <div class="agreement-box">
+      <details id="agreementDetails">
+        <summary><strong>View the full agreement you are signing</strong></summary>
+        <div class="agreement-version" id="agreementVersion"></div>
+        <div class="agreement-copy" id="agreementBody"></div>
+      </details>
+      <label class="ack" style="margin-top:16px"><input id="agreementAccepted" type="checkbox"><span><strong>I understand this is a contract.</strong> I have reviewed the Patient Registration, Treatment Consent & Financial Agreement and agree to its terms. My selections above, typed name, date/time, and the agreement version will be preserved with my signed record.</span></label>
+    </div>
+
     <div class="section">
       <div class="section-title">Electronic signature</div>
-      <div class="field"><label for="signatureName">Type your full name <span class="req">*</span></label><input id="signatureName" type="text" autocomplete="name" placeholder="Your full legal name"><p class="note">By typing your name and submitting, you electronically sign the acknowledgments and consents you selected above.</p></div>
+      <div class="field"><label for="signatureName">Type your full name <span class="req">*</span></label><input id="signatureName" type="text" autocomplete="name" placeholder="Your full legal name"><p class="note">By typing your name and submitting, you electronically sign the agreement and the acknowledgments/consents recorded above.</p></div>
     </div>
 
     <div class="nav-actions">
@@ -420,9 +488,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.8.2';
+var CLIENT_VERSION = 'v0.8.3';
 
-var FD = {token:'',booking:null,data:{},currentStep:1,completed:false,busy:false};
+var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,completed:false,busy:false};
 
 function $(id){return document.getElementById(id)}
 function q(sel){return document.querySelector(sel)}
@@ -461,6 +529,56 @@ function apiPost(action,step,data,uploads){
   }).then(function(r){return r.json()});
 }
 
+
+function apiPharmacySearch(query){
+  var params=new URLSearchParams({
+    action:'pharmacy-search',t:FD.token,q:clean(query),zip:clean($('zip').value),city:clean($('city').value),state:clean($('state').value)
+  });
+  return fetch(GATEWAY_URL+'?'+params.toString()).then(function(r){return r.json()});
+}
+
+function renderAgreement(){
+  var a=FD.agreement;
+  if(!a||!Array.isArray(a.sections)){
+    $('agreementVersion').textContent='Agreement unavailable';
+    $('agreementBody').innerHTML='<p>Please call Lexington Podiatry before signing.</p>';
+    return;
+  }
+  $('agreementVersion').textContent='Agreement version '+escapeHtml(a.version||'');
+  $('agreementBody').innerHTML=a.sections.map(function(s){
+    return '<h4>'+escapeHtml(s.title||'')+'</h4>'+((s.paragraphs||[]).map(function(p){return '<p>'+escapeHtml(p)+'</p>'}).join(''));
+  }).join('');
+}
+
+function renderPharmacySelection(){
+  var name=clean($('pharmacy').value),address=clean($('pharmacyAddress').value),phone=clean($('pharmacyPhone').value);
+  if(!name){$('pharmacySelected').classList.add('hidden');$('pharmacySelected').textContent='';return}
+  $('pharmacySelected').innerHTML='<strong>Selected:</strong> '+escapeHtml(name)+(address?'<br>'+escapeHtml(address):'')+(phone?'<br>'+escapeHtml(phone):'');
+  $('pharmacySelected').classList.remove('hidden');
+}
+
+function searchPharmacy(){
+  var btn=$('pharmacySearchBtn'),results=$('pharmacyResults');
+  btn.disabled=true;btn.textContent='Searching…';results.innerHTML='';
+  apiPharmacySearch($('pharmacySearch').value).then(function(res){
+    if(!res.success)throw new Error(res.error||'Pharmacy search is unavailable.');
+    var rows=res.results||[];
+    if(!rows.length){
+      results.innerHTML='<div class="note">No matching pharmacy was found. Try a chain/name such as CVS, Walgreens, Duane Reade, or type the pharmacy manually below.</div>';
+      return;
+    }
+    results.innerHTML=rows.map(function(x,i){
+      return '<button type="button" class="pharmacy-result" data-pharm-index="'+i+'"><strong>'+escapeHtml(x.name)+'</strong><span>'+escapeHtml(x.address)+(x.phone?' · '+escapeHtml(x.phone):'')+'</span></button>';
+    }).join('');
+    qa('[data-pharm-index]').forEach(function(el){el.addEventListener('click',function(){
+      var x=rows[Number(el.getAttribute('data-pharm-index'))];
+      setValue('pharmacy',x.name);setValue('pharmacyNpi',x.npi||'');setValue('pharmacyPhone',x.phone||'');setValue('pharmacyAddress',x.address||'');
+      renderPharmacySelection();results.innerHTML='';
+    })});
+  }).catch(function(err){results.innerHTML='<div class="note">'+escapeHtml(err.message||'Pharmacy search is unavailable. Type the pharmacy manually below.')+'</div>'})
+  .finally(function(){btn.disabled=false;btn.textContent='Find pharmacy'});
+}
+
 function boot(){
   FD.token=tokenFromUrl();
 
@@ -478,6 +596,7 @@ function boot(){
     if(!res.success)throw new Error(res.error||'Could not load registration.');
     FD.booking=res.booking||{};
     FD.data=res.intake&&res.intake.data?res.intake.data:{};
+    FD.agreement=res.agreement||null;
     FD.completed=!!(res.intake&&res.intake.completed);
 
     hydrate();
@@ -525,7 +644,7 @@ function hydrate(){
   setValue('phone',d.phone||b.phone);
   setValue('email',d.email||b.email);
 
-  ['address1','address2','city','state','zip','emergencyName','emergencyPhone','pharmacy',
+  ['address1','address2','city','state','zip','emergencyName','emergencyPhone','pharmacy','pharmacyNpi','pharmacyPhone','pharmacyAddress',
    'allergies','medications','medicalOther','surgicalHistory','hpi','secondaryCarrier',
    'secondaryMemberId','secondaryGroupId','signatureName'].forEach(function(id){setValue(id,d[id])});
 
@@ -541,12 +660,16 @@ function hydrate(){
   setCheck('noShowPolicyAccepted',!!d.noShowPolicyAccepted);
   setCheck('privacyAcknowledged',!!d.privacyAcknowledged);
   setCheck('treatmentConsent',!!d.treatmentConsent);
+  setCheck('telemedicineConsent',!!d.telemedicineConsent);
+  setCheck('billingAuthorizationAccepted',!!d.billingAuthorizationAccepted);
   setCheck('financialPolicyAcknowledged',!!d.financialPolicyAcknowledged);
+  setCheck('agreementAccepted',!!d.agreementAccepted);
   setCheck('planToAttend',!!d.planToAttend);
 
   if(d.insuranceCardStatus)setRadio('insuranceCardStatus',d.insuranceCardStatus);
   if(d.photoIdStatus)setRadio('photoIdStatus',d.photoIdStatus);
   if(d.healthChange)setRadio('healthChange',d.healthChange);
+  if(d.medicationHistoryChoice)setRadio('medicationHistoryChoice',d.medicationHistoryChoice);
 
   if(Array.isArray(d.medicalHistory)){
     qa('#historyChecks input[type="checkbox"]').forEach(function(cb){
@@ -554,7 +677,7 @@ function hydrate(){
     });
   }
 
-  updateConditionalFields();renderEstimate();renderConfirmSummary();
+  updateConditionalFields();renderEstimate();renderConfirmSummary();renderAgreement();renderPharmacySelection();
 }
 
 function setValue(id,v){if($(id)&&v!=null)$(id).value=String(v)}
@@ -602,7 +725,8 @@ function collect(){
     phone:clean($('phone').value),email:clean($('email').value),
     address1:clean($('address1').value),address2:clean($('address2').value),city:clean($('city').value),
     state:clean($('state').value),zip:clean($('zip').value),
-    emergencyName:clean($('emergencyName').value),emergencyPhone:clean($('emergencyPhone').value),pharmacy:clean($('pharmacy').value),
+    emergencyName:clean($('emergencyName').value),emergencyPhone:clean($('emergencyPhone').value),
+    pharmacy:clean($('pharmacy').value),pharmacyNpi:clean($('pharmacyNpi').value),pharmacyPhone:clean($('pharmacyPhone').value),pharmacyAddress:clean($('pharmacyAddress').value),
     insuranceCarrier:clean($('insuranceCarrier').value),insurancePlan:clean($('insurancePlan').value),
     memberId:clean($('memberId').value),groupId:clean($('groupId').value),
     insuranceCardStatus:radioValue('insuranceCardStatus'),photoIdStatus:radioValue('photoIdStatus'),
@@ -614,7 +738,9 @@ function collect(){
     medicalOther:clean($('medicalOther').value),surgicalHistory:clean($('surgicalHistory').value),hpi:clean($('hpi').value),
     confirmationPolicyAccepted:$('confirmationPolicyAccepted').checked,noShowPolicyAccepted:$('noShowPolicyAccepted').checked,
     privacyAcknowledged:$('privacyAcknowledged').checked,treatmentConsent:$('treatmentConsent').checked,
-    financialPolicyAcknowledged:$('financialPolicyAcknowledged').checked,
+    medicationHistoryChoice:radioValue('medicationHistoryChoice'),telemedicineConsent:$('telemedicineConsent').checked,
+    billingAuthorizationAccepted:$('billingAuthorizationAccepted').checked,financialPolicyAcknowledged:$('financialPolicyAcknowledged').checked,
+    agreementAccepted:$('agreementAccepted').checked,
     planToAttend:$('planToAttend').checked,signatureName:clean($('signatureName').value)
   };
 }
@@ -654,12 +780,17 @@ function validateStep(step,data){
     if(!data.noShowPolicyAccepted)throw new Error('Please acknowledge the $50 no-show policy.');
     if(!data.privacyAcknowledged)throw new Error('Please acknowledge the privacy notice.');
     if(!data.treatmentConsent)throw new Error('Consent to treatment is required.');
+    if(data.medicationHistoryChoice!=='authorize'&&data.medicationHistoryChoice!=='manual')throw new Error('Please choose whether you authorize electronic medication-history retrieval.');
   }
 
-  if(step===5&&!data.financialPolicyAcknowledged)throw new Error('Please acknowledge the financial policy.');
+  if(step===5){
+    if(!data.billingAuthorizationAccepted)throw new Error('Please authorize insurance billing and assignment of benefits.');
+    if(!data.financialPolicyAcknowledged)throw new Error('Please acknowledge the financial policy.');
+  }
 
   if(step===6){
     if(!data.planToAttend)throw new Error('Please confirm that you plan to attend.');
+    if(!data.agreementAccepted)throw new Error('Please review and accept the agreement you are signing.');
     if(!data.signatureName)throw new Error('Please type your full name as your electronic signature.');
   }
   return true;
@@ -756,6 +887,9 @@ qa('input[name="insuranceCardStatus"],input[name="photoIdStatus"],input[name="he
 $('hasSecondary').addEventListener('change',updateConditionalFields);
 $('noKnownAllergies').addEventListener('change',updateConditionalFields);
 $('completeBtn').addEventListener('click',complete);
+$('pharmacySearchBtn').addEventListener('click',searchPharmacy);
+$('pharmacySearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
+$('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').value)&&clean($('pharmacy').value)!==clean(FD.data.pharmacy||'')){setValue('pharmacyNpi','');setValue('pharmacyPhone','');setValue('pharmacyAddress','')}renderPharmacySelection()});
 
 boot();
 </script>
