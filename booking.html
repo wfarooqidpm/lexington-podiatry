@@ -360,8 +360,8 @@ input.invalid,select.invalid{border-color:#C04040;}
   <div class="panel" id="panel4">
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:28px;">Please review your details before submitting.</p>
     <div id="reviewSummary" style="border:1px solid var(--line-soft);border-radius:14px;padding:28px;margin-bottom:28px;background:#fff;font-size:15.5px;line-height:1.8;"></div>
-    <div class="form-nav"><button class="btn btn-ink" onclick="submitBooking()" id="btnSubmit">Request appointment</button><button class="btn-back" onclick="goBack(3)">← Back</button></div>
-    <p style="font-size:13px;color:var(--ink-soft);margin-top:16px;">By submitting you agree to receive a confirmation email. We'll reach out if we need to adjust your time.</p>
+    <div class="form-nav"><button class="btn btn-ink" onclick="submitBooking()" id="btnSubmit">Reserve time &amp; continue</button><button class="btn-back" onclick="goBack(3)">← Back</button></div>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:16px;">Next, you’ll continue to Front Door to complete the registration and confirmation required for your appointment.</p>
   </div>
 
   <!-- PANEL 5 CONFIRMATION -->
@@ -405,12 +405,22 @@ input.invalid,select.invalid{border-color:#C04040;}
 // CONFIGURATION — replace with your deployed Apps Script URL
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxS7b06t34epLzgRSlT16nJXltMwfe0QtQCtmgq4yYifqcqj91jrA6A9MOKAzlm-AAEg/exec';
 
+// Front Door public gateway — creates WEBSITE Front Door record after the existing booking succeeds.
+var FRONT_DOOR_GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbzI4pFwTopy9eE6yK56R8RrBDsjJOFNFT8oqSAqkOHzIcfue73KL7baPWp2Q_qP3IQq/exec';
+
 var state = {
   patientType: null,
   verifiedName: null,
   verifiedPhone: null,
   selectedSlot: null,
-  currentStep: 1
+  currentStep: 1,
+
+  // Website → Front Door handoff state.
+  // Once bookingCommitted becomes true, we NEVER post the booking again.
+  websiteBookingId: null,
+  bookingCommitted: false,
+  bookingPayload: null,
+  bookingResult: null
 };
 
 function toggleMenu(btn) {
@@ -729,22 +739,36 @@ function goToStep4() {
   document.getElementById('reviewSummary').innerHTML = summary;
 }
 
-function submitBooking() {
-  var btn = document.getElementById('btnSubmit');
-  btn.disabled = true; btn.textContent = 'Submitting…';
-  var payload = { patientType: state.patientType, slotIso: state.selectedSlot.iso, slotLabel: state.selectedSlot.label };
+function buildWebsiteBookingPayload() {
+  var payload = {
+    patientType: state.patientType,
+    slotIso: state.selectedSlot.iso,
+    slotLabel: state.selectedSlot.label
+  };
+
   if (state.patientType === 'new') {
     payload.firstName = document.getElementById('npFirst').value.trim();
     payload.lastName = document.getElementById('npLast').value.trim();
     payload.dob = document.getElementById('npDob').value;
     payload.phone = document.getElementById('npPhone').value.trim();
     payload.email = document.getElementById('npEmail').value.trim();
+
     var insurerVal = document.getElementById('npInsurer').value.trim();
-    payload.insurer = (insurerVal === 'Other') ? (document.getElementById('insurerOther').value.trim() || 'Other') : insurerVal;
+    payload.insurer = insurerVal === 'Other'
+      ? (document.getElementById('insurerOther').value.trim() || 'Other')
+      : insurerVal;
+
     payload.insId = document.getElementById('npInsId').value.trim();
-    var checkedVals = Array.from(document.querySelectorAll('input[name="npReasons"]:checked')).map(function(cb) { return cb.value; });
+
+    var checkedVals = Array.from(
+      document.querySelectorAll('input[name="npReasons"]:checked')
+    ).map(function(cb) {
+      return cb.value;
+    });
+
     payload.reason = checkedVals.join(', ');
     payload.notes = document.getElementById('npPrimary').value.trim();
+
   } else {
     payload.firstName = state.verifiedName.split(' ')[0];
     payload.lastName = state.verifiedName.split(' ').slice(1).join(' ');
@@ -752,24 +776,176 @@ function submitBooking() {
     payload.email = document.getElementById('rpEmail').value.trim();
     payload.reason = document.getElementById('rpReason').value;
   }
-  fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.success) {
-        setStep(5);
-        document.getElementById('panel5').classList.add('active');
-        document.getElementById('confirmedSlot').textContent = state.selectedSlot.label;
-        document.querySelectorAll('.step-tab').forEach(function(t) { t.classList.add('done'); });
-      } else {
-        btn.disabled = false; btn.textContent = 'Request appointment';
-        alert('Something went wrong: ' + (data.error || 'Please try again or call us.'));
-      }
-    })
-    .catch(function() {
-      btn.disabled = false; btn.textContent = 'Request appointment';
-      alert('Connection error. Please try again or call (212) 510-8665.');
-    });
+
+  return payload;
 }
+
+
+function newWebsiteBookingId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return 'WEB-' + window.crypto.randomUUID().replace(/-/g, '');
+  }
+
+  return 'WEB-' +
+    Date.now().toString(36) +
+    '-' +
+    Math.random().toString(36).slice(2) +
+    Math.random().toString(36).slice(2);
+}
+
+
+/**
+ * FRONT DOOR ONLY.
+ *
+ * Safe to retry: the gateway uses websiteBookingId as an idempotency key,
+ * so retrying this function returns the same Front Door token instead of
+ * creating another row.
+ */
+function startFrontDoorForWebsite() {
+  if (!state.bookingCommitted || !state.bookingPayload) {
+    return Promise.reject(
+      new Error('The appointment request has not been reserved yet.')
+    );
+  }
+
+  if (!state.websiteBookingId) {
+    state.websiteBookingId = newWebsiteBookingId();
+  }
+
+  return fetch(FRONT_DOOR_GATEWAY_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'website-book',
+      websiteBookingId: state.websiteBookingId,
+      booking: state.bookingPayload
+    })
+  })
+  .then(function(r) {
+    return r.json();
+  })
+  .then(function(data) {
+    if (!data.success || !data.token) {
+      throw new Error(
+        data.error || 'Front Door could not be started.'
+      );
+    }
+
+    window.location.href =
+      '/frontdoor.html?t=' +
+      encodeURIComponent(data.token);
+
+    return data;
+  });
+}
+
+
+function showFrontDoorRetry() {
+  setStep(5);
+  document.getElementById('panel5').classList.add('active');
+
+  var box = document.querySelector('#panel5 .confirm-box');
+
+  box.innerHTML =
+    '<div class="cb-icon">✓</div>' +
+    '<h2>Your appointment request was received</h2>' +
+    '<p class="cb-detail">Your time has already been reserved. ' +
+    'Please continue to the required registration — do not submit the appointment again.</p>' +
+    '<div class="cb-slot">' + state.selectedSlot.label + '</div>' +
+    '<p class="cb-detail">Front Door did not open automatically.</p>' +
+    '<div style="margin-top:22px;">' +
+      '<button class="btn btn-ink" id="btnRetryFrontDoor" onclick="retryFrontDoor()">Continue registration</button>' +
+    '</div>' +
+    '<p style="margin-top:18px;font-size:13px;color:var(--ink-soft);">' +
+    'If this continues, call <a href="tel:+12125108665" style="color:var(--brass);font-weight:600;">(212) 510-8665</a>.' +
+    '</p>';
+
+  document.querySelectorAll('.step-tab').forEach(function(t) {
+    t.classList.add('done');
+  });
+}
+
+
+function retryFrontDoor() {
+  var btn = document.getElementById('btnRetryFrontDoor');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Opening registration…';
+  }
+
+  startFrontDoorForWebsite().catch(function() {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Continue registration';
+    }
+
+    alert(
+      'We already received your appointment request, but registration could not open. ' +
+      'Please try this button again or call (212) 510-8665. Do not submit a second appointment.'
+    );
+  });
+}
+
+
+function submitBooking() {
+  // If the appointment endpoint already succeeded, never call it twice.
+  if (state.bookingCommitted) {
+    retryFrontDoor();
+    return;
+  }
+
+  var btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Reserving time…';
+
+  state.bookingPayload = buildWebsiteBookingPayload();
+
+  if (!state.websiteBookingId) {
+    state.websiteBookingId = newWebsiteBookingId();
+  }
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(state.bookingPayload)
+  })
+  .then(function(r) {
+    return r.json();
+  })
+  .then(function(data) {
+    if (!data.success) {
+      throw new Error(
+        data.error || 'Please try again or call us.'
+      );
+    }
+
+    // Hard boundary: the calendar/web booking is now committed.
+    // From this point forward, errors may retry Front Door ONLY.
+    state.bookingCommitted = true;
+    state.bookingResult = data;
+
+    btn.textContent = 'Starting registration…';
+
+    return startFrontDoorForWebsite();
+  })
+  .catch(function(err) {
+    if (state.bookingCommitted) {
+      // The appointment was already accepted by the existing endpoint.
+      // Never re-enable the booking submit button.
+      showFrontDoorRetry();
+      return;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Reserve time & continue';
+
+    alert(
+      'Something went wrong: ' +
+      (err && err.message
+        ? err.message
+        : 'Please try again or call (212) 510-8665.')
+    );
+  });
+}
+
 
 function goBack(toStep) {
   setStep(toStep);
