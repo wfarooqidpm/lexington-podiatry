@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Front Door | Lexington Podiatry</title>
+<meta name="description" content="Complete your registration and confirm your Lexington Podiatry appointment.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,400;0,9..144,500;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ivory:#FAF7F0;--stone:#F1ECE1;--paper:#FDFBF6;--ink:#1B1814;--ink-soft:#5A544B;
+  --brass:#8C6D1F;--brass-deep:#6E5517;--champagne:#CFC47C;--champagne-soft:#E4DCAE;
+  --walnut:#2B2118;--line:rgba(27,24,20,.14);--line-soft:rgba(27,24,20,.08);
+  --good:#245f45;--good-bg:#eef6f0;--warn:#8a5616;--warn-bg:#fff7e8;
+  --bad:#8b2020;--bad-bg:#fdf0f0;
+  --serif:"Fraunces",Georgia,serif;--sans:"Hanken Grotesk",-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+a{color:inherit}.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+.topbar{background:var(--walnut);color:var(--champagne-soft);font-size:13px}
+.topbar .wrap{min-height:39px;display:flex;justify-content:space-between;align-items:center;gap:18px;padding-top:7px;padding-bottom:7px}
+.topbar a{color:var(--champagne);text-decoration:none;font-weight:600}
+.nav{background:rgba(250,247,240,.95);border-bottom:1px solid var(--line-soft)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:17px;padding-bottom:17px}
+.brand{text-decoration:none;display:flex;align-items:center;gap:14px}
+.mark{width:44px;height:44px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:23px}
+.brand-text strong{display:block;font-size:16px;letter-spacing:.15em;text-transform:uppercase}
+.brand-text span{display:block;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px}
+.secure-chip{font-size:12px;text-transform:uppercase;letter-spacing:.13em;font-weight:700;color:var(--brass-deep);border:1px solid var(--champagne);background:var(--champagne-soft);padding:8px 11px;border-radius:999px}
+.hero{padding:56px 0 42px;border-bottom:1px solid var(--line-soft)}
+.eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--brass)}
+.hero h1{font-family:var(--serif);font-weight:340;font-size:clamp(36px,5vw,54px);line-height:1.08;margin:12px 0 0;letter-spacing:-.02em}
+.hero h1 em{font-weight:400;color:var(--brass)}
+.hero p{margin:14px 0 0;color:var(--ink-soft);max-width:700px;font-size:18px}
+.loading,.fatal{max-width:720px;margin:60px auto;padding:30px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
+.fatal{border-color:#e0b8b8;background:var(--bad-bg);color:var(--bad)}.hidden{display:none!important}
+.main{padding:44px 0 88px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:52px;align-items:start}
+.appointment-card{background:var(--walnut);color:var(--ivory);border-radius:16px;padding:24px;margin-bottom:28px}
+.appointment-card .small{color:var(--champagne);font-size:11px;text-transform:uppercase;letter-spacing:.17em;font-weight:700}
+.appointment-card h2{font-family:var(--serif);font-weight:400;font-size:25px;line-height:1.2;margin:7px 0 5px}
+.appointment-card p{margin:0;color:rgba(250,247,240,.72);font-size:14px}
+.progress{display:grid;grid-template-columns:repeat(6,1fr);border-bottom:2px solid var(--line);margin-bottom:34px}
+.progress button{border:0;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;padding:10px 4px 12px;color:var(--ink-soft);font-size:10px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;cursor:pointer}
+.progress button.active{color:var(--brass);border-bottom-color:var(--brass)}.progress button.done{color:var(--good)}.progress button:disabled{cursor:default;opacity:.45}
+.panel{display:none}.panel.active{display:block}
+.panel h2{font-family:var(--serif);font-size:31px;font-weight:400;margin:0 0 8px;line-height:1.15}
+.intro{color:var(--ink-soft);margin:0 0 28px}
+.section{border:1px solid var(--line);background:var(--paper);border-radius:16px;padding:24px;margin-bottom:20px}
+.section-title{font-size:11px;letter-spacing:.17em;text-transform:uppercase;font-weight:700;color:var(--brass);margin-bottom:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.field{margin-bottom:17px;min-width:0}.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px}
+.field .req{color:var(--brass)}
+input[type="text"],input[type="email"],input[type="tel"],input[type="date"],select,textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;background:var(--ivory);color:var(--ink);padding:13px 14px;min-height:48px;font-size:16px}
+textarea{min-height:105px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--brass);outline:none}
+.note{font-size:13px;color:var(--ink-soft);margin-top:6px}
+.prefill{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--good);font-weight:700;margin-left:6px}
+.choice-list{display:grid;gap:10px}
+.choice{border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;display:flex;align-items:flex-start;gap:11px;background:var(--ivory);cursor:pointer}
+.choice:has(input:checked){border-color:var(--brass);background:var(--stone)}
+.choice input{margin-top:5px;accent-color:var(--brass)}.choice strong{display:block;font-size:15px}.choice span{display:block;font-size:13px;color:var(--ink-soft);margin-top:2px}
+.check-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 14px}.check{display:flex;align-items:flex-start;gap:8px;font-size:14px}.check input{margin-top:5px;accent-color:var(--brass)}
+.callout{border-radius:14px;padding:18px 20px;margin-bottom:18px;border:1px solid var(--line)}
+.callout.gold{background:#f8f2df;border-color:var(--champagne)}.callout.good{background:var(--good-bg);border-color:#bbd7c4}.callout.warn{background:var(--warn-bg);border-color:#e5c78e}.callout strong{display:block;margin-bottom:4px}
+.policy-card{border:1.5px solid var(--line);border-radius:15px;background:var(--paper);padding:22px;margin-bottom:16px}
+.policy-card.featured{border-color:var(--brass);box-shadow:inset 4px 0 0 var(--brass)}
+.policy-card h3{font-family:var(--serif);font-size:23px;font-weight:400;margin:0 0 8px}
+.policy-card p{margin:0 0 13px;color:var(--ink-soft)}.policy-card .money{font-family:var(--serif);font-size:34px;color:var(--brass);line-height:1;margin:7px 0 10px}
+.ack{display:flex;align-items:flex-start;gap:10px;padding-top:11px;border-top:1px solid var(--line-soft);font-weight:600;font-size:14px}.ack input{margin-top:5px;accent-color:var(--brass)}
+details{border-top:1px solid var(--line-soft);padding-top:11px;margin-top:12px}summary{cursor:pointer;font-weight:600;color:var(--brass-deep);font-size:14px}details p{font-size:14px;margin-top:10px}
+.financial-box{border:1.5px solid var(--champagne);border-radius:16px;background:#f8f2df;padding:24px;margin-bottom:20px}
+.financial-box .amount{font-family:var(--serif);font-size:42px;line-height:1.1;color:var(--brass-deep);margin:8px 0}
+.financial-box .confidence{display:inline-block;border:1px solid var(--champagne);border-radius:999px;padding:5px 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.nav-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:30px}
+.btn{border:1.5px solid transparent;border-radius:999px;padding:13px 23px;font-weight:700;cursor:pointer;transition:.18s ease;background:none}
+.btn.primary{background:var(--ink);color:var(--ivory)}.btn.primary:hover{background:var(--walnut);transform:translateY(-1px)}
+.btn.secondary{border-color:var(--line);color:var(--ink)}.btn.secondary:hover{border-color:var(--ink)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.save-state{font-size:13px;color:var(--ink-soft)}
+.sidebar{position:sticky;top:24px}.side-card{border:1px solid var(--line);border-radius:15px;padding:20px;margin-bottom:16px;background:var(--paper)}
+.side-card h3{font-family:var(--serif);font-size:20px;font-weight:400;margin:0 0 8px}.side-card p{font-size:14px;color:var(--ink-soft);margin:0}.side-card a{color:var(--brass-deep);font-weight:700;text-decoration:none}
+.complete-box{text-align:center;border:1.5px solid #b8d5c2;background:var(--good-bg);padding:34px;border-radius:18px}
+.complete-icon{width:54px;height:54px;border-radius:50%;background:var(--good);color:white;display:grid;place-items:center;font-size:26px;margin:0 auto 15px}
+.complete-box h2{font-size:32px}.complete-box p{max-width:560px;margin:10px auto;color:#3d5f4c}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:white;padding:10px 14px;border-radius:8px;max-width:min(90vw,620px);z-index:100;box-shadow:0 8px 30px rgba(0,0,0,.16);font-size:14px}
+footer{border-top:1px solid var(--line);padding:27px 0 36px;color:var(--ink-soft);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.invalid{border-color:var(--bad)!important;background:var(--bad-bg)!important}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;display:grid;grid-template-columns:1fr 1fr;gap:14px}.side-card{margin:0}}
+@media(max-width:680px){.wrap{padding:0 18px}.topbar .wrap{display:block;text-align:center;padding:8px 18px}.topbar .wrap span:first-child{display:none}.secure-chip{display:none}.hero{padding:38px 0 30px}.main{padding-top:28px}.progress{overflow-x:auto;grid-template-columns:repeat(6,88px)}.progress button{font-size:9px}.grid2,.grid3{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr 1fr}.section{padding:19px}.sidebar{grid-template-columns:1fr}.nav-actions .btn{width:100%}.save-state{width:100%;text-align:center}}
+@media(max-width:420px){.check-grid{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+<div class="topbar">
+  <div class="wrap">
+    <span>353 Lexington Ave, Rm 1502 · New York, NY 10016</span>
+    <span>Questions? <a href="tel:+12125108665">(212) 510-8665</a></span>
+  </div>
+</div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Lexington Podiatry home">
+      <span class="mark" aria-hidden="true">L</span>
+      <span class="brand-text"><strong>Lexington Podiatry</strong><span>New York City</span></span>
+    </a>
+    <span class="secure-chip">Secure registration</span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Front Door</div>
+    <h1>Complete your registration.<br><em>Then you’re ready.</em></h1>
+    <p>We already have some of your booking information. Review it, complete what is missing, and confirm that you plan to attend.</p>
+  </div>
+</section>
+
+<div id="loading" class="loading">Loading your secure registration…</div>
+<div id="fatal" class="fatal hidden"></div>
+
+<main id="app" class="main hidden">
+<div class="wrap"><div class="layout"><div>
+
+  <div class="appointment-card">
+    <div class="small" id="sourceLabel">Appointment request</div>
+    <h2 id="appointmentDisplay">—</h2>
+    <p id="appointmentReason"></p>
+  </div>
+
+  <nav class="progress" aria-label="Registration progress">
+    <button type="button" data-step="1">About you</button>
+    <button type="button" data-step="2">Insurance</button>
+    <button type="button" data-step="3">Your health</button>
+    <button type="button" data-step="4">Policies</button>
+    <button type="button" data-step="5">Cost</button>
+    <button type="button" data-step="6">Confirm</button>
+  </nav>
+
+  <section class="panel" data-panel="1">
+    <h2>About you</h2>
+    <p class="intro">We’ve pre-filled what we received with your booking. Please correct anything that has changed.</p>
+
+    <div class="section">
+      <div class="section-title">Contact information</div>
+      <div class="grid2">
+        <div class="field"><label for="firstName">First name <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="firstName" type="text" autocomplete="given-name"></div>
+        <div class="field"><label for="lastName">Last name <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="lastName" type="text" autocomplete="family-name"></div>
+        <div class="field"><label for="dob">Date of birth <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="dob" type="date" autocomplete="bday"></div>
+        <div class="field"><label for="phone">Mobile / best phone <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="phone" type="tel" autocomplete="tel"></div>
+        <div class="field"><label for="email">Email <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="email" type="email" autocomplete="email"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Address</div>
+      <div class="field"><label for="address1">Address line 1 <span class="req">*</span></label><input id="address1" type="text" autocomplete="address-line1"></div>
+      <div class="field"><label for="address2">Address line 2</label><input id="address2" type="text" autocomplete="address-line2"></div>
+      <div class="grid3">
+        <div class="field"><label for="city">City <span class="req">*</span></label><input id="city" type="text" autocomplete="address-level2"></div>
+        <div class="field"><label for="state">State <span class="req">*</span></label><input id="state" type="text" autocomplete="address-level1" placeholder="NY"></div>
+        <div class="field"><label for="zip">ZIP code <span class="req">*</span></label><input id="zip" type="text" inputmode="numeric" autocomplete="postal-code"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Helpful contacts</div>
+      <div class="grid2">
+        <div class="field"><label for="emergencyName">Emergency contact</label><input id="emergencyName" type="text"></div>
+        <div class="field"><label for="emergencyPhone">Emergency contact phone</label><input id="emergencyPhone" type="tel"></div>
+      </div>
+      <div class="field"><label for="pharmacy">Preferred pharmacy</label><input id="pharmacy" type="text" placeholder="Pharmacy name and location"></div>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn primary" type="button" data-next="2">Continue to insurance</button>
+      <span class="save-state" id="save1"></span>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="2">
+    <h2>Insurance</h2>
+    <p class="intro">You don’t need to know payer IDs, deductible amounts, or insurance billing codes. We’ll verify those separately.</p>
+
+    <div class="section">
+      <div class="section-title">Primary insurance</div>
+      <div class="grid2">
+        <div class="field"><label for="insuranceCarrier">Insurance company <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="insuranceCarrier" type="text"></div>
+        <div class="field"><label for="insurancePlan">Plan name</label><input id="insurancePlan" type="text"></div>
+        <div class="field"><label for="memberId">Member ID <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="memberId" type="text" autocomplete="off"></div>
+        <div class="field"><label for="groupId">Group number</label><input id="groupId" type="text" autocomplete="off"></div>
+      </div>
+      <p class="note">We usually do not need separate subscriber information if eligibility can identify your coverage from the information above.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Insurance card</div>
+      <div class="choice-list">
+        <label class="choice zocdoc-only"><input type="radio" name="insuranceCardStatus" value="zocdoc"><span><strong>I already uploaded my insurance card to Zocdoc</strong><span>Please do not upload it again. We’ll mark it for staff verification.</span></span></label>
+        <label class="choice"><input type="radio" name="insuranceCardStatus" value="upload"><span><strong>Upload my insurance card here</strong><span>JPG, PNG, or PDF. Maximum 4 MB per file.</span></span></label>
+        <label class="choice"><input type="radio" name="insuranceCardStatus" value="bring"><span><strong>I will bring my physical insurance card to the office</strong><span>This will not stop us from checking eligibility when we have enough information.</span></span></label>
+      </div>
+      <div id="insuranceUploads" class="hidden" style="margin-top:18px">
+        <div class="grid2">
+          <div class="field"><label for="insuranceFront">Insurance card — front</label><input id="insuranceFront" type="file" accept="image/jpeg,image/png,application/pdf"></div>
+          <div class="field"><label for="insuranceBack">Insurance card — back</label><input id="insuranceBack" type="file" accept="image/jpeg,image/png,application/pdf"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Photo ID</div>
+      <div class="choice-list">
+        <label class="choice zocdoc-only"><input type="radio" name="photoIdStatus" value="zocdoc"><span><strong>I already uploaded my photo ID to Zocdoc</strong><span>No need to upload it twice.</span></span></label>
+        <label class="choice"><input type="radio" name="photoIdStatus" value="upload"><span><strong>Upload my photo ID here</strong><span>JPG, PNG, or PDF. Maximum 4 MB.</span></span></label>
+        <label class="choice"><input type="radio" name="photoIdStatus" value="bring"><span><strong>I will bring my physical photo ID to the office</strong></span></label>
+      </div>
+      <div id="photoUpload" class="field hidden" style="margin-top:18px"><label for="photoIdFile">Photo ID</label><input id="photoIdFile" type="file" accept="image/jpeg,image/png,application/pdf"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" id="secondaryTitle">Secondary insurance</div>
+      <label class="check"><input id="hasSecondary" type="checkbox"><span id="secondaryPrompt">I have secondary insurance</span></label>
+      <div id="secondaryFields" class="hidden" style="margin-top:18px">
+        <div class="grid2">
+          <div class="field"><label for="secondaryCarrier">Secondary insurance company <span class="req">*</span></label><input id="secondaryCarrier" type="text"></div>
+          <div class="field"><label for="secondaryMemberId">Secondary member ID <span class="req">*</span></label><input id="secondaryMemberId" type="text"></div>
+          <div class="field"><label for="secondaryGroupId">Secondary group number</label><input id="secondaryGroupId" type="text"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn secondary" type="button" data-back="1">Back</button>
+      <button class="btn primary" type="button" data-next="3">Continue to health</button>
+      <span class="save-state" id="save2"></span>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="3">
+    <h2>Your health</h2>
+    <p class="intro" id="healthIntro">A few details help us prepare for your visit before you arrive.</p>
+
+    <div id="returningHealthChoice" class="callout gold hidden">
+      <strong>Since your last visit, has anything changed?</strong>
+      <div class="choice-list" style="margin-top:12px">
+        <label class="choice"><input type="radio" name="healthChange" value="none"><span><strong>No changes</strong><span>My medications, allergies, and medical history are unchanged.</span></span></label>
+        <label class="choice"><input type="radio" name="healthChange" value="changes"><span><strong>I have updates</strong><span>I’ll enter the changes below.</span></span></label>
+      </div>
+    </div>
+
+    <div id="healthDetails">
+      <div class="section">
+        <div class="section-title">Allergies & medications</div>
+        <label class="check" style="margin-bottom:13px"><input id="noKnownAllergies" type="checkbox"><span>No known allergies</span></label>
+        <div class="field" id="allergyField"><label for="allergies">Allergies</label><textarea id="allergies" placeholder="Medication, food, adhesive, latex, or other allergies"></textarea></div>
+        <div class="field"><label for="medications">Current medications</label><textarea id="medications" placeholder="One medication per line is fine. Include dose if known."></textarea></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Medical history</div>
+        <div class="check-grid" id="historyChecks">
+          <label class="check"><input type="checkbox" value="Asthma"><span>Asthma</span></label>
+          <label class="check"><input type="checkbox" value="Allergic Rhinitis"><span>Allergic rhinitis</span></label>
+          <label class="check"><input type="checkbox" value="Hives"><span>Hives</span></label>
+          <label class="check"><input type="checkbox" value="Food Allergy"><span>Food allergy</span></label>
+          <label class="check"><input type="checkbox" value="Heart Disease"><span>Heart disease</span></label>
+          <label class="check"><input type="checkbox" value="Stroke"><span>Stroke</span></label>
+          <label class="check"><input type="checkbox" value="High Blood Pressure"><span>High blood pressure</span></label>
+          <label class="check"><input type="checkbox" value="Diabetes"><span>Diabetes</span></label>
+          <label class="check"><input type="checkbox" value="Cancer"><span>Cancer</span></label>
+          <label class="check"><input type="checkbox" value="Bleeding Disorder"><span>Bleeding disorder</span></label>
+          <label class="check"><input type="checkbox" value="Pacemaker"><span>Pacemaker</span></label>
+        </div>
+        <div class="field" style="margin-top:16px"><label for="medicalOther">Other medical conditions</label><input id="medicalOther" type="text"></div>
+        <div class="field"><label for="surgicalHistory">Surgical history</label><textarea id="surgicalHistory" placeholder="Previous operations and approximate dates, if known"></textarea></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Today’s visit</div>
+      <div class="field"><label for="bookingReason">Booking reason <span class="prefill">from booking</span></label><input id="bookingReason" type="text" readonly></div>
+      <div class="field"><label for="hpi">How can we help?</label><textarea id="hpi" placeholder="Tell us where the problem is, how long it has been going on, and what you are feeling."></textarea></div>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn secondary" type="button" data-back="2">Back</button>
+      <button class="btn primary" type="button" data-next="4">Continue to policies</button>
+      <span class="save-state" id="save3"></span>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="4">
+    <h2>Policies & consent</h2>
+    <p class="intro">The important parts should be clear—not buried in pages of fine print.</p>
+
+    <div class="policy-card featured">
+      <h3>Appointment confirmation</h3>
+      <p>Your requested appointment is not considered fully confirmed until you complete Front Door and confirm that you plan to attend. Appointments that remain unconfirmed may be removed from the schedule so the time can be offered to another patient.</p>
+      <label class="ack"><input id="confirmationPolicyAccepted" type="checkbox"><span>I understand that an unconfirmed appointment may be removed from the schedule.</span></label>
+    </div>
+
+    <div class="policy-card featured">
+      <h3>No-show policy</h3>
+      <div class="money">$50</div>
+      <p>Once you confirm your appointment, a missed appointment without notice carries a $50 no-show fee. We send a reminder at approximately 6:00 PM the evening before your visit, and you may reschedule when you receive that reminder if needed.</p>
+      <label class="ack"><input id="noShowPolicyAccepted" type="checkbox"><span>I understand the $50 no-show fee that applies after I have confirmed my appointment.</span></label>
+    </div>
+
+    <div id="zocdocPolicy" class="policy-card hidden">
+      <h3>Booked through Zocdoc?</h3>
+      <p>If you decide not to keep this appointment, please cancel it directly through Zocdoc so the booking is properly released.</p>
+    </div>
+
+    <div class="policy-card">
+      <h3>Privacy</h3>
+      <p>We use health information for treatment, payment, healthcare operations, and other uses permitted or required by law. You have rights regarding access, restrictions, confidential communications, and complaints.</p>
+      <details><summary>Privacy notice summary</summary><p>Your health information may be shared with clinicians involved in your care, health plans when needed for payment or authorization, and practice vendors or operations as permitted by law. You may request access to your records and confidential communications, and may raise privacy concerns without retaliation.</p></details>
+      <label class="ack"><input id="privacyAcknowledged" type="checkbox"><span>I acknowledge that Lexington Podiatry’s Notice of Privacy Practices has been made available to me.</span></label>
+    </div>
+
+    <div class="policy-card">
+      <h3>Consent to treatment</h3>
+      <p>I consent to podiatric evaluation and routine treatment. Specific procedures that require separate consent will be discussed with me when appropriate.</p>
+      <label class="ack"><input id="treatmentConsent" type="checkbox"><span>I consent to evaluation and treatment by Lexington Podiatry.</span></label>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn secondary" type="button" data-back="3">Back</button>
+      <button class="btn primary" type="button" data-next="5">Continue to cost</button>
+      <span class="save-state" id="save4"></span>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="5">
+    <h2>Your expected cost</h2>
+    <p class="intro">We use the insurance information available to us to make this as useful as possible without pretending an estimate is a guarantee.</p>
+
+    <div id="estimateReady" class="financial-box hidden">
+      <div class="section-title">Estimated patient responsibility</div>
+      <div class="amount" id="estimateAmount">$—</div>
+      <div class="confidence" id="estimateConfidence">Estimate</div>
+      <p style="margin-bottom:0">This estimate is based on the information currently available to Lexington Podiatry.</p>
+    </div>
+
+    <div id="estimatePending" class="callout warn">
+      <strong>An exact estimate is not available yet.</strong>
+      We may have verified coverage without having enough information to calculate an exact amount. Your final responsibility can include applicable copays, deductibles, coinsurance, or non-covered services assigned by your health plan.
+    </div>
+
+    <div class="policy-card">
+      <h3>Financial responsibility</h3>
+      <p>Insurance benefits and estimates are not guarantees of payment. Amounts known to be your responsibility are due at the time of service. You remain responsible for patient amounts assigned by your health plan after the claim is processed.</p>
+      <label class="ack"><input id="financialPolicyAcknowledged" type="checkbox"><span>I understand the financial information above and accept responsibility for amounts assigned to me by my health plan.</span></label>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn secondary" type="button" data-back="4">Back</button>
+      <button class="btn primary" type="button" data-next="6">Review & confirm</button>
+      <span class="save-state" id="save5"></span>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="6">
+    <h2>Confirm your appointment</h2>
+    <p class="intro">One final step. Your information will be reviewed and then your appointment can proceed into our clinical schedule.</p>
+
+    <div class="section"><div class="section-title">Your appointment</div><div id="confirmSummary"></div></div>
+
+    <div class="policy-card featured">
+      <label class="ack" style="border-top:0;padding-top:0"><input id="planToAttend" type="checkbox"><span><strong>I confirm that I plan to attend this appointment.</strong></span></label>
+    </div>
+
+    <div id="zocdocCancelReminder" class="callout gold hidden">
+      <strong>Changed your mind?</strong>
+      If you no longer plan to attend, please cancel the booking through Zocdoc instead of confirming here.
+    </div>
+
+    <div class="section">
+      <div class="section-title">Electronic signature</div>
+      <div class="field"><label for="signatureName">Type your full name <span class="req">*</span></label><input id="signatureName" type="text" autocomplete="name" placeholder="Your full legal name"><p class="note">By typing your name and submitting, you electronically sign the acknowledgments and consents you selected above.</p></div>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn secondary" type="button" data-back="5">Back</button>
+      <button class="btn primary" type="button" id="completeBtn">Complete Front Door & confirm</button>
+      <span class="save-state" id="save6"></span>
+    </div>
+  </section>
+
+  <section id="completePanel" class="hidden">
+    <div class="complete-box">
+      <div class="complete-icon">✓</div>
+      <h2>Front Door complete</h2>
+      <p>Thank you. We received your registration and confirmation. Lexington Podiatry will finish the internal scheduling and insurance steps. You do not need to complete this form again.</p>
+    </div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  <div class="side-card"><h3>Why Front Door?</h3><p>Complete the details we need before your visit so your appointment can focus on your foot and ankle concern—not paperwork.</p></div>
+  <div class="side-card"><h3>Insurance cards</h3><p>If you already uploaded a card to Zocdoc, don’t upload it twice. You may also bring the physical card to the office.</p></div>
+  <div class="side-card"><h3>Need help?</h3><p>Call <a href="tel:+12125108665">(212) 510-8665</a>.</p></div>
+</aside>
+
+</div></div>
+</main>
+
+<footer><div class="wrap"><span>Lexington Podiatry · WAF Podiatry P.C.</span><span>353 Lexington Ave, Rm 1502 · New York, NY 10016</span></div></footer>
+
+<script>
+// Replace this after deploying FrontDoorGateway.gs as a separate Web App.
+var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbzI4pFwTopy9eE6yK56R8RrBDsjJOFNFT8oqSAqkOHzIcfue73KL7baPWp2Q_qP3IQq/exec';
+var CLIENT_VERSION = 'v0.8.0';
+
+var FD = {token:'',booking:null,data:{},currentStep:1,completed:false,busy:false};
+
+function $(id){return document.getElementById(id)}
+function q(sel){return document.querySelector(sel)}
+function qa(sel){return Array.prototype.slice.call(document.querySelectorAll(sel))}
+function clean(v){return String(v==null?'':v).trim()}
+
+function escapeHtml(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function toast(msg){
+  var old=q('.toast');if(old)old.remove();
+  var el=document.createElement('div');el.className='toast';el.textContent=msg;
+  document.body.appendChild(el);setTimeout(function(){if(el.parentNode)el.remove()},3500);
+}
+
+function setFatal(msg){
+  $('loading').classList.add('hidden');$('app').classList.add('hidden');
+  $('fatal').textContent=msg;$('fatal').classList.remove('hidden');
+}
+
+function gatewayReady(){return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(GATEWAY_URL)}
+function tokenFromUrl(){var p=new URLSearchParams(window.location.search);return clean(p.get('t')||'')}
+
+function apiGet(){
+  return fetch(GATEWAY_URL+'?action=load&t='+encodeURIComponent(FD.token))
+    .then(function(r){return r.json()});
+}
+
+function apiPost(action,step,data,uploads){
+  return fetch(GATEWAY_URL,{
+    method:'POST',
+    body:JSON.stringify({action:action,token:FD.token,step:step,clientVersion:CLIENT_VERSION,data:data,uploads:uploads||[]})
+  }).then(function(r){return r.json()});
+}
+
+function boot(){
+  FD.token=tokenFromUrl();
+
+  if(!gatewayReady()){
+    setFatal('Front Door is not connected yet. The gateway deployment URL still needs to be added to this page.');
+    return;
+  }
+
+  if(!/^[a-f0-9]{64}$/i.test(FD.token)){
+    setFatal('This Front Door link is invalid or incomplete. Please use the link sent by Lexington Podiatry.');
+    return;
+  }
+
+  apiGet().then(function(res){
+    if(!res.success)throw new Error(res.error||'Could not load registration.');
+    FD.booking=res.booking||{};
+    FD.data=res.intake&&res.intake.data?res.intake.data:{};
+    FD.completed=!!(res.intake&&res.intake.completed);
+
+    hydrate();
+    $('loading').classList.add('hidden');$('app').classList.remove('hidden');
+
+    if(FD.completed){showComplete();return}
+
+    var savedStep=Number(res.intake&&res.intake.currentStep||1);
+    if(!isFinite(savedStep)||savedStep<1||savedStep>6)savedStep=1;
+    showStep(savedStep);
+  }).catch(function(err){
+    setFatal(err.message||'Could not load your registration. Please call Lexington Podiatry.');
+  });
+}
+
+function hydrate(){
+  var b=FD.booking,d=FD.data;
+  $('sourceLabel').textContent=b.source==='ZOCDOC'?'Zocdoc appointment':'Appointment request';
+  $('appointmentDisplay').textContent=b.appointmentDisplay||'Appointment';
+  $('appointmentReason').textContent=b.visitReason?'Reason: '+b.visitReason:'';
+
+  if(b.source==='ZOCDOC'){
+    $('zocdocPolicy').classList.remove('hidden');
+    $('zocdocCancelReminder').classList.remove('hidden');
+  }else{
+    qa('.zocdoc-only').forEach(function(el){el.classList.add('hidden')});
+  }
+
+  var returning=String(b.patientType||'').toUpperCase()==='RETURNING';
+  if(returning){
+    $('returningHealthChoice').classList.remove('hidden');
+    $('healthIntro').textContent='For a follow-up, we only need changes since your last visit. If nothing changed, say so and move on.';
+  }
+
+  var carrier=clean(d.insuranceCarrier||b.insuranceCarrier);
+  if(/medicare/i.test(carrier)){
+    $('secondaryTitle').textContent='Secondary / supplemental insurance';
+    $('secondaryPrompt').textContent='I have secondary or supplemental insurance in addition to Medicare';
+  }
+
+  setValue('firstName',d.firstName||b.firstName);
+  setValue('lastName',d.lastName||b.lastName);
+  setValue('dob',d.dob||b.dob);
+  setValue('phone',d.phone||b.phone);
+  setValue('email',d.email||b.email);
+
+  ['address1','address2','city','state','zip','emergencyName','emergencyPhone','pharmacy',
+   'allergies','medications','medicalOther','surgicalHistory','hpi','secondaryCarrier',
+   'secondaryMemberId','secondaryGroupId','signatureName'].forEach(function(id){setValue(id,d[id])});
+
+  setValue('insuranceCarrier',carrier);
+  setValue('insurancePlan',d.insurancePlan||b.insurancePlan);
+  setValue('memberId',d.memberId||b.memberId);
+  setValue('groupId',d.groupId||b.groupId);
+  setValue('bookingReason',b.visitReason||'');
+
+  setCheck('hasSecondary',!!d.hasSecondaryInsurance);
+  setCheck('noKnownAllergies',!!d.noKnownAllergies);
+  setCheck('confirmationPolicyAccepted',!!d.confirmationPolicyAccepted);
+  setCheck('noShowPolicyAccepted',!!d.noShowPolicyAccepted);
+  setCheck('privacyAcknowledged',!!d.privacyAcknowledged);
+  setCheck('treatmentConsent',!!d.treatmentConsent);
+  setCheck('financialPolicyAcknowledged',!!d.financialPolicyAcknowledged);
+  setCheck('planToAttend',!!d.planToAttend);
+
+  if(d.insuranceCardStatus)setRadio('insuranceCardStatus',d.insuranceCardStatus);
+  if(d.photoIdStatus)setRadio('photoIdStatus',d.photoIdStatus);
+  if(d.healthChange)setRadio('healthChange',d.healthChange);
+
+  if(Array.isArray(d.medicalHistory)){
+    qa('#historyChecks input[type="checkbox"]').forEach(function(cb){
+      cb.checked=d.medicalHistory.indexOf(cb.value)>-1;
+    });
+  }
+
+  updateConditionalFields();renderEstimate();renderConfirmSummary();
+}
+
+function setValue(id,v){if($(id)&&v!=null)$(id).value=String(v)}
+function setCheck(id,v){if($(id))$(id).checked=!!v}
+function setRadio(name,value){
+  qa('input[name="'+name+'"]').forEach(function(el){el.checked=(el.value===String(value))});
+}
+function radioValue(name){var el=q('input[name="'+name+'"]:checked');return el?el.value:''}
+
+function updateConditionalFields(){
+  $('secondaryFields').classList.toggle('hidden',!$('hasSecondary').checked);
+  $('insuranceUploads').classList.toggle('hidden',radioValue('insuranceCardStatus')!=='upload');
+  $('photoUpload').classList.toggle('hidden',radioValue('photoIdStatus')!=='upload');
+  $('allergyField').classList.toggle('hidden',$('noKnownAllergies').checked);
+
+  var returning=String(FD.booking.patientType||'').toUpperCase()==='RETURNING';
+  if(returning){
+    $('healthDetails').classList.toggle('hidden',radioValue('healthChange')==='none');
+  }
+}
+
+function renderEstimate(){
+  var b=FD.booking,amount=b.estimateAmount;
+  if(amount!==''&&amount!=null&&isFinite(Number(amount))){
+    $('estimateReady').classList.remove('hidden');$('estimatePending').classList.add('hidden');
+    $('estimateAmount').textContent='$'+Number(amount).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    $('estimateConfidence').textContent=b.estimateConfidence||b.estimateStatus||'Estimate';
+  }else{
+    $('estimateReady').classList.add('hidden');$('estimatePending').classList.remove('hidden');
+  }
+}
+
+function renderConfirmSummary(){
+  if(!FD.booking)return;
+  $('confirmSummary').innerHTML=
+    '<strong>'+escapeHtml(FD.booking.appointmentDisplay||'')+'</strong>'+
+    (FD.booking.visitReason?'<div style="margin-top:6px;color:var(--ink-soft)">Reason: '+escapeHtml(FD.booking.visitReason)+'</div>':'')+
+    '<div style="margin-top:12px;color:var(--ink-soft);font-size:14px">Completing Front Door records your confirmation. Lexington Podiatry will then finish the internal scheduling steps.</div>';
+}
+
+function collect(){
+  return {
+    firstName:clean($('firstName').value),lastName:clean($('lastName').value),dob:clean($('dob').value),
+    phone:clean($('phone').value),email:clean($('email').value),
+    address1:clean($('address1').value),address2:clean($('address2').value),city:clean($('city').value),
+    state:clean($('state').value),zip:clean($('zip').value),
+    emergencyName:clean($('emergencyName').value),emergencyPhone:clean($('emergencyPhone').value),pharmacy:clean($('pharmacy').value),
+    insuranceCarrier:clean($('insuranceCarrier').value),insurancePlan:clean($('insurancePlan').value),
+    memberId:clean($('memberId').value),groupId:clean($('groupId').value),
+    insuranceCardStatus:radioValue('insuranceCardStatus'),photoIdStatus:radioValue('photoIdStatus'),
+    hasSecondaryInsurance:$('hasSecondary').checked,secondaryCarrier:clean($('secondaryCarrier').value),
+    secondaryMemberId:clean($('secondaryMemberId').value),secondaryGroupId:clean($('secondaryGroupId').value),
+    healthChange:radioValue('healthChange'),noKnownAllergies:$('noKnownAllergies').checked,
+    allergies:clean($('allergies').value),medications:clean($('medications').value),
+    medicalHistory:qa('#historyChecks input[type="checkbox"]:checked').map(function(cb){return cb.value}),
+    medicalOther:clean($('medicalOther').value),surgicalHistory:clean($('surgicalHistory').value),hpi:clean($('hpi').value),
+    confirmationPolicyAccepted:$('confirmationPolicyAccepted').checked,noShowPolicyAccepted:$('noShowPolicyAccepted').checked,
+    privacyAcknowledged:$('privacyAcknowledged').checked,treatmentConsent:$('treatmentConsent').checked,
+    financialPolicyAcknowledged:$('financialPolicyAcknowledged').checked,
+    planToAttend:$('planToAttend').checked,signatureName:clean($('signatureName').value)
+  };
+}
+
+function clearInvalid(){qa('.invalid').forEach(function(el){el.classList.remove('invalid')})}
+function markInvalid(id){if($(id)){$(id).classList.add('invalid');$(id).scrollIntoView({behavior:'smooth',block:'center'})}}
+
+function validateStep(step,data){
+  clearInvalid();
+  function need(id,msg){if(!clean(data[id])){markInvalid(id);throw new Error(msg)}}
+
+  if(step===1){
+    ['firstName','lastName','dob','phone','email','address1','city','state','zip'].forEach(function(id){
+      need(id,'Please complete all required contact and address fields.');
+    });
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){markInvalid('email');throw new Error('Please enter a valid email address.')}
+  }
+
+  if(step===2){
+    need('insuranceCarrier','Please enter your insurance company.');
+    need('memberId','Please enter your member ID.');
+    if(!data.insuranceCardStatus)throw new Error('Please choose what you will do with your insurance card.');
+    if(!data.photoIdStatus)throw new Error('Please choose what you will do with your photo ID.');
+    if(data.hasSecondaryInsurance&&(!data.secondaryCarrier||!data.secondaryMemberId)){
+      throw new Error('Please enter the secondary insurance company and member ID.');
+    }
+  }
+
+  if(step===3){
+    var returning=String(FD.booking.patientType||'').toUpperCase()==='RETURNING';
+    if(returning&&!data.healthChange)throw new Error('Please tell us whether anything changed since your last visit.');
+  }
+
+  if(step===4){
+    if(!data.confirmationPolicyAccepted)throw new Error('Please acknowledge the appointment confirmation policy.');
+    if(!data.noShowPolicyAccepted)throw new Error('Please acknowledge the $50 no-show policy.');
+    if(!data.privacyAcknowledged)throw new Error('Please acknowledge the privacy notice.');
+    if(!data.treatmentConsent)throw new Error('Consent to treatment is required.');
+  }
+
+  if(step===5&&!data.financialPolicyAcknowledged)throw new Error('Please acknowledge the financial policy.');
+
+  if(step===6){
+    if(!data.planToAttend)throw new Error('Please confirm that you plan to attend.');
+    if(!data.signatureName)throw new Error('Please type your full name as your electronic signature.');
+  }
+  return true;
+}
+
+function showStep(step){
+  FD.currentStep=step;
+  qa('.panel').forEach(function(p){p.classList.toggle('active',Number(p.getAttribute('data-panel'))===step)});
+  qa('.progress button').forEach(function(btn){
+    var n=Number(btn.getAttribute('data-step'));
+    btn.classList.toggle('active',n===step);btn.classList.toggle('done',n<step);
+  });
+  window.scrollTo({top:q('.main').offsetTop-10,behavior:'smooth'});
+}
+
+function saveAndMove(target){
+  if(FD.busy)return;
+  var data=collect();
+  try{validateStep(FD.currentStep,data)}catch(err){toast(err.message);return}
+
+  FD.busy=true;setBusy(true,'Saving…');
+  apiPost('save',String(target),data,[]).then(function(res){
+    if(!res.success)throw new Error(res.error||'Could not save.');
+    FD.data=data;FD.busy=false;setBusy(false,'');showStep(target);toast('Saved');
+  }).catch(function(err){
+    FD.busy=false;setBusy(false,'');toast(err.message||'Could not save. Please try again.');
+  });
+}
+
+function setBusy(on,msg){
+  qa('.btn').forEach(function(b){b.disabled=!!on});
+  var el=$('save'+FD.currentStep);if(el)el.textContent=msg||'';
+}
+
+function showComplete(){
+  qa('.panel').forEach(function(p){p.classList.remove('active')});
+  q('.progress').classList.add('hidden');q('.appointment-card').classList.add('hidden');
+  $('completePanel').classList.remove('hidden');
+}
+
+function complete(){
+  if(FD.busy)return;
+  var data=collect();
+  try{validateStep(6,data)}catch(err){toast(err.message);return}
+
+  FD.busy=true;setBusy(true,'Uploading & saving…');$('completeBtn').textContent='Completing…';
+
+  buildUploads(data).then(function(uploads){
+    return apiPost('complete','6',data,uploads);
+  }).then(function(res){
+    if(!res.success)throw new Error(res.error||'Could not complete Front Door.');
+    FD.completed=true;showComplete();toast('Front Door complete');
+  }).catch(function(err){
+    FD.busy=false;setBusy(false,'');$('completeBtn').textContent='Complete Front Door & confirm';
+    toast(err.message||'Could not complete Front Door. Please try again.');
+  });
+}
+
+function buildUploads(data){
+  var tasks=[];
+  if(data.insuranceCardStatus==='upload'){
+    if($('insuranceFront').files[0])tasks.push(fileToUpload($('insuranceFront').files[0],'insurance_front'));
+    if($('insuranceBack').files[0])tasks.push(fileToUpload($('insuranceBack').files[0],'insurance_back'));
+  }
+  if(data.photoIdStatus==='upload'&&$('photoIdFile').files[0])tasks.push(fileToUpload($('photoIdFile').files[0],'photo_id'));
+
+  return Promise.all(tasks).then(function(items){
+    if(data.insuranceCardStatus==='upload'&&!items.some(function(x){return x.kind==='insurance_front'||x.kind==='insurance_back'})){
+      throw new Error('Please choose at least one insurance card file, or choose another card option.');
+    }
+    if(data.photoIdStatus==='upload'&&!items.some(function(x){return x.kind==='photo_id'})){
+      throw new Error('Please choose a photo ID file, or choose another ID option.');
+    }
+    return items;
+  });
+}
+
+function fileToUpload(file,kind){
+  return new Promise(function(resolve,reject){
+    var max=4*1024*1024,allowed=['image/jpeg','image/png','application/pdf'];
+    if(file.size>max){reject(new Error('Each uploaded file must be 4 MB or smaller.'));return}
+    if(allowed.indexOf(file.type)<0){reject(new Error('Files must be JPG, PNG, or PDF.'));return}
+    var reader=new FileReader();
+    reader.onload=function(){resolve({kind:kind,name:file.name,mime:file.type,base64:String(reader.result||'')})};
+    reader.onerror=function(){reject(new Error('A file could not be read.'))};
+    reader.readAsDataURL(file);
+  });
+}
+
+qa('[data-next]').forEach(function(btn){btn.addEventListener('click',function(){saveAndMove(Number(btn.getAttribute('data-next')))})});
+qa('[data-back]').forEach(function(btn){btn.addEventListener('click',function(){showStep(Number(btn.getAttribute('data-back')))})});
+qa('.progress button').forEach(function(btn){btn.addEventListener('click',function(){var step=Number(btn.getAttribute('data-step'));if(step<=FD.currentStep)showStep(step)})});
+qa('input[name="insuranceCardStatus"],input[name="photoIdStatus"],input[name="healthChange"]').forEach(function(el){el.addEventListener('change',updateConditionalFields)});
+$('hasSecondary').addEventListener('change',updateConditionalFields);
+$('noKnownAllergies').addEventListener('change',updateConditionalFields);
+$('completeBtn').addEventListener('click',complete);
+
+boot();
+</script>
+</body>
+</html>
