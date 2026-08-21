@@ -157,7 +157,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <button type="button" data-step="2">Insurance</button>
     <button type="button" data-step="3">Your health</button>
     <button type="button" data-step="4">Policies</button>
-    <button type="button" data-step="5">Cost</button>
+    <button type="button" data-step="5">Financial</button>
     <button type="button" data-step="6">Confirm</button>
   </nav>
 
@@ -275,19 +275,26 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div id="healthDetails">
       <div class="section">
         <div class="section-title">Allergies & medications</div>
-        <label class="check" style="margin-bottom:13px"><input id="noKnownAllergies" type="checkbox"><span>No known allergies</span></label>
+        <label class="check" style="margin-bottom:13px"><input id="noKnownAllergies" type="checkbox" checked><span>No known allergies</span></label>
         <div class="field" id="allergyField"><label for="allergies">Allergies</label><textarea id="allergies" placeholder="Medication, food, adhesive, latex, or other allergies"></textarea></div>
         <div class="field"><label for="medications">Current medications</label><textarea id="medications" placeholder="One medication per line is fine. Include dose if known."></textarea></div>
         <div class="field">
-          <label for="pharmacySearch">Preferred pharmacy</label>
-          <div class="pharm-search-row">
-            <input id="pharmacySearch" type="text" placeholder="CVS, Walgreens, Duane Reade, or pharmacy name">
-            <button class="btn secondary" type="button" id="pharmacySearchBtn">Find pharmacy</button>
+          <label>Preferred pharmacy</label>
+          <div class="grid2">
+            <div class="field" style="margin-bottom:0">
+              <label for="pharmacyNameSearch">Pharmacy name</label>
+              <input id="pharmacyNameSearch" type="text" placeholder="CVS, Duane Reade, Walgreens…">
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label for="pharmacyLocationSearch">Town or ZIP code</label>
+              <input id="pharmacyLocationSearch" type="text" placeholder="New York or 10016">
+            </div>
           </div>
-          <p class="note">Searches the CMS/NPPES pharmacy directory using the address/ZIP you entered. If your pharmacy is not listed, type it manually below.</p>
+          <button class="btn secondary" type="button" id="pharmacySearchBtn" style="margin-top:10px">Search pharmacies</button>
+          <p class="note">Choose the actual pharmacy from the results. If it is not listed, you can still enter it manually.</p>
           <div id="pharmacyResults" class="pharmacy-results"></div>
           <div id="pharmacySelected" class="pharmacy-selected hidden"></div>
-          <input id="pharmacy" type="text" placeholder="Or type pharmacy name and street/location manually" style="margin-top:10px">
+          <input id="pharmacy" type="text" placeholder="Or enter pharmacy name and address manually" style="margin-top:10px">
           <input id="pharmacyNpi" type="hidden"><input id="pharmacyPhone" type="hidden"><input id="pharmacyAddress" type="hidden">
         </div>
       </div>
@@ -373,29 +380,24 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <label class="ack"><input id="treatmentConsent" type="checkbox"><span>I consent to evaluation and treatment by Dr. Wiqar Farooqi and authorized clinical staff under his direction.</span></label>
 
       <div class="consent-subchoice">
-        <strong style="font-size:14px">Medication history</strong>
-        <p class="note" style="margin:5px 0 9px">Choose one. You may authorize an electronic medication-history lookup, or provide your medication list yourself.</p>
-        <div class="choice-list">
-          <label class="choice"><input type="radio" name="medicationHistoryChoice" value="authorize"><span><strong>Authorize electronic medication-history lookup</strong><span>I authorize Dr. Wiqar Farooqi, WAF Podiatry P.C., and authorized staff to obtain medication history and prescription benefit information from permitted pharmacy/e-prescribing sources for treatment and medication reconciliation.</span></span></label>
-          <label class="choice"><input type="radio" name="medicationHistoryChoice" value="manual"><span><strong>I prefer to provide my medication list myself</strong><span>Do not retrieve my medication history electronically for this authorization.</span></span></label>
-        </div>
+        <label class="ack" style="border-top:0;padding-top:0"><input id="medicationHistoryConsent" type="checkbox" checked><span>I authorize Dr. Wiqar Farooqi, WAF Podiatry P.C., and authorized staff to obtain my medication history and prescription benefit information from permitted pharmacy, e-prescribing, and health-information sources for treatment and medication reconciliation.</span></label>
       </div>
 
       <div class="consent-subchoice">
-        <label class="ack" style="border-top:0;padding-top:0"><input id="telemedicineConsent" type="checkbox"><span><strong>Telemedicine standing consent (optional).</strong> If I choose or agree to receive a remote visit, I consent to telemedicine and understand that an in-person evaluation may still be recommended when clinically appropriate.</span></label>
+        <label class="ack" style="border-top:0;padding-top:0"><input id="telemedicineConsent" type="checkbox" checked><span>I authorize telemedicine when clinically appropriate and understand that an in-person evaluation may still be recommended.</span></label>
       </div>
     </div>
 
     <div class="nav-actions">
       <button class="btn secondary" type="button" data-back="3">Back</button>
-      <button class="btn primary" type="button" data-next="5">Continue to cost</button>
+      <button class="btn primary" type="button" data-next="5">Continue to financial responsibility</button>
       <span class="save-state" id="save4"></span>
     </div>
   </section>
 
   <section class="panel" data-panel="5">
-    <h2>Your expected cost</h2>
-    <p class="intro">We use the insurance information available to us to make this as useful as possible without pretending an estimate is a guarantee.</p>
+    <h2>Financial responsibility</h2>
+    <p class="intro">Review any available estimate, insurance billing authorization, and your financial responsibility before signing.</p>
 
     <div id="estimateReady" class="financial-box hidden">
       <div class="section-title">Estimated patient responsibility</div>
@@ -430,7 +432,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
   <section class="panel" data-panel="6">
     <h2>Confirm your appointment</h2>
-    <p class="intro">One final step. Your information will be reviewed and then your appointment can proceed into our clinical schedule.</p>
+    <p class="intro">Review the agreement below, sign it electronically, and confirm that you plan to attend.</p>
 
     <div class="section"><div class="section-title">Your appointment</div><div id="confirmSummary"></div></div>
 
@@ -445,16 +447,21 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
     <div class="agreement-box">
       <details id="agreementDetails">
-        <summary><strong>View the full agreement you are signing</strong></summary>
+        <summary><strong>View the full Patient Registration, Treatment Consent &amp; Financial Agreement</strong></summary>
         <div class="agreement-version" id="agreementVersion"></div>
         <div class="agreement-copy" id="agreementBody"></div>
       </details>
-      <label class="ack" style="margin-top:16px"><input id="agreementAccepted" type="checkbox"><span><strong>I understand this is a contract.</strong> I have reviewed the Patient Registration, Treatment Consent & Financial Agreement and agree to its terms. My selections above, typed name, date/time, and the agreement version will be preserved with my signed record.</span></label>
-    </div>
 
-    <div class="section">
-      <div class="section-title">Electronic signature</div>
-      <div class="field"><label for="signatureName">Type your full name <span class="req">*</span></label><input id="signatureName" type="text" autocomplete="name" placeholder="Your full legal name"><p class="note">By typing your name and submitting, you electronically sign the agreement and the acknowledgments/consents recorded above.</p></div>
+      <label class="ack" style="margin-top:16px"><input id="agreementAccepted" type="checkbox"><span><strong>I understand this is a contract.</strong> I have reviewed the agreement above and agree to its terms and to the consent selections I made in Front Door.</span></label>
+
+      <div style="border-top:1px solid var(--line-soft);margin-top:16px;padding-top:16px">
+        <div class="section-title">Electronic signature</div>
+        <div class="grid2">
+          <div class="field" style="margin-bottom:0"><label for="signatureName">Electronic signature — type your full legal name <span class="req">*</span></label><input id="signatureName" type="text" autocomplete="name" placeholder="Your full legal name"></div>
+          <div class="field" style="margin-bottom:0"><label>Date signed</label><input id="signatureDate" type="text" readonly></div>
+        </div>
+        <p class="note" style="margin-top:10px">Your typed name and the date/time of submission are attached to this agreement and preserved with the signed PDF record.</p>
+      </div>
     </div>
 
     <div class="nav-actions">
@@ -468,7 +475,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="complete-box">
       <div class="complete-icon">✓</div>
       <h2>Front Door complete</h2>
-      <p>Thank you. We received your registration and confirmation. Lexington Podiatry will finish the internal scheduling and insurance steps. You do not need to complete this form again.</p>
+      <p>Thank you. Your registration and appointment confirmation have been received.</p>
     </div>
   </section>
 
@@ -488,7 +495,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.8.3';
+var CLIENT_VERSION = 'v0.8.4';
 
 var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,completed:false,busy:false};
 
@@ -530,11 +537,23 @@ function apiPost(action,step,data,uploads){
 }
 
 
-function apiPharmacySearch(query){
+function apiPharmacySearch(name,location){
   var params=new URLSearchParams({
-    action:'pharmacy-search',t:FD.token,q:clean(query),zip:clean($('zip').value),city:clean($('city').value),state:clean($('state').value)
+    action:'pharmacy-search',
+    t:FD.token,
+    name:clean(name),
+    location:clean(location),
+    zip:clean($('zip').value),
+    city:clean($('city').value),
+    state:clean($('state').value)
   });
-  return fetch(GATEWAY_URL+'?'+params.toString()).then(function(r){return r.json()});
+  return fetch(GATEWAY_URL+'?'+params.toString(),{cache:'no-store'}).then(function(r){return r.json()});
+}
+
+function renderSignatureDate(){
+  var now=new Date();
+  var text=now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  if($('signatureDate'))$('signatureDate').value=text;
 }
 
 function renderAgreement(){
@@ -560,7 +579,7 @@ function renderPharmacySelection(){
 function searchPharmacy(){
   var btn=$('pharmacySearchBtn'),results=$('pharmacyResults');
   btn.disabled=true;btn.textContent='Searching…';results.innerHTML='';
-  apiPharmacySearch($('pharmacySearch').value).then(function(res){
+  apiPharmacySearch($('pharmacyNameSearch').value,$('pharmacyLocationSearch').value).then(function(res){
     if(!res.success)throw new Error(res.error||'Pharmacy search is unavailable.');
     var rows=res.results||[];
     if(!rows.length){
@@ -576,7 +595,7 @@ function searchPharmacy(){
       renderPharmacySelection();results.innerHTML='';
     })});
   }).catch(function(err){results.innerHTML='<div class="note">'+escapeHtml(err.message||'Pharmacy search is unavailable. Type the pharmacy manually below.')+'</div>'})
-  .finally(function(){btn.disabled=false;btn.textContent='Find pharmacy'});
+  .finally(function(){btn.disabled=false;btn.textContent='Search pharmacies'});
 }
 
 function boot(){
@@ -594,6 +613,9 @@ function boot(){
 
   apiGet().then(function(res){
     if(!res.success)throw new Error(res.error||'Could not load registration.');
+    if(String(res.version||'')!=='v0.8.4'){
+      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.8.4 before using this page.');
+    }
     FD.booking=res.booking||{};
     FD.data=res.intake&&res.intake.data?res.intake.data:{};
     FD.agreement=res.agreement||null;
@@ -655,12 +677,13 @@ function hydrate(){
   setValue('bookingReason',b.visitReason||'');
 
   setCheck('hasSecondary',!!d.hasSecondaryInsurance);
-  setCheck('noKnownAllergies',!!d.noKnownAllergies);
+  setCheck('noKnownAllergies',Object.prototype.hasOwnProperty.call(d,'noKnownAllergies') ? !!d.noKnownAllergies : true);
   setCheck('confirmationPolicyAccepted',!!d.confirmationPolicyAccepted);
   setCheck('noShowPolicyAccepted',!!d.noShowPolicyAccepted);
   setCheck('privacyAcknowledged',!!d.privacyAcknowledged);
   setCheck('treatmentConsent',!!d.treatmentConsent);
-  setCheck('telemedicineConsent',!!d.telemedicineConsent);
+  setCheck('medicationHistoryConsent',Object.prototype.hasOwnProperty.call(d,'medicationHistoryConsent') ? !!d.medicationHistoryConsent : true);
+  setCheck('telemedicineConsent',Object.prototype.hasOwnProperty.call(d,'telemedicineConsent') ? !!d.telemedicineConsent : true);
   setCheck('billingAuthorizationAccepted',!!d.billingAuthorizationAccepted);
   setCheck('financialPolicyAcknowledged',!!d.financialPolicyAcknowledged);
   setCheck('agreementAccepted',!!d.agreementAccepted);
@@ -669,7 +692,6 @@ function hydrate(){
   if(d.insuranceCardStatus)setRadio('insuranceCardStatus',d.insuranceCardStatus);
   if(d.photoIdStatus)setRadio('photoIdStatus',d.photoIdStatus);
   if(d.healthChange)setRadio('healthChange',d.healthChange);
-  if(d.medicationHistoryChoice)setRadio('medicationHistoryChoice',d.medicationHistoryChoice);
 
   if(Array.isArray(d.medicalHistory)){
     qa('#historyChecks input[type="checkbox"]').forEach(function(cb){
@@ -677,7 +699,7 @@ function hydrate(){
     });
   }
 
-  updateConditionalFields();renderEstimate();renderConfirmSummary();renderAgreement();renderPharmacySelection();
+  updateConditionalFields();renderEstimate();renderConfirmSummary();renderAgreement();renderSignatureDate();renderPharmacySelection();
 }
 
 function setValue(id,v){if($(id)&&v!=null)$(id).value=String(v)}
@@ -715,8 +737,7 @@ function renderConfirmSummary(){
   if(!FD.booking)return;
   $('confirmSummary').innerHTML=
     '<strong>'+escapeHtml(FD.booking.appointmentDisplay||'')+'</strong>'+
-    (FD.booking.visitReason?'<div style="margin-top:6px;color:var(--ink-soft)">Reason: '+escapeHtml(FD.booking.visitReason)+'</div>':'')+
-    '<div style="margin-top:12px;color:var(--ink-soft);font-size:14px">Completing Front Door records your confirmation. Lexington Podiatry will then finish the internal scheduling steps.</div>';
+    (FD.booking.visitReason?'<div style="margin-top:6px;color:var(--ink-soft)">Reason: '+escapeHtml(FD.booking.visitReason)+'</div>':'');
 }
 
 function collect(){
@@ -738,7 +759,7 @@ function collect(){
     medicalOther:clean($('medicalOther').value),surgicalHistory:clean($('surgicalHistory').value),hpi:clean($('hpi').value),
     confirmationPolicyAccepted:$('confirmationPolicyAccepted').checked,noShowPolicyAccepted:$('noShowPolicyAccepted').checked,
     privacyAcknowledged:$('privacyAcknowledged').checked,treatmentConsent:$('treatmentConsent').checked,
-    medicationHistoryChoice:radioValue('medicationHistoryChoice'),telemedicineConsent:$('telemedicineConsent').checked,
+    medicationHistoryConsent:$('medicationHistoryConsent').checked,telemedicineConsent:$('telemedicineConsent').checked,
     billingAuthorizationAccepted:$('billingAuthorizationAccepted').checked,financialPolicyAcknowledged:$('financialPolicyAcknowledged').checked,
     agreementAccepted:$('agreementAccepted').checked,
     planToAttend:$('planToAttend').checked,signatureName:clean($('signatureName').value)
@@ -780,7 +801,6 @@ function validateStep(step,data){
     if(!data.noShowPolicyAccepted)throw new Error('Please acknowledge the $50 no-show policy.');
     if(!data.privacyAcknowledged)throw new Error('Please acknowledge the privacy notice.');
     if(!data.treatmentConsent)throw new Error('Consent to treatment is required.');
-    if(data.medicationHistoryChoice!=='authorize'&&data.medicationHistoryChoice!=='manual')throw new Error('Please choose whether you authorize electronic medication-history retrieval.');
   }
 
   if(step===5){
@@ -888,7 +908,8 @@ $('hasSecondary').addEventListener('change',updateConditionalFields);
 $('noKnownAllergies').addEventListener('change',updateConditionalFields);
 $('completeBtn').addEventListener('click',complete);
 $('pharmacySearchBtn').addEventListener('click',searchPharmacy);
-$('pharmacySearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
+$('pharmacyNameSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
+$('pharmacyLocationSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').value)&&clean($('pharmacy').value)!==clean(FD.data.pharmacy||'')){setValue('pharmacyNpi','');setValue('pharmacyPhone','');setValue('pharmacyAddress','')}renderPharmacySelection()});
 
 boot();
