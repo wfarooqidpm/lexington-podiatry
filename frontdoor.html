@@ -29,7 +29,8 @@ a{color:inherit}.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
 .topbar a{color:var(--champagne);text-decoration:none;font-weight:600}
 .nav{background:rgba(250,247,240,.95);border-bottom:1px solid var(--line-soft)}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:17px;padding-bottom:17px}
-.brand{text-decoration:none;display:flex;align-items:center;gap:14px}
+.brand{text-decoration:none;display:flex;align-items:center;gap:12px}
+.brand .lockup{height:60px;width:auto;display:block}
 .mark{width:44px;height:44px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:23px}
 .brand-text strong{display:block;font-size:16px;letter-spacing:.15em;text-transform:uppercase}
 .brand-text span{display:block;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px}
@@ -243,8 +244,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="/" aria-label="Lexington Podiatry home">
-      <span class="mark" aria-hidden="true">L</span>
-      <span class="brand-text"><strong>Lexington Podiatry</strong><span>New York City</span></span>
+      <img class="lockup" src="data:image/png;base64,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" alt="Lexington Podiatry">
     </a>
     <span class="secure-chip">Secure registration</span>
   </div>
@@ -254,7 +254,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   <div class="wrap">
     <div class="eyebrow">Front Door</div>
     <h1>Complete your registration.<br><em>Then you’re ready.</em></h1>
-    <p>We already have some of your booking information. Review it, complete what is missing, and confirm that you plan to attend.</p>
+    <p>We already have some of your booking information. Review it, complete what is missing, and sign your registration before your visit.</p>
   </div>
 </section>
 
@@ -276,12 +276,16 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <button type="button" data-step="3">Your health</button>
     <button type="button" data-step="4">Policies</button>
     <button type="button" data-step="5">Financial</button>
-    <button type="button" data-step="6">Confirm</button>
+    <button type="button" data-step="6">Sign</button>
   </nav>
 
   <section class="panel" data-panel="1">
     <h2>About you</h2>
     <p class="intro">We’ve pre-filled what we received with your booking. Please correct anything that has changed.</p>
+    <div id="demographicsLockNote" class="callout eligibility-success hidden" style="margin-bottom:18px">
+      <strong>✓ Details locked after insurance verification</strong>
+      <div style="margin-top:5px">Your name, date of birth, contact information, and address are locked because they are tied to the verified coverage. To make a correction, return to Insurance and choose <strong>Change insurance</strong>.</div>
+    </div>
 
     <div class="section">
       <div class="section-title">Contact information</div>
@@ -557,8 +561,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
     <div class="policy-card featured">
       <h3>Appointment confirmation</h3>
-      <p>Your requested appointment is not considered fully confirmed until you complete Front Door and confirm that you plan to attend. Appointments that remain unconfirmed may be removed from the schedule so the time can be offered to another patient.</p>
-      <label class="ack"><input id="confirmationPolicyAccepted" type="checkbox"><span>I understand that an unconfirmed appointment may be removed from the schedule.</span></label>
+      <p>Completing Front Door prepares your appointment but does not itself confirm attendance. Lexington Podiatry generally asks patients to confirm their appointment on the evening before the visit. An appointment that remains unconfirmed may be released so the time can be offered to another patient.</p>
+      <label class="ack"><input id="confirmationPolicyAccepted" type="checkbox"><span>I understand that I will be asked to confirm my appointment separately and that an appointment left unconfirmed may be released.</span></label>
     </div>
 
     <div class="policy-card featured">
@@ -590,7 +594,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       </div>
 
       <div class="consent-subchoice">
-        <label class="ack" style="border-top:0;padding-top:0"><input id="telemedicineConsent" type="checkbox" checked><span>I authorize telemedicine when clinically appropriate and understand that an in-person evaluation may still be recommended.</span></label>
+        <label class="ack" style="border-top:0;padding-top:0"><input id="telemedicineConsent" type="checkbox" checked><span><strong>Telemedicine authorization.</strong> I voluntarily consent to evaluation, treatment, follow-up, care coordination, and communication through secure video, audio, and other electronic technology when clinically appropriate. I understand that telemedicine has limitations compared with an in-person examination; technical, privacy, or communication problems may occur despite reasonable safeguards; the clinician may stop a virtual visit or recommend in-person or emergency evaluation when medically appropriate; and I may withdraw this authorization for future telemedicine services without affecting my ability to receive in-person care.</span></label>
+        <div id="telemedicineDeclineWarning" class="hidden" style="margin-top:10px;color:#9b1c1c;font-weight:800;font-size:13px;line-height:1.5">Telemedicine consent is declined. Without telemedicine consent, no virtual/video appointment can be scheduled or provided. You may still receive in-person care.</div>
       </div>
     </div>
 
@@ -636,25 +641,30 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
     <div class="nav-actions">
       <button class="btn secondary" type="button" data-back="4">Back</button>
-      <button class="btn primary" type="button" data-next="6">Review & confirm</button>
+      <button class="btn primary" type="button" data-next="6">Review & sign</button>
       <span class="save-state" id="save5"></span>
     </div>
   </section>
 
   <section class="panel" data-panel="6">
-    <h2>Confirm your appointment</h2>
-    <p class="intro">Review the agreement below, sign it electronically, and confirm that you plan to attend.</p>
+    <h2>Review &amp; sign</h2>
+    <p class="intro">Review the visit information and your agreement below, then sign and complete Front Door.</p>
 
-    <div class="section"><div class="section-title">Your appointment</div><div id="confirmSummary"></div></div>
-
-    <div class="policy-card featured">
-      <label class="ack" style="border-top:0;padding-top:0"><input id="planToAttend" type="checkbox"><span><strong>I confirm that I plan to attend this appointment.</strong></span></label>
+    <div class="section">
+      <div class="section-title">Your visit</div>
+      <div id="confirmSummary"></div>
     </div>
 
-    <div id="zocdocCancelReminder" class="callout gold hidden">
-      <strong>Changed your mind?</strong>
-      If you no longer plan to attend, please cancel the booking through Zocdoc instead of confirming here.
+    <div id="finalEstimateSnapshot" class="financial-box initial-estimate-ready hidden" style="padding:19px 21px">
+      <div class="estimate-kicker">Estimated financial responsibility</div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap">
+        <div><div class="amount" id="finalEstimateAmount" style="font-size:34px;margin:4px 0">$—</div><div style="font-size:13px;color:#405047">Initial evaluation</div></div>
+        <div class="confidence" id="finalEstimateConfidence">Verified insurance benefit</div>
+      </div>
+      <div id="virtualPrepayWarning" class="hidden" style="margin-top:14px;padding:12px 14px;border-radius:10px;background:#fff0f0;border:1px solid #d99b9b;color:#8d2525;font-size:13px;line-height:1.5;font-weight:700">Payment is required before a virtual visit. After Front Door is completed, Lexington Podiatry will send a payment link for the amount shown above. The virtual visit will not take place unless the required payment has been received before the appointment.</div>
     </div>
+
+    <div id="finalEstimatePending" class="callout hidden"><strong>Financial estimate pending.</strong> We do not yet have enough verified benefit information to show a reliable amount here.</div>
 
     <div class="agreement-box">
       <details id="agreementDetails">
@@ -677,7 +687,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
     <div class="nav-actions">
       <button class="btn secondary" type="button" data-back="5">Back</button>
-      <button class="btn primary" type="button" id="completeBtn">Complete Front Door & confirm</button>
+      <button class="btn primary" type="button" id="completeBtn">Sign &amp; complete Front Door</button>
       <span class="save-state" id="save6"></span>
     </div>
   </section>
@@ -686,7 +696,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="complete-box">
       <div class="complete-icon">✓</div>
       <h2>Front Door complete</h2>
-      <p>Thank you. Your registration and appointment confirmation have been received.</p>
+      <p>Thank you. Your registration and signed agreement have been received. Your appointment will be confirmed separately on the evening-before workflow.</p>
     </div>
   </section>
 
@@ -825,6 +835,34 @@ function setInsuranceLocked(locked){
     el.setAttribute('aria-readonly',locked?'true':'false');
     el.classList.toggle('verified-input',!!locked);
   });
+
+  setVerifiedDemographicsLocked_(locked);
+}
+
+function setVerifiedDemographicsLocked_(locked){
+  [
+    'firstName',
+    'lastName',
+    'dob',
+    'phone',
+    'email',
+    'address1',
+    'address2',
+    'city',
+    'state',
+    'zip'
+  ].forEach(function(id){
+    var el=$(id);
+    if(!el)return;
+
+    el.readOnly=!!locked;
+    el.setAttribute('aria-readonly',locked?'true':'false');
+    el.classList.toggle('verified-input',!!locked);
+  });
+
+  if($('demographicsLockNote')){
+    $('demographicsLockNote').classList.toggle('hidden',!locked);
+  }
 }
 
 function renderInsuranceCardRequirement(){
@@ -1312,6 +1350,7 @@ function renderFinancialEligibility(){
   }
 
   renderStatusSidebar();
+  renderFinalFinancialSnapshot_();
 }
 
 function pollEligibility(){
@@ -1527,7 +1566,6 @@ function hydrate(){
   setCheck('billingAuthorizationAccepted',!!d.billingAuthorizationAccepted);
   setCheck('financialPolicyAcknowledged',!!d.financialPolicyAcknowledged);
   setCheck('agreementAccepted',!!d.agreementAccepted);
-  setCheck('planToAttend',!!d.planToAttend);
 
   if(d.insuranceCardStatus)setRadio('insuranceCardStatus',d.insuranceCardStatus);
   if(d.photoIdStatus)setRadio('photoIdStatus',d.photoIdStatus);
@@ -1539,7 +1577,7 @@ function hydrate(){
     });
   }
 
-  updateConditionalFields();renderEstimate();renderConfirmSummary();renderAgreement();renderSignatureDate();renderPharmacySelection();renderStatusSidebar();
+  updateConditionalFields();renderEstimate();renderConfirmSummary();renderFinalFinancialSnapshot_();renderTelemedicineWarning_();renderAgreement();renderSignatureDate();renderPharmacySelection();renderStatusSidebar();
 }
 
 function setValue(id,v){if($(id)&&v!=null)$(id).value=String(v)}
@@ -1573,6 +1611,24 @@ function renderEstimate(){
   }
 }
 
+
+function frontDoorIsVirtual_(){
+  var mode=clean(FD.booking&&FD.booking.visitMode||'').toUpperCase();
+  if(mode.indexOf('VIDEO')>-1||mode.indexOf('VIRTUAL')>-1||mode.indexOf('TELE')>-1)return true;
+  if(mode.indexOf('IN PERSON')>-1)return false;
+  var reason=clean(FD.booking&&FD.booking.visitReason||'').toUpperCase();
+  if(reason.indexOf('TELEHEALTH')>-1||reason.indexOf('TELEMED')>-1||reason.indexOf('VIRTUAL')>-1||reason.indexOf('VIDEO CONSULT')>-1)return true;
+  var iso=clean(FD.booking&&FD.booking.appointmentStart||'');
+  if(iso){try{var weekday=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short'}).format(new Date(iso));if(weekday==='Fri')return true;}catch(ignore){}}
+  return false;
+}
+function renderTelemedicineWarning_(){if($('telemedicineDeclineWarning'))$('telemedicineDeclineWarning').classList.toggle('hidden',$('telemedicineConsent').checked);}
+function renderFinalFinancialSnapshot_(){
+  var estimate=FD.estimate||null,ready=$('finalEstimateSnapshot'),pending=$('finalEstimatePending');if(!ready||!pending)return;
+  var status=String(estimate&&estimate.status||'').toUpperCase();
+  if(status==='READY'&&estimate.amount!==''&&estimate.amount!=null){ready.classList.remove('hidden');pending.classList.add('hidden');$('finalEstimateAmount').textContent='$'+Number(estimate.amount).toFixed(2);$('finalEstimateConfidence').textContent=estimate.confidence==='HIGH'?'Verified insurance benefit':'Visit estimate';$('virtualPrepayWarning').classList.toggle('hidden',!(frontDoorIsVirtual_()&&Number(estimate.amount)>0));}
+  else{ready.classList.add('hidden');pending.classList.remove('hidden');}
+}
 function renderConfirmSummary(){
   if(!FD.booking)return;
   $('confirmSummary').innerHTML=
@@ -1604,7 +1660,7 @@ function collect(){
     medicationHistoryConsent:$('medicationHistoryConsent').checked,telemedicineConsent:$('telemedicineConsent').checked,
     billingAuthorizationAccepted:$('billingAuthorizationAccepted').checked,financialPolicyAcknowledged:$('financialPolicyAcknowledged').checked,
     agreementAccepted:$('agreementAccepted').checked,
-    planToAttend:$('planToAttend').checked,signatureName:clean($('signatureName').value)
+    signatureName:clean($('signatureName').value)
   };
 }
 
@@ -1642,6 +1698,7 @@ function validateStep(step,data){
     if(!data.noShowPolicyAccepted)throw new Error('Please acknowledge the $50 no-show policy.');
     if(!data.privacyAcknowledged)throw new Error('Please acknowledge the privacy notice.');
     if(!data.treatmentConsent)throw new Error('Consent to treatment is required.');
+    if(frontDoorIsVirtual_()&&!data.telemedicineConsent)throw new Error('Telemedicine consent is required for a virtual/video appointment.');
     if(!data.billingAuthorizationAccepted)throw new Error('Please authorize insurance billing and assignment of benefits.');
     if(!data.financialPolicyAcknowledged)throw new Error('Please acknowledge the financial policy.');
   }
@@ -1653,7 +1710,6 @@ function validateStep(step,data){
       showInsuranceCardChoices();
       throw new Error('We could not verify your insurance automatically. Please choose how you will provide your insurance card.');
     }
-    if(!data.planToAttend)throw new Error('Please confirm that you plan to attend.');
     if(!data.agreementAccepted)throw new Error('Please review and accept the agreement you are signing.');
     if(!data.signatureName)throw new Error('Please type your full name as your electronic signature.');
   }
@@ -1663,6 +1719,8 @@ function validateStep(step,data){
 function showStep(step){
   FD.currentStep=step;
   renderStatusSidebar();
+  renderTelemedicineWarning_();
+  if(step===6)renderFinalFinancialSnapshot_();
   qa('.panel').forEach(function(p){p.classList.toggle('active',Number(p.getAttribute('data-panel'))===step)});
   qa('.progress button').forEach(function(btn){
     var n=Number(btn.getAttribute('data-step'));
@@ -1722,7 +1780,7 @@ function complete(){
     if(!res.success)throw new Error(res.error||'Could not complete Front Door.');
     FD.completed=true;showComplete();toast('Front Door complete');
   }).catch(function(err){
-    FD.busy=false;setBusy(false,'');$('completeBtn').textContent='Complete Front Door & confirm';
+    FD.busy=false;setBusy(false,'');$('completeBtn').textContent='Sign & complete Front Door';
     toast(err.message||'Could not complete Front Door. Please try again.');
   });
 }
@@ -1775,6 +1833,7 @@ $('noKnownAllergies').addEventListener('change',updateConditionalFields);
   $(id).addEventListener('change',renderStatusSidebar);
 });
 
+$('telemedicineConsent').addEventListener('change',function(){renderTelemedicineWarning_();renderStatusSidebar();});
 $('completeBtn').addEventListener('click',complete);
 $('pharmacySearchBtn').addEventListener('click',searchPharmacy);
 $('changeInsuranceBtn').addEventListener('click',unlockInsuranceForChange);
