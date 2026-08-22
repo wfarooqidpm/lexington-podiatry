@@ -111,6 +111,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;display:grid;grid-template-columns:1fr 1fr;gap:14px}.side-card{margin:0}}
 @media(max-width:680px){.wrap{padding:0 18px}.topbar .wrap{display:block;text-align:center;padding:8px 18px}.topbar .wrap span:first-child{display:none}.secure-chip{display:none}.hero{padding:38px 0 30px}.main{padding-top:28px}.progress{overflow-x:auto;grid-template-columns:repeat(6,88px)}.progress button{font-size:9px}.grid2,.grid3{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr 1fr}.section{padding:19px}.sidebar{grid-template-columns:1fr}.nav-actions .btn{width:100%}.save-state{width:100%;text-align:center}}
 @media(max-width:420px){.check-grid{grid-template-columns:1fr}}
+.verified-label{font-size:10px;color:#2f6f52;font-weight:800;margin-left:6px;text-transform:uppercase;letter-spacing:.08em}
 </style>
 </head>
 
@@ -168,30 +169,30 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="section">
       <div class="section-title">Contact information</div>
       <div class="grid2">
-        <div class="field"><label for="firstName">First name <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="firstName" type="text" autocomplete="given-name"></div>
-        <div class="field"><label for="lastName">Last name <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="lastName" type="text" autocomplete="family-name"></div>
-        <div class="field"><label for="dob">Date of birth <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="dob" type="date" autocomplete="bday"></div>
-        <div class="field"><label for="phone">Mobile / best phone <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="phone" type="tel" autocomplete="tel"></div>
-        <div class="field"><label for="email">Email <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="email" type="email" autocomplete="email"></div>
+        <div class="field"><label for="firstName">First name <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="firstName" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
+        <div class="field"><label for="lastName">Last name <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="lastName" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
+        <div class="field"><label for="dob">Date of birth <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="dob" data-lpignore="true" data-1p-ignore="true" type="date" autocomplete="off"></div>
+        <div class="field"><label for="phone">Mobile / best phone <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="phone" data-lpignore="true" data-1p-ignore="true" type="tel" autocomplete="off"></div>
+        <div class="field"><label for="email">Email <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="email" data-lpignore="true" data-1p-ignore="true" type="email" autocomplete="off"></div>
       </div>
     </div>
 
     <div class="section">
       <div class="section-title">Address</div>
-      <div class="field"><label for="address1">Address line 1 <span class="req">*</span></label><input id="address1" type="text" autocomplete="address-line1"></div>
-      <div class="field"><label for="address2">Address line 2</label><input id="address2" type="text" autocomplete="address-line2"></div>
+      <div class="field"><label for="address1">Address line 1 <span class="req">*</span></label><input id="address1" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
+      <div class="field"><label for="address2">Address line 2</label><input id="address2" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
       <div class="grid3">
-        <div class="field"><label for="city">City <span class="req">*</span></label><input id="city" type="text" autocomplete="address-level2"></div>
-        <div class="field"><label for="state">State <span class="req">*</span></label><input id="state" type="text" autocomplete="address-level1" placeholder="NY"></div>
-        <div class="field"><label for="zip">ZIP code <span class="req">*</span></label><input id="zip" type="text" inputmode="numeric" autocomplete="postal-code"></div>
+        <div class="field"><label for="city">City <span class="req">*</span></label><input id="city" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
+        <div class="field"><label for="state">State <span class="req">*</span></label><input id="state" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off" placeholder="NY"></div>
+        <div class="field"><label for="zip">ZIP code <span class="req">*</span></label><input id="zip" data-lpignore="true" data-1p-ignore="true" type="text" inputmode="numeric" autocomplete="off"></div>
       </div>
     </div>
 
     <div class="section">
       <div class="section-title">Helpful contacts</div>
       <div class="grid2">
-        <div class="field"><label for="emergencyName">Emergency contact</label><input id="emergencyName" type="text"></div>
-        <div class="field"><label for="emergencyPhone">Emergency contact phone</label><input id="emergencyPhone" type="tel"></div>
+        <div class="field"><label for="emergencyName">Emergency contact</label><input id="emergencyName" data-lpignore="true" data-1p-ignore="true" type="text"></div>
+        <div class="field"><label for="emergencyPhone">Emergency contact phone</label><input id="emergencyPhone" data-lpignore="true" data-1p-ignore="true" type="tel"></div>
       </div>
     </div>
 
@@ -208,12 +209,44 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="section">
       <div class="section-title">Primary insurance</div>
       <div class="grid2">
-        <div class="field"><label for="insuranceCarrier">Insurance company <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="insuranceCarrier" type="text"></div>
-        <div class="field"><label for="insurancePlan">Plan name</label><input id="insurancePlan" type="text"></div>
+        <div class="field">
+          <label for="insuranceCarrier">Insurance company <span class="req">*</span><span class="prefill">pre-filled</span></label>
+          <input id="insuranceCarrier" type="text" list="insuranceCarrierOptions" autocomplete="off">
+          <datalist id="insuranceCarrierOptions">
+            <option value="Aetna"></option>
+            <option value="Cigna"></option>
+            <option value="Anthem BCBS"></option>
+            <option value="UnitedHealthcare"></option>
+            <option value="Oxford"></option>
+            <option value="TRICARE"></option>
+            <option value="Medicare"></option>
+            <option value="1199 SEIU"></option>
+            <option value="AARP Medicare Supplement"></option>
+          </datalist>
+        </div>
+        <div class="field"><label for="insurancePlan">Plan name <span class="verified-label hidden" id="planVerified">verified</span></label><input id="insurancePlan" type="text"></div>
         <div class="field"><label for="memberId">Member ID <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="memberId" type="text" autocomplete="off"></div>
-        <div class="field"><label for="groupId">Group number</label><input id="groupId" type="text" autocomplete="off"></div>
+        <div class="field"><label for="groupId">Group number <span class="verified-label hidden" id="groupVerified">verified</span></label><input id="groupId" type="text" autocomplete="off"></div>
       </div>
-      <p class="note">We usually do not need separate subscriber information if eligibility can identify your coverage from the information above.</p>
+
+      <p class="note">For Medicare Advantage, enter the insurance company shown on the card (for example Aetna, Anthem, UnitedHealthcare, Humana, or Wellcare), rather than “Medicare Advantage.” We only ask for policyholder details if the payer says they are needed.</p>
+
+      <div id="eligibilityBox" class="callout hidden" style="margin-top:16px">
+        <strong id="eligibilityTitle">Checking your coverage…</strong>
+        <div id="eligibilityText" style="margin-top:5px"></div>
+        <div id="eligibilityDetails" class="hidden" style="margin-top:12px"></div>
+      </div>
+
+      <div id="subscriberFields" class="hidden" style="margin-top:18px;padding-top:18px;border-top:1px solid var(--line-soft)">
+        <div class="section-title">Policyholder details</div>
+        <p class="note">The payer could not identify the patient from the member information above. Please enter the primary policyholder’s information so we can try again.</p>
+        <div class="grid2">
+          <div class="field"><label for="subscriberFirstName">Policyholder first name <span class="req">*</span></label><input id="subscriberFirstName" type="text" autocomplete="off"></div>
+          <div class="field"><label for="subscriberLastName">Policyholder last name <span class="req">*</span></label><input id="subscriberLastName" type="text" autocomplete="off"></div>
+          <div class="field"><label for="subscriberDob">Policyholder date of birth <span class="req">*</span></label><input id="subscriberDob" type="date" autocomplete="off"></div>
+        </div>
+        <button class="btn secondary" type="button" id="retryEligibilityBtn">Try coverage check again</button>
+      </div>
     </div>
 
     <div class="section">
@@ -283,11 +316,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           <div class="grid2">
             <div class="field" style="margin-bottom:0">
               <label for="pharmacyNameSearch">Pharmacy name</label>
-              <input id="pharmacyNameSearch" type="text" placeholder="CVS, Duane Reade, Walgreens…">
+              <input id="pharmacyNameSearch" type="text" placeholder="CVS" autocomplete="off">
             </div>
             <div class="field" style="margin-bottom:0">
               <label for="pharmacyLocationSearch">Town or ZIP code</label>
-              <input id="pharmacyLocationSearch" type="text" placeholder="New York or 10016">
+              <input id="pharmacyLocationSearch" type="text" placeholder="Astoria, NY" autocomplete="off">
             </div>
           </div>
           <button class="btn secondary" type="button" id="pharmacySearchBtn" style="margin-top:10px">Search pharmacies</button>
@@ -399,6 +432,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <h2>Financial responsibility</h2>
     <p class="intro">Review any available estimate, insurance billing authorization, and your financial responsibility before signing.</p>
 
+    <div id="financialEligibilityBox" class="callout hidden" style="margin-bottom:18px">
+      <strong id="financialEligibilityTitle">Insurance verification</strong>
+      <div id="financialEligibilityText" style="margin-top:5px"></div>
+    </div>
+
     <div id="estimateReady" class="financial-box hidden">
       <div class="section-title">Estimated patient responsibility</div>
       <div class="amount" id="estimateAmount">$—</div>
@@ -495,7 +533,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.8.4';
+var CLIENT_VERSION = 'v0.9.0';
 
 var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,completed:false,busy:false};
 
@@ -536,6 +574,149 @@ function apiPost(action,step,data,uploads){
   }).then(function(r){return r.json()});
 }
 
+
+function apiEligibilityStatus(){
+  var params=new URLSearchParams({
+    action:'eligibility-status',
+    t:FD.token,
+    _:String(Date.now())
+  });
+  return fetch(GATEWAY_URL+'?'+params.toString(),{cache:'no-store'}).then(function(r){return r.json()});
+}
+
+function requestEligibility(data){
+  return apiPost('eligibility-request','2',data,[]);
+}
+
+function eligibilityPending(status){
+  status=String(status||'').toUpperCase();
+  return status==='QUEUED'||status==='CHECKING';
+}
+
+function applyEligibilityResult(res){
+  if(!res||!res.success)return;
+  FD.eligibility=res;
+
+  var status=String(res.status||'').toUpperCase();
+  var box=$('eligibilityBox');
+  var title=$('eligibilityTitle');
+  var text=$('eligibilityText');
+  var details=$('eligibilityDetails');
+
+  box.classList.remove('hidden');
+  box.classList.remove('gold');
+
+  if(eligibilityPending(status)){
+    box.classList.add('gold');
+    title.textContent='Checking your coverage…';
+    text.textContent='You can continue with registration while we check.';
+    details.classList.add('hidden');
+  }else if(status==='ACTIVE'){
+    title.textContent='✓ Coverage found';
+    text.textContent=res.message||'Active coverage was returned by the payer.';
+
+    var pieces=[];
+    if(res.payerDisplay)pieces.push('<strong>Payer:</strong> '+escapeHtml(res.payerDisplay));
+    if(res.planName)pieces.push('<strong>Plan:</strong> '+escapeHtml(res.planName));
+    if(res.groupNumber)pieces.push('<strong>Group:</strong> '+escapeHtml(res.groupNumber));
+    if(res.planNumber)pieces.push('<strong>Plan number:</strong> '+escapeHtml(res.planNumber));
+
+    details.innerHTML=pieces.join('<br>');
+    details.classList.toggle('hidden',!pieces.length);
+
+    if(res.planName){
+      setValue('insurancePlan',res.planName);
+      $('planVerified').classList.remove('hidden');
+    }
+
+    if(res.groupNumber){
+      setValue('groupId',res.groupNumber);
+      $('groupVerified').classList.remove('hidden');
+    }
+
+    $('subscriberFields').classList.add('hidden');
+  }else if(status==='INACTIVE'){
+    title.textContent='Coverage needs attention';
+    text.textContent=res.message||'The payer returned inactive coverage.';
+    details.classList.add('hidden');
+  }else if(status==='NEEDS SUBSCRIBER INFO'){
+    title.textContent='One more insurance detail is needed';
+    text.textContent=res.message||'Please enter the primary policyholder details below.';
+    details.classList.add('hidden');
+    $('subscriberFields').classList.remove('hidden');
+  }else{
+    title.textContent='Insurance verification';
+    text.textContent=res.message||'We will review this insurance manually.';
+    details.classList.add('hidden');
+  }
+
+  renderFinancialEligibility();
+}
+
+function renderFinancialEligibility(){
+  if(!FD.eligibility)return;
+
+  var r=FD.eligibility;
+  var status=String(r.status||'').toUpperCase();
+  var box=$('financialEligibilityBox');
+  var title=$('financialEligibilityTitle');
+  var text=$('financialEligibilityText');
+
+  box.classList.remove('hidden');
+
+  if(status==='ACTIVE'){
+    title.textContent='✓ Insurance coverage found';
+    var parts=[];
+    if(r.planName)parts.push('Plan: '+r.planName);
+    if(r.groupNumber)parts.push('Group: '+r.groupNumber);
+    text.textContent=parts.length?parts.join(' · '):(r.message||'Active coverage was returned.');
+  }else if(eligibilityPending(status)){
+    title.textContent='Insurance verification in progress';
+    text.textContent='We are still checking your coverage. This does not prevent you from completing registration.';
+  }else{
+    title.textContent='Insurance verification';
+    text.textContent=r.message||'Staff will review the insurance information.';
+  }
+}
+
+function pollEligibility(){
+  if(FD.eligibilityTimer)return;
+
+  FD.eligibilityStartedAt=Date.now();
+
+  function tick(){
+    apiEligibilityStatus().then(function(res){
+      if(!res.success)return;
+      applyEligibilityResult(res);
+
+      if(!eligibilityPending(res.status)){
+        clearInterval(FD.eligibilityTimer);
+        FD.eligibilityTimer=null;
+      }else if(Date.now()-FD.eligibilityStartedAt>90000){
+        clearInterval(FD.eligibilityTimer);
+        FD.eligibilityTimer=null;
+      }
+    }).catch(function(){});
+  }
+
+  tick();
+  FD.eligibilityTimer=setInterval(tick,3000);
+}
+
+function queueEligibilityFromCurrentData(data){
+  applyEligibilityResult({
+    success:true,
+    status:'QUEUED',
+    message:'Coverage check queued.'
+  });
+
+  return requestEligibility(data).then(function(res){
+    if(!res.success)throw new Error(res.error||'Coverage check could not be queued.');
+    applyEligibilityResult(res);
+    pollEligibility();
+    return res;
+  });
+}
 
 function apiPharmacySearch(name,location){
   var params=new URLSearchParams({
@@ -613,15 +794,20 @@ function boot(){
 
   apiGet().then(function(res){
     if(!res.success)throw new Error(res.error||'Could not load registration.');
-    if(String(res.version||'')!=='v0.8.4'){
-      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.8.4 before using this page.');
+    if(String(res.version||'')!=='v0.9.0'){
+      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.9.0 before using this page.');
     }
     FD.booking=res.booking||{};
     FD.data=res.intake&&res.intake.data?res.intake.data:{};
     FD.agreement=res.agreement||null;
+    FD.eligibility=res.eligibility||null;
     FD.completed=!!(res.intake&&res.intake.completed);
 
     hydrate();
+    if(FD.eligibility&&FD.eligibility.status&&FD.eligibility.status!=='NOT REQUESTED'){
+      applyEligibilityResult(FD.eligibility);
+      if(eligibilityPending(FD.eligibility.status))pollEligibility();
+    }
     $('loading').classList.add('hidden');$('app').classList.remove('hidden');
 
     if(FD.completed){showComplete();return}
@@ -674,6 +860,9 @@ function hydrate(){
   setValue('insurancePlan',d.insurancePlan||b.insurancePlan);
   setValue('memberId',d.memberId||b.memberId);
   setValue('groupId',d.groupId||b.groupId);
+  setValue('subscriberFirstName',d.subscriberFirstName);
+  setValue('subscriberLastName',d.subscriberLastName);
+  setValue('subscriberDob',d.subscriberDob);
   setValue('bookingReason',b.visitReason||'');
 
   setCheck('hasSecondary',!!d.hasSecondaryInsurance);
@@ -750,6 +939,8 @@ function collect(){
     pharmacy:clean($('pharmacy').value),pharmacyNpi:clean($('pharmacyNpi').value),pharmacyPhone:clean($('pharmacyPhone').value),pharmacyAddress:clean($('pharmacyAddress').value),
     insuranceCarrier:clean($('insuranceCarrier').value),insurancePlan:clean($('insurancePlan').value),
     memberId:clean($('memberId').value),groupId:clean($('groupId').value),
+    subscriberFirstName:clean($('subscriberFirstName').value),subscriberLastName:clean($('subscriberLastName').value),
+    subscriberDob:clean($('subscriberDob').value),
     insuranceCardStatus:radioValue('insuranceCardStatus'),photoIdStatus:radioValue('photoIdStatus'),
     hasSecondaryInsurance:$('hasSecondary').checked,secondaryCarrier:clean($('secondaryCarrier').value),
     secondaryMemberId:clean($('secondaryMemberId').value),secondaryGroupId:clean($('secondaryGroupId').value),
@@ -834,7 +1025,18 @@ function saveAndMove(target){
   FD.busy=true;setBusy(true,'Saving…');
   apiPost('save',String(target),data,[]).then(function(res){
     if(!res.success)throw new Error(res.error||'Could not save.');
-    FD.data=data;FD.busy=false;setBusy(false,'');showStep(target);toast('Saved');
+    FD.data=data;
+
+    if(FD.currentStep===2&&target===3){
+      return queueEligibilityFromCurrentData(data).catch(function(err){
+        toast(err.message||'We could not start the insurance check. You can continue and staff will review it.');
+        return null;
+      }).then(function(){
+        FD.busy=false;setBusy(false,'');showStep(target);toast('Saved');
+      });
+    }
+
+    FD.busy=false;setBusy(false,'');showStep(target);toast('Saved');
   }).catch(function(err){
     FD.busy=false;setBusy(false,'');toast(err.message||'Could not save. Please try again.');
   });
@@ -908,9 +1110,22 @@ $('hasSecondary').addEventListener('change',updateConditionalFields);
 $('noKnownAllergies').addEventListener('change',updateConditionalFields);
 $('completeBtn').addEventListener('click',complete);
 $('pharmacySearchBtn').addEventListener('click',searchPharmacy);
+$('retryEligibilityBtn').addEventListener('click',function(){
+  var data=collect();
+  try{validateStep(2,data)}catch(err){toast(err.message);return}
+  queueEligibilityFromCurrentData(data).catch(function(err){
+    toast(err.message||'Could not retry coverage check.');
+  });
+});
 $('pharmacyNameSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacyLocationSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').value)&&clean($('pharmacy').value)!==clean(FD.data.pharmacy||'')){setValue('pharmacyNpi','');setValue('pharmacyPhone','');setValue('pharmacyAddress','')}renderPharmacySelection()});
+['insuranceCarrier','memberId','subscriberFirstName','subscriberLastName','subscriberDob'].forEach(function(id){
+  $(id).addEventListener('input',function(){
+    $('planVerified').classList.add('hidden');
+    $('groupVerified').classList.add('hidden');
+  });
+});
 
 boot();
 </script>
