@@ -436,7 +436,7 @@ input.invalid,select.invalid{border-color:#C04040;}
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxS7b06t34epLzgRSlT16nJXltMwfe0QtQCtmgq4yYifqcqj91jrA6A9MOKAzlm-AAEg/exec';
 
 // Front Door public gateway — creates WEBSITE Front Door record after the existing booking succeeds.
-var BOOKING_CLIENT_VERSION = 'v0.9.5';
+var BOOKING_CLIENT_VERSION = 'v0.9.6';
 var FRONT_DOOR_GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
 
 var state = {
@@ -882,9 +882,9 @@ function verifyFrontDoorGatewayVersion() {
   return fetch(FRONT_DOOR_GATEWAY_URL + '?action=health&_=' + Date.now(), {cache:'no-store'})
     .then(function(r){ return r.json(); })
     .then(function(data){
-      if (!data.success || String(data.version || '') !== 'v0.9.5') {
+      if (!data.success || String(data.version || '') !== 'v0.9.6') {
         throw new Error(
-          'Front Door Gateway is not on v0.9.5 yet. The appointment was not submitted.'
+          'Front Door Gateway is not on v0.9.6 yet. The appointment was not submitted.'
         );
       }
       return data;
