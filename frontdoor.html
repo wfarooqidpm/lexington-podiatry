@@ -148,6 +148,35 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .card-optional-note strong{color:#245a37}
 .payer-id-hint{margin-top:5px;font-size:12px;color:var(--ink-soft);line-height:1.4}
 
+
+.discovery-offer{
+  margin-top:16px;
+  padding:16px 17px;
+  border:1px solid #d8c27f;
+  border-radius:12px;
+  background:#fff9e8;
+}
+.discovery-offer strong{color:#604c15}
+.discovery-searching{
+  background:#fff5cf !important;
+  border-color:#d8b84f !important;
+}
+.discovery-review{
+  background:#f7f3e8 !important;
+  border-color:#c8b987 !important;
+}
+.discovery-side{
+  background:#fff5cf !important;
+  border-color:#d8b84f !important;
+}
+.discovery-side h3{color:#604c15}
+.discovery-side .search-mark{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#9a7621;color:white;font-weight:900;
+  font-size:18px;margin-bottom:10px;
+}
+
 </style>
 </head>
 
@@ -301,6 +330,21 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           <div class="field"><label for="subscriberDob">Policyholder date of birth <span class="req">*</span></label><input id="subscriberDob" type="date" autocomplete="off"></div>
         </div>
         <button class="btn secondary" type="button" id="retryEligibilityBtn">Try coverage check again</button>
+      </div>
+
+      <div id="discoveryOffer" class="discovery-offer hidden">
+        <strong>Not sure which insurance is active?</strong>
+        <div class="note" style="margin-top:6px">
+          We can search for active coverage using your name, date of birth, and address. It can take up to about two minutes, and you can keep completing registration while we search.
+        </div>
+        <button class="btn secondary" type="button" id="startDiscoveryBtn" style="margin-top:12px">
+          Find my active coverage
+        </button>
+      </div>
+
+      <div id="discoveryResultBox" class="callout hidden" style="margin-top:16px">
+        <strong id="discoveryResultTitle">Searching for active coverage…</strong>
+        <div id="discoveryResultText" style="margin-top:6px"></div>
       </div>
     </div>
 
@@ -597,6 +641,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 </div>
 
 <aside class="sidebar">
+  <div id="discoverySideCard" class="side-card discovery-side hidden">
+    <div class="search-mark">⌕</div>
+    <h3 id="discoverySideTitle">Searching coverage</h3>
+    <div id="discoverySideText" class="verify-line"></div>
+  </div>
   <div id="eligibilitySideCard" class="side-card verified-side hidden">
     <div class="verify-mark">✓</div>
     <h3>Coverage verified</h3>
@@ -617,9 +666,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.9.5';
+var CLIENT_VERSION = 'v0.9.6';
 
-var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,completed:false,busy:false};
+var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false};
 
 function $(id){return document.getElementById(id)}
 function q(sel){return document.querySelector(sel)}
@@ -692,7 +741,9 @@ function payerForCarrier(name){
 }
 
 function insuranceIsActive(){
-  return !!(FD.eligibility&&String(FD.eligibility.status||'').toUpperCase()==='ACTIVE'&&!FD.insuranceUnlocked);
+  var eligActive=!!(FD.eligibility&&String(FD.eligibility.status||'').toUpperCase()==='ACTIVE');
+  var discoveryFound=!!(FD.discovery&&String(FD.discovery.status||'').toUpperCase()==='FOUND');
+  return !!((eligActive||discoveryFound)&&!FD.insuranceUnlocked);
 }
 
 function setInsuranceLocked(locked){
@@ -713,7 +764,15 @@ function renderInsuranceCardRequirement(){
   $('insuranceCardDefaultNote').classList.toggle('hidden',active||(!eligibilityPending(status)&&status&&status!=='NOT REQUESTED'&&status!=='EDITING'));
   $('insuranceCardVerifiedNote').classList.toggle('hidden',!active);
 
-  var needsHelp=!active&&status&&status!=='NOT REQUESTED'&&status!=='QUEUED'&&status!=='CHECKING'&&status!=='EDITING';
+  var discoveryStatus=String(FD.discovery&&FD.discovery.status||'').toUpperCase();
+  var discoveryStillWorking=discoveryPending(discoveryStatus);
+  var discoveryResolvedWithoutVerification=discoveryStatus&&discoveryStatus!=='NOT REQUESTED'&&!discoveryStillWorking&&discoveryStatus!=='FOUND';
+
+  var needsHelp=!active&&!discoveryStillWorking&&(
+    discoveryResolvedWithoutVerification ||
+    (status&&status!=='NOT REQUESTED'&&status!=='QUEUED'&&status!=='CHECKING'&&status!=='EDITING'&&discoveryStatus==='NOT REQUESTED')
+  );
+
   $('insuranceCardNeedsHelpNote').classList.toggle('hidden',!needsHelp);
 
   if(active&&!choice){
@@ -743,6 +802,14 @@ function unlockInsuranceForChange(){
 
   setValue('insurancePlan','');
   setValue('groupId','');
+
+  FD.discovery=null;
+  if(FD.discoveryTimer){
+    clearInterval(FD.discoveryTimer);
+    FD.discoveryTimer=null;
+  }
+  $('discoveryResultBox').classList.add('hidden');
+  $('discoverySideCard').classList.add('hidden');
 
   FD.eligibility={
     success:true,
@@ -780,6 +847,193 @@ function syncCarrierFromPayerId(){
   if(hit){
     setValue('insuranceCarrier',hit.carrier);
   }
+}
+
+
+function apiDiscoveryStatus(){
+  var params=new URLSearchParams({
+    action:'discovery-status',
+    t:FD.token,
+    _:String(Date.now())
+  });
+  return fetch(
+    GATEWAY_URL+'?'+params.toString(),
+    {cache:'no-store'}
+  ).then(function(r){return r.json()});
+}
+
+function requestDiscovery(data){
+  return apiPost(
+    'discovery-request',
+    '2',
+    data,
+    []
+  );
+}
+
+function discoveryPending(status){
+  status=String(status||'').toUpperCase();
+  return status==='QUEUED'||status==='SEARCHING'||status==='PENDING';
+}
+
+function eligibilityNeedsDiscoveryOffer(){
+  if(insuranceIsActive())return false;
+  var status=String(FD.eligibility&&FD.eligibility.status||'').toUpperCase();
+  if(!status||status==='NOT REQUESTED'||status==='QUEUED'||status==='CHECKING'||status==='EDITING')return false;
+  return true;
+}
+
+function renderDiscoveryOffer(){
+  var alreadyStarted=FD.discovery&&String(FD.discovery.status||'').toUpperCase()!=='NOT REQUESTED';
+  $('discoveryOffer').classList.toggle(
+    'hidden',
+    !eligibilityNeedsDiscoveryOffer()||alreadyStarted
+  );
+}
+
+function applyDiscoveryResult(res){
+  if(!res||!res.success)return;
+  FD.discovery=res;
+
+  var status=String(res.status||'').toUpperCase();
+  var box=$('discoveryResultBox');
+  var title=$('discoveryResultTitle');
+  var text=$('discoveryResultText');
+  var side=$('discoverySideCard');
+  var sideTitle=$('discoverySideTitle');
+  var sideText=$('discoverySideText');
+
+  box.classList.remove('discovery-searching','eligibility-success','discovery-review');
+  side.classList.remove('verified-side');
+
+  if(status==='NOT REQUESTED'){
+    box.classList.add('hidden');
+    side.classList.add('hidden');
+    renderDiscoveryOffer();
+    return;
+  }
+
+  box.classList.remove('hidden');
+  side.classList.remove('hidden');
+
+  if(discoveryPending(status)){
+    box.classList.add('discovery-searching');
+    title.textContent='Searching for active coverage…';
+    text.textContent='You can keep completing registration while we search.';
+    sideTitle.textContent='Searching coverage';
+    sideText.textContent='We’re checking for active insurance in the background.';
+  }else if(status==='FOUND'){
+    FD.insuranceUnlocked=false;
+
+    box.classList.add('eligibility-success');
+    side.classList.add('verified-side');
+
+    title.textContent='✓ Active coverage found';
+    text.textContent=res.message||'We found one high-confidence coverage match.';
+
+    if(res.payerName)setValue('insuranceCarrier',res.payerName);
+    if(res.payerId)setValue('payerId',res.payerId);
+    if(res.memberId)setValue('memberId',res.memberId);
+    if(res.planName)setValue('insurancePlan',res.planName);
+    if(res.groupNumber)setValue('groupId',res.groupNumber);
+
+    if(res.payerId)$('payerVerified').classList.remove('hidden');
+    if(res.planName)$('planVerified').classList.remove('hidden');
+    if(res.groupNumber)$('groupVerified').classList.remove('hidden');
+
+    setInsuranceLocked(true);
+    $('insuranceLockNote').classList.remove('hidden');
+
+    sideTitle.textContent='Coverage found';
+    var bits=[];
+    if(res.payerName)bits.push(res.payerName);
+    if(res.planName)bits.push('Plan: '+res.planName);
+    if(res.groupNumber)bits.push('Group: '+res.groupNumber);
+    sideText.textContent=bits.join(' · ');
+
+    $('eligibilitySideCard').classList.add('hidden');
+  }else if(status==='NONE'){
+    box.classList.add('discovery-review');
+    title.textContent='No active coverage found';
+    text.textContent=res.message||'Please provide your insurance card so the office can review it.';
+    sideTitle.textContent='Coverage not found';
+    sideText.textContent='Please provide your insurance card so we can review it.';
+  }else if(status==='MULTIPLE'){
+    box.classList.add('discovery-review');
+    title.textContent='More than one coverage found';
+    text.textContent=res.message||'The office will review the possible matches rather than guessing.';
+    sideTitle.textContent='Coverage needs review';
+    sideText.textContent='We found multiple possible active plans and will review them.';
+  }else if(status==='REVIEW'){
+    box.classList.add('discovery-review');
+    title.textContent='Possible coverage found';
+    text.textContent=res.message||'The result needs review before we use it.';
+    sideTitle.textContent='Coverage needs review';
+    sideText.textContent='We found a possible plan, but it needs review.';
+  }else{
+    box.classList.add('discovery-review');
+    title.textContent='Coverage search needs review';
+    text.textContent=res.message||'The office can finish reviewing your insurance.';
+    sideTitle.textContent='Coverage search';
+    sideText.textContent='The office will finish reviewing the result.';
+  }
+
+  renderDiscoveryOffer();
+  renderInsuranceCardRequirement();
+  renderFinancialEligibility();
+}
+
+function pollDiscovery(){
+  if(FD.discoveryTimer)return;
+
+  FD.discoveryStartedAt=Date.now();
+
+  function tick(){
+    apiDiscoveryStatus().then(function(res){
+      if(!res.success)return;
+      applyDiscoveryResult(res);
+
+      if(!discoveryPending(res.status)){
+        clearInterval(FD.discoveryTimer);
+        FD.discoveryTimer=null;
+      }else if(Date.now()-FD.discoveryStartedAt>180000){
+        clearInterval(FD.discoveryTimer);
+        FD.discoveryTimer=null;
+      }
+    }).catch(function(){});
+  }
+
+  tick();
+  FD.discoveryTimer=setInterval(tick,4000);
+}
+
+function startDiscovery(){
+  var data=collect();
+
+  if(!data.firstName||!data.lastName||!data.dob||!data.address1||!data.city||!data.state||!data.zip){
+    toast('Please complete your name, date of birth, and address first.');
+    showStep(1);
+    return;
+  }
+
+  applyDiscoveryResult({
+    success:true,
+    status:'QUEUED',
+    message:'Searching for active insurance coverage…'
+  });
+
+  requestDiscovery(data).then(function(res){
+    if(!res.success)throw new Error(res.error||'Could not start the coverage search.');
+    applyDiscoveryResult(res);
+    pollDiscovery();
+    toast('Coverage search started. You can keep going.');
+  }).catch(function(err){
+    FD.discovery=null;
+    $('discoveryResultBox').classList.add('hidden');
+    $('discoverySideCard').classList.add('hidden');
+    renderDiscoveryOffer();
+    toast(err.message||'Could not start the coverage search.');
+  });
 }
 
 function apiEligibilityStatus(){
@@ -874,14 +1128,25 @@ function applyEligibilityResult(res){
   }
 
   renderVerifiedSideCard(res);
+  renderDiscoveryOffer();
   renderInsuranceCardRequirement();
   renderFinancialEligibility();
 }
 
 function renderFinancialEligibility(){
-  if(!FD.eligibility)return;
+  var r=null;
 
-  var r=FD.eligibility;
+  if(FD.discovery&&String(FD.discovery.status||'').toUpperCase()==='FOUND'){
+    r={
+      status:'ACTIVE',
+      planName:FD.discovery.planName||'',
+      groupNumber:FD.discovery.groupNumber||'',
+      message:'Active coverage was found through insurance discovery.'
+    };
+  }else{
+    if(!FD.eligibility)return;
+    r=FD.eligibility;
+  }
   var status=String(r.status||'').toUpperCase();
   var box=$('financialEligibilityBox');
   var title=$('financialEligibilityTitle');
@@ -1024,19 +1289,26 @@ function boot(){
 
   apiGet().then(function(res){
     if(!res.success)throw new Error(res.error||'Could not load registration.');
-    if(String(res.version||'')!=='v0.9.5'){
-      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.9.5 before using this page.');
+    if(String(res.version||'')!=='v0.9.6'){
+      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.9.6 before using this page.');
     }
     FD.booking=res.booking||{};
     FD.data=res.intake&&res.intake.data?res.intake.data:{};
     FD.agreement=res.agreement||null;
     FD.eligibility=res.eligibility||null;
+    FD.discovery=res.discovery||null;
     FD.completed=!!(res.intake&&res.intake.completed);
 
     hydrate();
     if(FD.eligibility&&FD.eligibility.status&&FD.eligibility.status!=='NOT REQUESTED'){
       applyEligibilityResult(FD.eligibility);
       if(eligibilityPending(FD.eligibility.status))pollEligibility();
+    }
+    if(FD.discovery&&FD.discovery.status&&FD.discovery.status!=='NOT REQUESTED'){
+      applyDiscoveryResult(FD.discovery);
+      if(discoveryPending(FD.discovery.status))pollDiscovery();
+    }else{
+      renderDiscoveryOffer();
     }
     $('loading').classList.add('hidden');$('app').classList.remove('hidden');
 
@@ -1230,7 +1502,8 @@ function validateStep(step,data){
   }
 
   if(step===6){
-    if(!insuranceIsActive()&&!data.insuranceCardStatus){
+    var discoveryStatus=String(FD.discovery&&FD.discovery.status||'').toUpperCase();
+    if(!insuranceIsActive()&&!discoveryPending(discoveryStatus)&&!data.insuranceCardStatus){
       showStep(2);
       showInsuranceCardChoices();
       throw new Error('We could not verify your insurance automatically. Please choose how you will provide your insurance card.');
@@ -1346,6 +1619,7 @@ $('noKnownAllergies').addEventListener('change',updateConditionalFields);
 $('completeBtn').addEventListener('click',complete);
 $('pharmacySearchBtn').addEventListener('click',searchPharmacy);
 $('changeInsuranceBtn').addEventListener('click',unlockInsuranceForChange);
+$('startDiscoveryBtn').addEventListener('click',startDiscovery);
 $('showInsuranceCardChoicesBtn').addEventListener('click',showInsuranceCardChoices);
 $('showInsuranceCardChoicesVerifiedBtn').addEventListener('click',showInsuranceCardChoices);
 $('insuranceCarrier').addEventListener('change',syncPayerIdFromCarrier);
