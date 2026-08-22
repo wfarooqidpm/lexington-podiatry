@@ -85,6 +85,27 @@ details{border-top:1px solid var(--line-soft);padding-top:11px;margin-top:12px}s
 .save-state{font-size:13px;color:var(--ink-soft)}
 .sidebar{position:sticky;top:24px}.side-card{border:1px solid var(--line);border-radius:15px;padding:20px;margin-bottom:16px;background:var(--paper)}
 .side-card h3{font-family:var(--serif);font-size:20px;font-weight:400;margin:0 0 8px}.side-card p{font-size:14px;color:var(--ink-soft);margin:0}.side-card a{color:var(--brass-deep);font-weight:700;text-decoration:none}
+
+.frontdoor-side-intro{padding:2px 2px 24px;margin-bottom:4px}
+.frontdoor-side-intro .eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--brass);margin-bottom:8px}
+.frontdoor-side-intro h3{font-family:var(--serif);font-size:25px;line-height:1.18;font-weight:400;margin:0;color:var(--ink)}
+.frontdoor-side-intro p{font-size:13px;line-height:1.5;color:var(--ink-soft);margin:9px 0 0}
+.status-side-card{position:relative}
+.status-mark{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;margin-bottom:12px}
+.medical-side{background:#eaf3f7;border-color:#9fc4d2}
+.medical-side h3{color:#25596b}
+.medical-side .status-mark{background:#4f8ca2;color:white}
+.medical-side .status-line{color:#355c69;font-size:13px;line-height:1.5;margin-top:5px}
+.policy-side{background:#f9eaea;border-color:#d9a5a5}
+.policy-side h3{color:#7b3434}
+.policy-side .status-mark{background:#a84f4f;color:white}
+.policy-side .status-line{color:#704343;font-size:13px;line-height:1.5;margin-top:5px}
+.side-help{padding:6px 2px 0;font-size:13px;color:var(--ink-soft)}
+.side-help a{color:var(--brass-deep);font-weight:700;text-decoration:none}
+.signature-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.95fr);gap:16px;align-items:end}
+.signature-grid .field{display:grid;grid-template-rows:42px 48px;margin-bottom:0}
+.signature-grid .field label{align-self:end;margin-bottom:7px}
+.signature-grid .field input{height:48px}
 .complete-box{text-align:center;border:1.5px solid #b8d5c2;background:var(--good-bg);padding:34px;border-radius:18px}
 .complete-icon{width:54px;height:54px;border-radius:50%;background:var(--good);color:white;display:grid;place-items:center;font-size:26px;margin:0 auto 15px}
 .complete-box h2{font-size:32px}.complete-box p{max-width:560px;margin:10px auto;color:#3d5f4c}
@@ -109,7 +130,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .agreement-version{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:5px}
 .consent-subchoice{margin-top:12px;padding-top:12px;border-top:1px solid var(--line-soft)}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;display:grid;grid-template-columns:1fr 1fr;gap:14px}.side-card{margin:0}}
-@media(max-width:680px){.wrap{padding:0 18px}.topbar .wrap{display:block;text-align:center;padding:8px 18px}.topbar .wrap span:first-child{display:none}.secure-chip{display:none}.hero{padding:38px 0 30px}.main{padding-top:28px}.progress{overflow-x:auto;grid-template-columns:repeat(6,88px)}.progress button{font-size:9px}.grid2,.grid3{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr 1fr}.section{padding:19px}.sidebar{grid-template-columns:1fr}.nav-actions .btn{width:100%}.save-state{width:100%;text-align:center}}
+@media(max-width:680px){.signature-grid{grid-template-columns:1fr}.signature-grid .field{grid-template-rows:auto 48px}.wrap{padding:0 18px}.topbar .wrap{display:block;text-align:center;padding:8px 18px}.topbar .wrap span:first-child{display:none}.secure-chip{display:none}.hero{padding:38px 0 30px}.main{padding-top:28px}.progress{overflow-x:auto;grid-template-columns:repeat(6,88px)}.progress button{font-size:9px}.grid2,.grid3{grid-template-columns:1fr}.check-grid{grid-template-columns:1fr 1fr}.section{padding:19px}.sidebar{grid-template-columns:1fr}.nav-actions .btn{width:100%}.save-state{width:100%;text-align:center}}
 @media(max-width:420px){.check-grid{grid-template-columns:1fr}}
 .verified-label{font-size:10px;color:#2f6f52;font-weight:800;margin-left:6px;text-transform:uppercase;letter-spacing:.08em}
 
@@ -200,6 +221,13 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   line-height:1.55;
   color:#405047;
 }
+.estimate-detail-toggle{margin-top:12px;border-top:1px solid rgba(36,90,55,.18);padding-top:12px}
+.estimate-detail-toggle summary{cursor:pointer;font-size:13px;font-weight:700;color:#2d5f3e;list-style:none}
+.estimate-detail-toggle summary::-webkit-details-marker{display:none}
+.estimate-detail-toggle summary::after{content:" +";font-weight:700}
+.estimate-detail-toggle[open] summary::after{content:" −"}
+.estimate-detail-list{margin:10px 0 0 18px;padding:0;color:#405047;font-size:13px;line-height:1.55}
+.estimate-detail-list li{margin:0 0 7px 0}
 
 </style>
 </head>
@@ -566,36 +594,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       </div>
     </div>
 
-    <div class="nav-actions">
-      <button class="btn secondary" type="button" data-back="3">Back</button>
-      <button class="btn primary" type="button" data-next="5">Continue to financial responsibility</button>
-      <span class="save-state" id="save4"></span>
-    </div>
-  </section>
-
-  <section class="panel" data-panel="5">
-    <h2>Financial responsibility</h2>
-    <p class="intro">Review any available estimate, insurance billing authorization, and your financial responsibility before signing.</p>
-
-    <div id="financialEligibilityBox" class="callout hidden" style="margin-bottom:18px">
-      <strong id="financialEligibilityTitle">Insurance verification</strong>
-      <div id="financialEligibilityText" style="margin-top:5px"></div>
-    </div>
-
-    <div id="estimateReady" class="financial-box initial-estimate-ready hidden">
-      <div class="estimate-kicker">Initial visit</div>
-      <div class="section-title">Estimated amount due for your initial evaluation</div>
-      <div class="amount" id="estimateAmount">$—</div>
-      <div class="confidence" id="estimateConfidence">Verified insurance benefit</div>
-      <div id="estimateBasis" class="note" style="margin-top:10px"></div>
-      <div id="estimateMessage" class="estimate-explain"></div>
-    </div>
-
-    <div id="estimatePending" class="callout warn">
-      <strong>An initial-visit estimate is not available yet.</strong>
-      Coverage may be verified even when the payer has not returned enough specific benefit information to calculate a reliable amount. We will not guess.
-    </div>
-
     <div class="policy-card">
       <h3>Insurance billing & assignment of benefits</h3>
       <p>I authorize WAF Podiatry P.C. to bill my health plan or other responsible payer for services rendered and to submit information reasonably necessary for payment. To the extent permitted by my plan and applicable law, I assign payable insurance benefits to WAF Podiatry P.C. and authorize direct payment to the practice.</p>
@@ -606,6 +604,34 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <h3>Financial responsibility</h3>
       <p>Insurance benefits and estimates are not guarantees of payment. Amounts known to be your responsibility are due at the time of service. You remain responsible for patient amounts assigned by your health plan after the claim is processed.</p>
       <label class="ack"><input id="financialPolicyAcknowledged" type="checkbox"><span>I understand the financial information above and accept responsibility for amounts assigned to me by my health plan.</span></label>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn secondary" type="button" data-back="3">Back</button>
+      <button class="btn primary" type="button" data-next="5">Continue to your estimate</button>
+      <span class="save-state" id="save4"></span>
+    </div>
+  </section>
+
+  <section class="panel" data-panel="5">
+    <h2>Your estimate</h2>
+    <p class="intro">Here is the amount we can estimate from the insurance benefit information available today.</p>
+
+    <div id="estimateReady" class="financial-box initial-estimate-ready hidden">
+      <div class="estimate-kicker">Initial visit</div>
+      <div class="section-title">Estimated amount due for your initial evaluation</div>
+      <div class="amount" id="estimateAmount">$—</div>
+      <div class="confidence" id="estimateConfidence">Verified insurance benefit</div>
+      <details id="estimateBreakdown" class="estimate-detail-toggle">
+        <summary>How this estimate was calculated</summary>
+        <ul id="estimateDetailList" class="estimate-detail-list"></ul>
+      </details>
+      <div id="estimateMessage" class="estimate-explain"></div>
+    </div>
+
+    <div id="estimatePending" class="callout warn">
+      <strong>An initial-visit estimate is not available yet.</strong>
+      Coverage may be verified even when the payer has not returned enough specific benefit information to calculate a reliable amount. We will not guess.
     </div>
 
     <div class="nav-actions">
@@ -641,9 +667,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
       <div style="border-top:1px solid var(--line-soft);margin-top:16px;padding-top:16px">
         <div class="section-title">Electronic signature</div>
-        <div class="grid2">
-          <div class="field" style="margin-bottom:0"><label for="signatureName">Electronic signature — type your full legal name <span class="req">*</span></label><input id="signatureName" type="text" autocomplete="name" placeholder="Your full legal name"></div>
-          <div class="field" style="margin-bottom:0"><label>Date signed</label><input id="signatureDate" type="text" readonly></div>
+        <div class="signature-grid">
+          <div class="field"><label for="signatureName">Electronic signature — type your full legal name <span class="req">*</span></label><input id="signatureName" type="text" autocomplete="name" placeholder="Your full legal name"></div>
+          <div class="field"><label for="signatureDate">Date signed</label><input id="signatureDate" type="text" readonly></div>
         </div>
         <p class="note" style="margin-top:10px">Your typed name and the date/time of submission are attached to this agreement and preserved with the signed PDF record.</p>
       </div>
@@ -667,11 +693,18 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 </div>
 
 <aside class="sidebar">
+  <div class="frontdoor-side-intro">
+    <div class="eyebrow">Front Door</div>
+    <h3>Walk past the paperwork and right into your appointment.</h3>
+    <p>As you complete each section, your visit status appears below.</p>
+  </div>
+
   <div id="discoverySideCard" class="side-card discovery-side hidden">
     <div class="search-mark">⌕</div>
     <h3 id="discoverySideTitle">Searching coverage</h3>
     <div id="discoverySideText" class="verify-line"></div>
   </div>
+
   <div id="eligibilitySideCard" class="side-card verified-side hidden">
     <div class="verify-mark">✓</div>
     <h3>Coverage verified</h3>
@@ -679,9 +712,21 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div id="eligibilitySidePlan" class="verify-line"></div>
     <div id="eligibilitySideGroup" class="verify-line"></div>
   </div>
-  <div class="side-card"><h3>Why Front Door?</h3><p>Complete the details we need before your visit so your appointment can focus on your foot and ankle concern—not paperwork.</p></div>
-  <div class="side-card"><h3>Insurance cards</h3><p>If you already uploaded a card to Zocdoc, don’t upload it twice. You may also bring the physical card to the office.</p></div>
-  <div class="side-card"><h3>Need help?</h3><p>Call <a href="tel:+12125108665">(212) 510-8665</a>.</p></div>
+
+  <div id="medicalStatusCard" class="side-card status-side-card medical-side">
+    <div id="medicalStatusMark" class="status-mark">•</div>
+    <h3 id="medicalStatusTitle">Medical information</h3>
+    <div id="medicalStatusMedical" class="status-line">Medical information not completed yet.</div>
+    <div id="medicalStatusPharmacy" class="status-line">Pharmacy not selected yet.</div>
+  </div>
+
+  <div id="policyStatusCard" class="side-card status-side-card policy-side">
+    <div id="policyStatusMark" class="status-mark">!</div>
+    <h3 id="policyStatusTitle">Policies &amp; consent</h3>
+    <div id="policyStatusText" class="status-line">Needs review.</div>
+  </div>
+
+  <div class="side-help">Need help? Call <a href="tel:+12125108665">(212) 510-8665</a>.</div>
 </aside>
 
 </div></div>
@@ -694,7 +739,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
 var CLIENT_VERSION = 'v0.10.0';
 
-var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null};
+var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null};
 
 function $(id){return document.getElementById(id)}
 function q(sel){return document.querySelector(sel)}
@@ -1160,42 +1205,47 @@ function applyEligibilityResult(res){
   renderFinancialEligibility();
 }
 
+
+function renderStatusSidebar(){
+  if(!$('medicalStatusCard')||!$('policyStatusCard'))return;
+
+  var medicalSaved=Number(FD.savedStep||1)>=4 || !!FD.completed;
+  var pharmacyName=clean($('pharmacy')&&$('pharmacy').value);
+
+  $('medicalStatusMedical').textContent=
+    medicalSaved
+      ? '✓ Medical information received.'
+      : 'Medical information not completed yet.';
+
+  $('medicalStatusPharmacy').textContent=
+    pharmacyName
+      ? '✓ Pharmacy selected: '+pharmacyName
+      : 'Pharmacy not selected yet.';
+
+  var medicalReady=medicalSaved&&!!pharmacyName;
+  $('medicalStatusMark').textContent=medicalReady?'✓':'•';
+  $('medicalStatusTitle').textContent=
+    medicalReady?'Medical information ready':'Medical information';
+
+  var policiesComplete=
+    $('confirmationPolicyAccepted').checked &&
+    $('noShowPolicyAccepted').checked &&
+    $('privacyAcknowledged').checked &&
+    $('treatmentConsent').checked &&
+    $('billingAuthorizationAccepted').checked &&
+    $('financialPolicyAcknowledged').checked;
+
+  $('policyStatusMark').textContent=policiesComplete?'✓':'!';
+  $('policyStatusTitle').textContent=
+    policiesComplete?'Policies accepted':'Policies & consent';
+  $('policyStatusText').textContent=
+    policiesComplete
+      ? 'Required policies and financial acknowledgements are complete.'
+      : 'Needs review and acknowledgement.';
+}
+
+
 function renderFinancialEligibility(){
-  var r=null;
-
-  if(FD.discovery&&String(FD.discovery.status||'').toUpperCase()==='FOUND'){
-    r={
-      status:'ACTIVE',
-      planName:FD.discovery.planName||'',
-      groupNumber:FD.discovery.groupNumber||'',
-      message:'Active coverage was found through insurance discovery.'
-    };
-  }else{
-    if(!FD.eligibility)return;
-    r=FD.eligibility;
-  }
-
-  var status=String(r.status||'').toUpperCase();
-  var box=$('financialEligibilityBox');
-  var title=$('financialEligibilityTitle');
-  var text=$('financialEligibilityText');
-
-  box.classList.remove('hidden');
-
-  if(status==='ACTIVE'){
-    title.textContent='✓ Insurance coverage found';
-    var parts=[];
-    if(r.planName)parts.push('Plan: '+r.planName);
-    if(r.groupNumber)parts.push('Group: '+r.groupNumber);
-    text.textContent=parts.length?parts.join(' · '):(r.message||'Active coverage was returned.');
-  }else if(eligibilityPending(status)){
-    title.textContent='Insurance verification in progress';
-    text.textContent='We are still checking your coverage. This does not prevent you from completing registration.';
-  }else{
-    title.textContent='Insurance verification';
-    text.textContent=r.message||'Staff will review the insurance information.';
-  }
-
   var estimate=FD.estimate||null;
   var estimateStatus=String(estimate&&estimate.status||'').toUpperCase();
   var ready=$('estimateReady');
@@ -1213,8 +1263,35 @@ function renderFinancialEligibility(){
         ? 'Verified insurance benefit · initial evaluation'
         : 'Initial visit estimate';
 
-    $('estimateBasis').textContent=
-      estimate.basis||'Based on the specific physician-visit benefit returned by your health plan.';
+    var detailLines=[];
+    detailLines.push('Your insurance coverage was verified.');
+
+    if(estimate.copay!=='' && estimate.copay!=null){
+      detailLines.push(
+        'Your plan returned an in-network copay of $'+
+        Number(estimate.copay).toFixed(2)+
+        ' for the initial physician visit.'
+      );
+    }
+
+    if(estimate.coinsurancePercent!=='' && estimate.coinsurancePercent!=null){
+      detailLines.push(
+        'Your plan returned '+
+        Number(estimate.coinsurancePercent).toFixed(0)+
+        '% coinsurance for that visit.'
+      );
+    }
+
+    detailLines.push(
+      estimate.deductibleExplicit
+        ? 'Your insurer tied this visit benefit to a deductible, so a final dollar estimate still depends on the contracted rate.'
+        : 'Your insurer did not return a deductible specifically tied to this initial visit benefit.'
+    );
+
+    $('estimateDetailList').innerHTML=
+      detailLines.map(function(line){
+        return '<li>'+escapeHtml(line)+'</li>';
+      }).join('');
 
     $('estimateMessage').textContent=
       estimate.message||
@@ -1225,14 +1302,16 @@ function renderFinancialEligibility(){
 
     if(estimateStatus==='NEEDS CONTRACTED RATE'){
       pending.innerHTML=
-        '<strong>Coverage is verified, but a dollar estimate needs the contracted rate.</strong> '+
-        escapeHtml(estimate.message||'We will not guess at the amount.');
+        '<strong>A reliable dollar estimate is not available yet.</strong> '+
+        escapeHtml(estimate.message||'A contracted rate is needed before we can calculate it.');
     }else if(estimate&&estimate.message){
       pending.innerHTML=
         '<strong>An initial-visit estimate is not available yet.</strong> '+
         escapeHtml(estimate.message);
     }
   }
+
+  renderStatusSidebar();
 }
 
 function pollEligibility(){
@@ -1333,7 +1412,7 @@ function searchPharmacy(){
     }).join('');
     qa('[data-pharm-index]').forEach(function(el){el.addEventListener('click',function(){
       var x=rows[Number(el.getAttribute('data-pharm-index'))];
-      setValue('pharmacy',x.name);setValue('pharmacyNpi',x.npi||'');setValue('pharmacyPhone',x.phone||'');setValue('pharmacyAddress',x.address||'');
+      setValue('pharmacy',x.name);setValue('pharmacyNpi',x.npi||'');setValue('pharmacyPhone',x.phone||'');setValue('pharmacyAddress',x.address||'');renderStatusSidebar();
       renderPharmacySelection();results.innerHTML='';
     })});
   }).catch(function(err){results.innerHTML='<div class="note">'+escapeHtml(err.message||'Pharmacy search is unavailable. Type the pharmacy manually below.')+'</div>'})
@@ -1383,6 +1462,8 @@ function boot(){
 
     var savedStep=Number(res.intake&&res.intake.currentStep||1);
     if(!isFinite(savedStep)||savedStep<1||savedStep>6)savedStep=1;
+    FD.savedStep=savedStep;
+    renderStatusSidebar();
     showStep(savedStep);
   }).catch(function(err){
     setFatal(err.message||'Could not load your registration. Please call Lexington Podiatry.');
@@ -1458,7 +1539,7 @@ function hydrate(){
     });
   }
 
-  updateConditionalFields();renderEstimate();renderConfirmSummary();renderAgreement();renderSignatureDate();renderPharmacySelection();
+  updateConditionalFields();renderEstimate();renderConfirmSummary();renderAgreement();renderSignatureDate();renderPharmacySelection();renderStatusSidebar();
 }
 
 function setValue(id,v){if($(id)&&v!=null)$(id).value=String(v)}
@@ -1561,9 +1642,6 @@ function validateStep(step,data){
     if(!data.noShowPolicyAccepted)throw new Error('Please acknowledge the $50 no-show policy.');
     if(!data.privacyAcknowledged)throw new Error('Please acknowledge the privacy notice.');
     if(!data.treatmentConsent)throw new Error('Consent to treatment is required.');
-  }
-
-  if(step===5){
     if(!data.billingAuthorizationAccepted)throw new Error('Please authorize insurance billing and assignment of benefits.');
     if(!data.financialPolicyAcknowledged)throw new Error('Please acknowledge the financial policy.');
   }
@@ -1584,6 +1662,7 @@ function validateStep(step,data){
 
 function showStep(step){
   FD.currentStep=step;
+  renderStatusSidebar();
   qa('.panel').forEach(function(p){p.classList.toggle('active',Number(p.getAttribute('data-panel'))===step)});
   qa('.progress button').forEach(function(btn){
     var n=Number(btn.getAttribute('data-step'));
@@ -1601,6 +1680,8 @@ function saveAndMove(target){
   apiPost('save',String(target),data,[]).then(function(res){
     if(!res.success)throw new Error(res.error||'Could not save.');
     FD.data=data;
+    FD.savedStep=Math.max(Number(FD.savedStep||1),Number(target||1));
+    renderStatusSidebar();
 
     if(FD.currentStep===2&&target===3){
       return queueEligibilityFromCurrentData(data).catch(function(err){
@@ -1683,6 +1764,17 @@ qa('.progress button').forEach(function(btn){btn.addEventListener('click',functi
 qa('input[name="insuranceCardStatus"],input[name="photoIdStatus"],input[name="healthChange"]').forEach(function(el){el.addEventListener('change',updateConditionalFields)});
 $('hasSecondary').addEventListener('change',updateConditionalFields);
 $('noKnownAllergies').addEventListener('change',updateConditionalFields);
+[
+  'confirmationPolicyAccepted',
+  'noShowPolicyAccepted',
+  'privacyAcknowledged',
+  'treatmentConsent',
+  'billingAuthorizationAccepted',
+  'financialPolicyAcknowledged'
+].forEach(function(id){
+  $(id).addEventListener('change',renderStatusSidebar);
+});
+
 $('completeBtn').addEventListener('click',complete);
 $('pharmacySearchBtn').addEventListener('click',searchPharmacy);
 $('changeInsuranceBtn').addEventListener('click',unlockInsuranceForChange);
@@ -1702,7 +1794,7 @@ $('retryEligibilityBtn').addEventListener('click',function(){
 });
 $('pharmacyNameSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacyLocationSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
-$('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').value)&&clean($('pharmacy').value)!==clean(FD.data.pharmacy||'')){setValue('pharmacyNpi','');setValue('pharmacyPhone','');setValue('pharmacyAddress','')}renderPharmacySelection()});
+$('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').value)&&clean($('pharmacy').value)!==clean(FD.data.pharmacy||'')){setValue('pharmacyNpi','');setValue('pharmacyPhone','');setValue('pharmacyAddress','')}renderPharmacySelection();renderStatusSidebar()});
 ['insuranceCarrier','payerId','memberId','subscriberFirstName','subscriberLastName','subscriberDob'].forEach(function(id){
   $(id).addEventListener('input',function(){
     if(insuranceIsActive())return;
