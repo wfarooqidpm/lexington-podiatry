@@ -1473,8 +1473,8 @@ function boot(){
 
   apiGet().then(function(res){
     if(!res.success)throw new Error(res.error||'Could not load registration.');
-    if(String(res.version||'')!=='v0.10.0'){
-      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.10.0 before using this page.');
+    if(String(res.version||'')!=='v0.10.1'){
+      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.10.1 before using this page.');
     }
     FD.booking=res.booking||{};
     FD.data=res.intake&&res.intake.data?res.intake.data:{};
