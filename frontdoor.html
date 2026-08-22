@@ -177,6 +177,30 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   font-size:18px;margin-bottom:10px;
 }
 
+
+.initial-estimate-ready{
+  background:#e8f4ec !important;
+  border:1px solid #7eaa8c !important;
+  box-shadow:0 12px 30px rgba(43,92,59,.10);
+}
+.initial-estimate-ready .amount{color:#245a37}
+.estimate-kicker{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#58735f;
+  font-weight:800;
+  margin-bottom:6px;
+}
+.estimate-explain{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid rgba(36,90,55,.18);
+  font-size:13px;
+  line-height:1.55;
+  color:#405047;
+}
+
 </style>
 </head>
 
@@ -558,16 +582,18 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div id="financialEligibilityText" style="margin-top:5px"></div>
     </div>
 
-    <div id="estimateReady" class="financial-box hidden">
-      <div class="section-title">Estimated patient responsibility</div>
+    <div id="estimateReady" class="financial-box initial-estimate-ready hidden">
+      <div class="estimate-kicker">Initial visit</div>
+      <div class="section-title">Estimated amount due for your initial evaluation</div>
       <div class="amount" id="estimateAmount">$—</div>
-      <div class="confidence" id="estimateConfidence">Estimate</div>
-      <p style="margin-bottom:0">This estimate is based on the information currently available to Lexington Podiatry.</p>
+      <div class="confidence" id="estimateConfidence">Verified insurance benefit</div>
+      <div id="estimateBasis" class="note" style="margin-top:10px"></div>
+      <div id="estimateMessage" class="estimate-explain"></div>
     </div>
 
     <div id="estimatePending" class="callout warn">
-      <strong>An exact estimate is not available yet.</strong>
-      We may have verified coverage without having enough information to calculate an exact amount. Your final responsibility can include applicable copays, deductibles, coinsurance, or non-covered services assigned by your health plan.
+      <strong>An initial-visit estimate is not available yet.</strong>
+      Coverage may be verified even when the payer has not returned enough specific benefit information to calculate a reliable amount. We will not guess.
     </div>
 
     <div class="policy-card">
@@ -666,9 +692,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.9.6';
+var CLIENT_VERSION = 'v0.10.0';
 
-var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false};
+var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null};
 
 function $(id){return document.getElementById(id)}
 function q(sel){return document.querySelector(sel)}
@@ -1057,6 +1083,7 @@ function eligibilityPending(status){
 function applyEligibilityResult(res){
   if(!res||!res.success)return;
   FD.eligibility=res;
+  if(res.estimate)FD.estimate=res.estimate;
 
   var status=String(res.status||'').toUpperCase();
   var box=$('eligibilityBox');
@@ -1147,6 +1174,7 @@ function renderFinancialEligibility(){
     if(!FD.eligibility)return;
     r=FD.eligibility;
   }
+
   var status=String(r.status||'').toUpperCase();
   var box=$('financialEligibilityBox');
   var title=$('financialEligibilityTitle');
@@ -1166,6 +1194,44 @@ function renderFinancialEligibility(){
   }else{
     title.textContent='Insurance verification';
     text.textContent=r.message||'Staff will review the insurance information.';
+  }
+
+  var estimate=FD.estimate||null;
+  var estimateStatus=String(estimate&&estimate.status||'').toUpperCase();
+  var ready=$('estimateReady');
+  var pending=$('estimatePending');
+
+  if(estimateStatus==='READY' && estimate.amount!=='' && estimate.amount!=null){
+    ready.classList.remove('hidden');
+    pending.classList.add('hidden');
+
+    $('estimateAmount').textContent=
+      '$'+Number(estimate.amount).toFixed(2);
+
+    $('estimateConfidence').textContent=
+      estimate.confidence==='HIGH'
+        ? 'Verified insurance benefit · initial evaluation'
+        : 'Initial visit estimate';
+
+    $('estimateBasis').textContent=
+      estimate.basis||'Based on the specific physician-visit benefit returned by your health plan.';
+
+    $('estimateMessage').textContent=
+      estimate.message||
+      'This estimate covers the initial evaluation only. Additional services may create additional patient responsibility.';
+  }else{
+    ready.classList.add('hidden');
+    pending.classList.remove('hidden');
+
+    if(estimateStatus==='NEEDS CONTRACTED RATE'){
+      pending.innerHTML=
+        '<strong>Coverage is verified, but a dollar estimate needs the contracted rate.</strong> '+
+        escapeHtml(estimate.message||'We will not guess at the amount.');
+    }else if(estimate&&estimate.message){
+      pending.innerHTML=
+        '<strong>An initial-visit estimate is not available yet.</strong> '+
+        escapeHtml(estimate.message);
+    }
   }
 }
 
@@ -1289,14 +1355,15 @@ function boot(){
 
   apiGet().then(function(res){
     if(!res.success)throw new Error(res.error||'Could not load registration.');
-    if(String(res.version||'')!=='v0.9.6'){
-      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.9.6 before using this page.');
+    if(String(res.version||'')!=='v0.10.0'){
+      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.10.0 before using this page.');
     }
     FD.booking=res.booking||{};
     FD.data=res.intake&&res.intake.data?res.intake.data:{};
     FD.agreement=res.agreement||null;
     FD.eligibility=res.eligibility||null;
     FD.discovery=res.discovery||null;
+    FD.estimate=res.estimate||((res.eligibility&&res.eligibility.estimate)||null);
     FD.completed=!!(res.intake&&res.intake.completed);
 
     hydrate();
