@@ -193,6 +193,12 @@ input.invalid,select.invalid{border-color:#C04040;}
 @media(max-width:860px){.booking-grid{grid-template-columns:1fr;gap:48px;}.booking-sidebar{order:-1;}}
 @media(max-width:767px){.mobile-bar{display:flex;}nav.links{display:none;}nav.links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:var(--ivory);border-bottom:1px solid var(--line);padding:20px 32px;gap:16px;}.menu-toggle{display:block;}body{padding-bottom:72px;}.brand .sub{display:none;}.mobile-bar .btn{flex:1;text-align:center;padding:14px;}}
 @media(max-width:560px){.type-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.slot-grid{grid-template-columns:repeat(2,1fr);}}
+
+.practice-banner-wrap{display:none;background:#fff8ed;border-top:1px solid #e7d5ad;border-bottom:1px solid #e7d5ad;}
+.practice-banner-wrap.show{display:block;}
+.practice-banner{max-width:1180px;margin:0 auto;padding:12px 24px;color:#70430d;font-size:14px;line-height:1.5;text-align:center;}
+.practice-banner + .practice-banner{border-top:1px solid #eadfc8;}
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NH5ZV4VP2X"></script>
@@ -227,6 +233,7 @@ input.invalid,select.invalid{border-color:#C04040;}
 </nav></div></header>
 
 <main>
+<div id="practiceBannerWrap" class="practice-banner-wrap"></div>
 <div class="booking-hero"><div class="wrap">
   <p class="eyebrow">Request an appointment</p>
   <h1>Book your visit with<br><em>Dr. Farooqi</em></h1>
@@ -249,12 +256,12 @@ input.invalid,select.invalid{border-color:#C04040;}
       <button class="type-card" id="cardNew" onclick="selectType(this)"  data-type="new">
         <div class="tc-title">New patient</div>
         <div class="tc-desc">First visit to Lexington Podiatry</div>
-        <span class="tc-time">45 min appointment</span>
+        <span class="tc-time" id="newDurationLabel">30 min appointment</span>
       </button>
       <button class="type-card" id="cardReturning" onclick="selectType(this)" data-type="returning">
         <div class="tc-title">Returning patient</div>
         <div class="tc-desc">You've seen Dr. Farooqi before</div>
-        <span class="tc-time">30 min appointment</span>
+        <span class="tc-time" id="returningDurationLabel">15 min appointment</span>
       </button>
     </div>
     <div class="form-nav" style="margin-top:32px;">
@@ -431,12 +438,9 @@ input.invalid,select.invalid{border-color:#C04040;}
 <div class="mobile-bar"><a class="btn btn-ink" href="/booking">Book online</a><a class="btn btn-ghost" href="tel:+12125108665">Call us</a></div>
 
 <script>
-// READ-ONLY legacy booking endpoint — patient verification + slot discovery only.
-// Website booking POSTs no longer go here, which suppresses the old automatic email.
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxS7b06t34epLzgRSlT16nJXltMwfe0QtQCtmgq4yYifqcqj91jrA6A9MOKAzlm-AAEg/exec';
-
-// Front Door public gateway — creates WEBSITE Front Door record after the existing booking succeeds.
-var BOOKING_CLIENT_VERSION = 'v0.10.0';
+// Public Front Door Gateway is now also the narrow public adapter for OS2 Scheduling.
+// The old standalone Booking Backend is no longer used by this page.
+var BOOKING_CLIENT_VERSION = 'v0.10.1';
 var FRONT_DOOR_GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
 
 var state = {
@@ -452,7 +456,10 @@ var state = {
   websiteBookingId: null,
   bookingCommitted: false,
   bookingPayload: null,
-  bookingResult: null
+  bookingResult: null,
+
+  // Read-only OS2 scheduling policy exposed by the public Gateway.
+  bookingConfig: null
 };
 
 function toggleMenu(btn) {
@@ -531,7 +538,7 @@ function verifyReturning() {
   var btn = document.getElementById('btnVerify');
   btn.disabled = true; btn.textContent = 'Checking…';
   document.getElementById('verifyResult').innerHTML = '';
-  fetch(SCRIPT_URL + '?action=verify&first=' + encodeURIComponent(first) + '&last=' + encodeURIComponent(last) + '&last4=' + encodeURIComponent(last4))
+  fetch(FRONT_DOOR_GATEWAY_URL + '?action=verify&first=' + encodeURIComponent(first) + '&last=' + encodeURIComponent(last) + '&last4=' + encodeURIComponent(last4) + '&_=' + Date.now(), {cache:'no-store'})
     .then(function(r) { return r.json(); })
     .then(function(data) {
       btn.disabled = false; btn.textContent = 'Find my record';
@@ -575,10 +582,21 @@ function loadSlots() {
   calViewYear = null; calViewMonth = null;
   var container = document.getElementById('slotContainer');
   container.innerHTML = '<p class="loading-slots">Loading available times…</p>';
-  var duration = state.patientType === 'new' ? 45 : 30;
-  fetch(SCRIPT_URL + '?action=slots&duration=' + duration)
+
+  fetch(
+    FRONT_DOOR_GATEWAY_URL +
+    '?action=slots&patientType=' + encodeURIComponent(state.patientType) +
+    '&_=' + Date.now(),
+    {cache:'no-store'}
+  )
     .then(function(r) { return r.json(); })
-    .then(function(data) { renderSlots(data.slots); })
+    .then(function(data) {
+      if (!data || !data.success) {
+        throw new Error((data && data.error) || 'Unable to load appointment times.');
+      }
+      renderPracticeBanners(data.activeBanners || []);
+      renderSlots(data.slots || []);
+    })
     .catch(function() {
       container.innerHTML = '<p class="no-slots">Unable to load times. Please call us at <a href="tel:+12125108665">(212) 510-8665</a> to book.</p>';
     });
@@ -646,7 +664,7 @@ function renderSlots(slots) {
   allSlots = slots || [];
 
   if (!allSlots.length) {
-    container.innerHTML = '<p class="no-slots">No online slots available in the next 2 weeks. Please call us at <a href="tel:+12125108665">(212) 510-8665</a>.</p>';
+    container.innerHTML = '<p class="no-slots">No online appointments are currently available. Please call us at <a href="tel:+12125108665">(212) 510-8665</a>.</p>';
     return;
   }
 
@@ -804,13 +822,13 @@ function goToStep4() {
               '<b>Insurance:</b> ' + (document.getElementById('npInsurer').value === 'Other' ? (document.getElementById('insurerOther').value.trim() || 'Other') : (document.getElementById('npInsurer').value || 'Not provided')) + ' · ' + (document.getElementById('npInsId').value || 'Not provided') + (document.getElementById('npPayerId').value ? ' · Payer ID ' + document.getElementById('npPayerId').value : '') + '<br>' +
               '<b>Concerns:</b> ' + reasonStr + (primaryNote ? '<br><b>Notes:</b> ' + primaryNote : '') + '<br>' +
               '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
-              '<b>Type:</b> New patient (45 min)';
+              '<b>Type:</b> New patient (' + bookingDurationLabel('new') + ')';
   } else {
     summary = '<b>Name:</b> ' + state.verifiedName + '<br>' +
               '<b>Email:</b> ' + document.getElementById('rpEmail').value + '<br>' +
               '<b>Reason:</b> ' + document.getElementById('rpReason').value + '<br>' +
               '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
-              '<b>Type:</b> Follow-up (30 min)';
+              '<b>Type:</b> Follow-up (' + bookingDurationLabel('returning') + ')';
   }
   document.getElementById('reviewSummary').innerHTML = summary;
 }
@@ -878,13 +896,72 @@ function newWebsiteBookingId() {
  * so retrying this function returns the same Front Door token instead of
  * creating another row.
  */
+function loadBookingConfig() {
+  return fetch(
+    FRONT_DOOR_GATEWAY_URL + '?action=booking-config&_=' + Date.now(),
+    {cache:'no-store'}
+  )
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if (!data || !data.success) return null;
+    state.bookingConfig = data;
+
+    var newLabel = document.getElementById('newDurationLabel');
+    var returningLabel = document.getElementById('returningDurationLabel');
+    if (newLabel) newLabel.textContent = Number(data.newDurationMinutes || 30) + ' min appointment';
+    if (returningLabel) returningLabel.textContent = Number(data.returningDurationMinutes || 15) + ' min appointment';
+
+    renderPracticeBanners(data.activeBanners || []);
+    return data;
+  })
+  .catch(function(){ return null; });
+}
+
+
+function renderPracticeBanners(banners) {
+  var wrap = document.getElementById('practiceBannerWrap');
+  if (!wrap) return;
+
+  var list = Array.isArray(banners) ? banners.filter(function(x){
+    return x && String(x.message || '').trim();
+  }) : [];
+
+  if (!list.length) {
+    wrap.classList.remove('show');
+    wrap.innerHTML = '';
+    return;
+  }
+
+  wrap.innerHTML = list.map(function(x){
+    return '<div class="practice-banner">' + escapeBookingHtml(String(x.message || '')) + '</div>';
+  }).join('');
+  wrap.classList.add('show');
+}
+
+
+function escapeBookingHtml(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+
+function bookingDurationLabel(type) {
+  var c = state.bookingConfig || {};
+  var n = type === 'new'
+    ? Number(c.newDurationMinutes || 30)
+    : Number(c.returningDurationMinutes || 15);
+  return n + ' min';
+}
+
+
 function verifyFrontDoorGatewayVersion() {
   return fetch(FRONT_DOOR_GATEWAY_URL + '?action=health&_=' + Date.now(), {cache:'no-store'})
     .then(function(r){ return r.json(); })
     .then(function(data){
-      if (!data.success || String(data.version || '') !== 'v0.10.0') {
+      if (!data.success || String(data.version || '') !== 'v0.10.1') {
         throw new Error(
-          'Front Door Gateway is not on v0.10.0 yet. The appointment was not submitted.'
+          'Front Door Gateway is not on v0.10.1 yet. The appointment was not submitted.'
         );
       }
       return data;
@@ -974,6 +1051,8 @@ function goBack(toStep) {
   }
   else if (toStep === 3) { document.getElementById('panel3').classList.add('active'); }
 }
+
+loadBookingConfig();
 </script>
 </body>
 </html>
