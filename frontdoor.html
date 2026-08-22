@@ -1614,13 +1614,15 @@ function renderEstimate(){
 
 function frontDoorIsVirtual_(){
   var mode=clean(FD.booking&&FD.booking.visitMode||'').toUpperCase();
-  if(mode.indexOf('VIDEO')>-1||mode.indexOf('VIRTUAL')>-1||mode.indexOf('TELE')>-1)return true;
-  if(mode.indexOf('IN PERSON')>-1)return false;
-  var reason=clean(FD.booking&&FD.booking.visitReason||'').toUpperCase();
-  if(reason.indexOf('TELEHEALTH')>-1||reason.indexOf('TELEMED')>-1||reason.indexOf('VIRTUAL')>-1||reason.indexOf('VIDEO CONSULT')>-1)return true;
-  var iso=clean(FD.booking&&FD.booking.appointmentStart||'');
-  if(iso){try{var weekday=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short'}).format(new Date(iso));if(weekday==='Fri')return true;}catch(ignore){}}
-  return false;
+
+  return (
+    mode==='VIDEO CONSULT' ||
+    mode==='VIDEO' ||
+    mode==='VIRTUAL' ||
+    mode==='VIRTUAL VISIT' ||
+    mode==='TELEMEDICINE' ||
+    mode==='TELEHEALTH'
+  );
 }
 function renderTelemedicineWarning_(){if($('telemedicineDeclineWarning'))$('telemedicineDeclineWarning').classList.toggle('hidden',$('telemedicineConsent').checked);}
 function renderFinalFinancialSnapshot_(){
