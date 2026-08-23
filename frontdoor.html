@@ -64,6 +64,7 @@ textarea{min-height:105px;resize:vertical}input:focus,select:focus,textarea:focu
 .note{font-size:13px;color:var(--ink-soft);margin-top:6px}
 .prefill{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--good);font-weight:700;margin-left:6px}
 .choice-list{display:grid;gap:10px}
+.payment-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}.payment-choice .choice{min-height:86px}.payment-choice .choice strong{font-size:16px}.selfpay-callout{border:1px solid var(--champagne);background:#fff8e8;border-radius:14px;padding:16px;margin-top:14px}.selfpay-callout .price{font-family:var(--serif);font-size:32px;color:var(--brass-deep);margin:4px 0}@media(max-width:680px){.payment-choice{grid-template-columns:1fr}}
 .choice{border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;display:flex;align-items:flex-start;gap:11px;background:var(--ivory);cursor:pointer}
 .choice:has(input:checked){border-color:var(--brass);background:var(--stone)}
 .choice input{margin-top:5px;accent-color:var(--brass)}.choice strong{display:block;font-size:15px}.choice span{display:block;font-size:13px;color:var(--ink-soft);margin-top:2px}
@@ -328,6 +329,19 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <p class="intro">You don’t need to know a payer ID, deductible amount, or insurance billing code. If a payer ID is printed on your card, you can enter it to help us route the verification accurately.</p>
 
     <div class="section">
+      <div class="section-title">How would you like to handle this visit?</div>
+      <div class="payment-choice">
+        <label class="choice"><input type="radio" name="paymentChoice" value="INSURANCE"><span><strong>Use my insurance</strong><span>We’ll check the plan information you provide and show an estimate when the payer returns enough detail.</span></span></label>
+        <label class="choice"><input type="radio" name="paymentChoice" value="SELF_PAY"><span><strong>Self-pay</strong><span>Skip insurance verification and use Lexington Podiatry’s cash price for this visit.</span></span></label>
+      </div>
+      <div id="selfPayPriceBox" class="selfpay-callout hidden">
+        <strong>Self-pay price</strong>
+        <div class="price" id="selfPayPriceAmount">$—</div>
+        <div class="note" id="selfPayPriceText">Cash price for the scheduled visit.</div>
+      </div>
+    </div>
+
+    <div class="section" id="insuranceDetailsSection">
       <div class="section-title">Primary insurance</div>
       <div class="grid2">
         <div class="field">
@@ -377,30 +391,21 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         </div>
       </div>
 
-      <div id="subscriberFields" class="hidden" style="margin-top:18px;padding-top:18px;border-top:1px solid var(--line-soft)">
-        <div class="section-title">Policyholder details</div>
-        <p class="note">The payer could not identify the patient from the member information above. Please enter the primary policyholder’s information so we can try again.</p>
-        <div class="grid2">
-          <div class="field"><label for="subscriberFirstName">Policyholder first name <span class="req">*</span></label><input id="subscriberFirstName" type="text" autocomplete="off"></div>
-          <div class="field"><label for="subscriberLastName">Policyholder last name <span class="req">*</span></label><input id="subscriberLastName" type="text" autocomplete="off"></div>
-          <div class="field"><label for="subscriberDob">Policyholder date of birth <span class="req">*</span></label><input id="subscriberDob" type="date" autocomplete="off"></div>
-        </div>
-        <button class="btn secondary" type="button" id="retryEligibilityBtn">Try coverage check again</button>
-      </div>
+      <div id="subscriberFields" class="hidden"></div>
 
       <div id="discoveryOffer" class="discovery-offer hidden">
-        <strong>Not sure which insurance is active?</strong>
-        <div class="note" style="margin-top:6px">
-          We can search for active coverage using your name, date of birth, and address. It can take up to about two minutes, and you can keep completing registration while we search.
+        <strong>We could not verify that insurance automatically.</strong>
+        <div class="note" style="margin-top:6px">Choose one of these two paths. We won’t keep asking you to retry the same insurance check.</div>
+        <div class="nav-actions" style="justify-content:flex-start;margin-top:12px">
+          <button class="btn secondary" type="button" id="startDiscoveryBtn">Find my active coverage</button>
+          <button class="btn primary" type="button" id="continueSelfPayBtn">Continue without insurance</button>
         </div>
-        <button class="btn secondary" type="button" id="startDiscoveryBtn" style="margin-top:12px">
-          Find my active coverage
-        </button>
       </div>
 
       <div id="discoveryResultBox" class="callout hidden" style="margin-top:16px">
         <strong id="discoveryResultTitle">Searching for active coverage…</strong>
         <div id="discoveryResultText" style="margin-top:6px"></div>
+        <button class="btn primary hidden" type="button" id="continueSelfPayDiscoveryBtn" style="margin-top:12px">Continue without insurance</button>
       </div>
     </div>
 
@@ -451,7 +456,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div id="photoUpload" class="field hidden" style="margin-top:18px"><label for="photoIdFile">Photo ID</label><input id="photoIdFile" type="file" accept="image/jpeg,image/png,application/pdf"></div>
     </div>
 
-    <div class="section">
+    <div class="section" id="secondaryInsuranceSection">
       <div class="section-title" id="secondaryTitle">Secondary insurance</div>
       <label class="check"><input id="hasSecondary" type="checkbox"><span id="secondaryPrompt">I have secondary insurance</span></label>
       <div id="secondaryFields" class="hidden" style="margin-top:18px">
@@ -599,7 +604,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       </div>
     </div>
 
-    <div class="policy-card">
+    <div class="policy-card" id="insuranceBillingPolicyCard">
       <h3>Insurance billing & assignment of benefits</h3>
       <p>I authorize WAF Podiatry P.C. to bill my health plan or other responsible payer for services rendered and to submit information reasonably necessary for payment. To the extent permitted by my plan and applicable law, I assign payable insurance benefits to WAF Podiatry P.C. and authorize direct payment to the practice.</p>
       <label class="ack"><input id="billingAuthorizationAccepted" type="checkbox"><span>I authorize WAF Podiatry P.C. to bill for services rendered and accept the assignment/direct-payment authorization described above.</span></label>
@@ -607,8 +612,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
     <div class="policy-card">
       <h3>Financial responsibility</h3>
-      <p>Insurance benefits and estimates are not guarantees of payment. Amounts known to be your responsibility are due at the time of service. You remain responsible for patient amounts assigned by your health plan after the claim is processed.</p>
-      <label class="ack"><input id="financialPolicyAcknowledged" type="checkbox"><span>I understand the financial information above and accept responsibility for amounts assigned to me by my health plan.</span></label>
+      <p id="financialPolicyText">Insurance benefits and estimates are not guarantees of payment. Amounts known to be your responsibility are due at the time of service. You remain responsible for patient amounts assigned by your health plan after the claim is processed.</p>
+      <label class="ack"><input id="financialPolicyAcknowledged" type="checkbox"><span id="financialPolicyAckText">I understand the financial information above and accept responsibility for amounts assigned to me by my health plan.</span></label>
     </div>
 
     <div class="nav-actions">
@@ -620,7 +625,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
   <section class="panel" data-panel="5">
     <h2>Your estimate</h2>
-    <p class="intro">Here is the amount we can estimate from the insurance benefit information available today.</p>
+    <p class="intro" id="estimateIntro">Here is the amount we can estimate from the insurance benefit information available today.</p>
 
     <div id="estimateReady" class="financial-box initial-estimate-ready hidden">
       <div class="estimate-kicker">Initial visit</div>
@@ -747,9 +752,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.10.0';
+var CLIENT_VERSION = 'v0.11.2';
 
-var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null};
+var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null,insuranceEstimate:null,cashPrice:null};
 
 function $(id){return document.getElementById(id)}
 function q(sel){return document.querySelector(sel)}
@@ -827,6 +832,62 @@ function insuranceIsActive(){
   return !!((eligActive||discoveryFound)&&!FD.insuranceUnlocked);
 }
 
+function paymentChoice(){
+  return radioValue('paymentChoice')||'INSURANCE';
+}
+function isSelfPay(){ return paymentChoice()==='SELF_PAY'; }
+function frontDoorPatientIsNew_(){
+  var t=String(FD.booking&&FD.booking.patientType||'').toUpperCase();
+  return !(t==='RETURNING'||t==='FOLLOW UP'||t==='FOLLOW-UP'||t==='FOLLOWUP');
+}
+function selfPayEstimateFromPrice_(){
+  var p=FD.cashPrice||{};
+  if(String(p.status||'').toUpperCase()==='READY'&&p.amount!==''&&p.amount!=null){
+    return {status:'READY',amount:Number(p.amount),currency:'USD',confidence:'CASH',basis:'SELF PAY CASH PRICE',serviceTypeCode:'SELF_PAY',copay:'',coinsurancePercent:'',deductibleExplicit:false,message:p.note||'This is the cash price for the scheduled visit. Additional services are separate.'};
+  }
+  return {status:'CASH PRICE NOT CONFIGURED',amount:'',currency:'USD',confidence:'',basis:'SELF PAY CASH PRICE',message:'The office will confirm the cash price for this visit.'};
+}
+function selectSelfPay_(showMessage){
+  setRadio('paymentChoice','SELF_PAY');
+  FD.insuranceUnlocked=true;
+  setInsuranceLocked(false);
+  if(FD.eligibilityTimer){clearInterval(FD.eligibilityTimer);FD.eligibilityTimer=null;}
+  if(FD.discoveryTimer){clearInterval(FD.discoveryTimer);FD.discoveryTimer=null;}
+  FD.estimate=selfPayEstimateFromPrice_();
+  applyPaymentChoiceUI_();
+  if(showMessage)toast('Self-pay selected. Insurance verification is skipped.');
+}
+function applyPaymentChoiceUI_(){
+  var self=isSelfPay();
+  $('insuranceDetailsSection').classList.toggle('hidden',self);
+  $('insuranceCardSection').classList.toggle('hidden',self);
+  $('secondaryInsuranceSection').classList.toggle('hidden',self);
+  $('insuranceBillingPolicyCard').classList.toggle('hidden',self);
+  $('selfPayPriceBox').classList.toggle('hidden',!self);
+  if(self){
+    $('hasSecondary').checked=false;
+    $('secondaryFields').classList.add('hidden');
+    var p=FD.cashPrice||{};
+    if(String(p.status||'').toUpperCase()==='READY'&&p.amount!==''&&p.amount!=null){
+      $('selfPayPriceAmount').textContent='$'+Number(p.amount).toFixed(2);
+      $('selfPayPriceText').textContent=p.note||'Cash price for the scheduled visit.';
+    }else{
+      $('selfPayPriceAmount').textContent='Price pending';
+      $('selfPayPriceText').textContent='The office will confirm the cash price for this visit.';
+    }
+    $('financialPolicyText').textContent='The self-pay amount shown covers the scheduled visit only. Additional services, procedures, imaging, supplies, or treatments are separate and will be discussed when applicable.';
+    $('financialPolicyAckText').textContent='I understand the self-pay price shown for my scheduled visit and that additional services may have additional charges.';
+    $('estimateIntro').textContent='Here is Lexington Podiatry’s cash price for your scheduled visit.';
+    FD.estimate=selfPayEstimateFromPrice_();
+  }else{
+    FD.estimate=FD.insuranceEstimate||null;
+    $('financialPolicyText').textContent='Insurance benefits and estimates are not guarantees of payment. Amounts known to be your responsibility are due at the time of service. You remain responsible for patient amounts assigned by your health plan after the claim is processed.';
+    $('financialPolicyAckText').textContent='I understand the financial information above and accept responsibility for amounts assigned to me by my health plan.';
+    $('estimateIntro').textContent='Here is the amount we can estimate from the insurance benefit information available today.';
+  }
+  renderFinancialEligibility();renderFinalFinancialSnapshot_();renderStatusSidebar();
+}
+
 function setInsuranceLocked(locked){
   ['insuranceCarrier','payerId','memberId','insurancePlan','groupId'].forEach(function(id){
     var el=$(id);
@@ -866,6 +927,7 @@ function setVerifiedDemographicsLocked_(locked){
 }
 
 function renderInsuranceCardRequirement(){
+  if(isSelfPay()){ $('insuranceCardSection').classList.add('hidden'); return; }
   var active=insuranceIsActive();
   var status=String(FD.eligibility&&FD.eligibility.status||'').toUpperCase();
   var choice=radioValue('insuranceCardStatus');
@@ -993,6 +1055,7 @@ function eligibilityNeedsDiscoveryOffer(){
 }
 
 function renderDiscoveryOffer(){
+  if(isSelfPay()){ $('discoveryOffer').classList.add('hidden'); return; }
   var alreadyStarted=FD.discovery&&String(FD.discovery.status||'').toUpperCase()!=='NOT REQUESTED';
   $('discoveryOffer').classList.toggle(
     'hidden',
@@ -1087,6 +1150,7 @@ function applyDiscoveryResult(res){
     sideText.textContent='The office will finish reviewing the result.';
   }
 
+  $('continueSelfPayDiscoveryBtn').classList.toggle('hidden',discoveryPending(status)||status==='FOUND');
   renderDiscoveryOffer();
   renderInsuranceCardRequirement();
   renderFinancialEligibility();
@@ -1166,7 +1230,7 @@ function eligibilityPending(status){
 function applyEligibilityResult(res){
   if(!res||!res.success)return;
   FD.eligibility=res;
-  if(res.estimate)FD.estimate=res.estimate;
+  if(res.estimate){FD.estimate=res.estimate;FD.insuranceEstimate=res.estimate;}
 
   var status=String(res.status||'').toUpperCase();
   var box=$('eligibilityBox');
@@ -1225,10 +1289,10 @@ function applyEligibilityResult(res){
   }else if(status==='NEEDS SUBSCRIBER INFO'){
     setInsuranceLocked(false);
     $('insuranceLockNote').classList.add('hidden');
-    title.textContent='One more insurance detail is needed';
-    text.textContent=res.message||'Please enter the primary policyholder details below.';
+    title.textContent='We could not verify that coverage';
+    text.textContent='You can search for other active coverage or continue as self-pay. We will not ask you to retry the same check.';
     details.classList.add('hidden');
-    $('subscriberFields').classList.remove('hidden');
+    $('subscriberFields').classList.add('hidden');
   }else{
     setInsuranceLocked(false);
     $('insuranceLockNote').classList.add('hidden');
@@ -1270,7 +1334,7 @@ function renderStatusSidebar(){
     $('noShowPolicyAccepted').checked &&
     $('privacyAcknowledged').checked &&
     $('treatmentConsent').checked &&
-    $('billingAuthorizationAccepted').checked &&
+    (isSelfPay() || $('billingAuthorizationAccepted').checked) &&
     $('financialPolicyAcknowledged').checked;
 
   $('policyStatusMark').textContent=policiesComplete?'✓':'!';
@@ -1284,7 +1348,8 @@ function renderStatusSidebar(){
 
 
 function renderFinancialEligibility(){
-  var estimate=FD.estimate||null;
+  var estimate=isSelfPay()?selfPayEstimateFromPrice_():(FD.estimate||null);
+  if(isSelfPay())FD.estimate=estimate;
   var estimateStatus=String(estimate&&estimate.status||'').toUpperCase();
   var ready=$('estimateReady');
   var pending=$('estimatePending');
@@ -1297,12 +1362,16 @@ function renderFinancialEligibility(){
       '$'+Number(estimate.amount).toFixed(2);
 
     $('estimateConfidence').textContent=
-      estimate.confidence==='HIGH'
-        ? 'Verified insurance benefit · initial evaluation'
-        : 'Initial visit estimate';
+      isSelfPay()
+        ? 'Self-pay cash price · scheduled visit'
+        : (estimate.confidence==='HIGH' ? 'Verified insurance benefit · initial evaluation' : 'Initial visit estimate');
 
     var detailLines=[];
-    detailLines.push('Your insurance coverage was verified.');
+    if(isSelfPay()){
+      detailLines.push('This amount comes from Lexington Podiatry’s current cash-price settings.');
+      detailLines.push('It covers the scheduled evaluation only; additional services are separate.');
+    }else{
+      detailLines.push('Your insurance coverage was verified.');
 
     if(estimate.copay!=='' && estimate.copay!=null){
       detailLines.push(
@@ -1320,11 +1389,12 @@ function renderFinancialEligibility(){
       );
     }
 
-    detailLines.push(
-      estimate.deductibleExplicit
-        ? 'Your insurer tied this visit benefit to a deductible, so a final dollar estimate still depends on the contracted rate.'
-        : 'Your insurer did not return a deductible specifically tied to this initial visit benefit.'
-    );
+      detailLines.push(
+        estimate.deductibleExplicit
+          ? 'Your insurer tied this visit benefit to a deductible, so a final dollar estimate still depends on the contracted rate.'
+          : 'Your insurer did not return a deductible specifically tied to this initial visit benefit.'
+      );
+    }
 
     $('estimateDetailList').innerHTML=
       detailLines.map(function(line){
@@ -1333,7 +1403,9 @@ function renderFinancialEligibility(){
 
     $('estimateMessage').textContent=
       estimate.message||
-      'This estimate covers the initial evaluation only. Additional services may create additional patient responsibility.';
+      (isSelfPay()
+        ? 'This cash price covers the scheduled evaluation only. Additional services are separate.'
+        : 'This estimate covers the initial evaluation only. Additional services may create additional patient responsibility.');
   }else{
     ready.classList.add('hidden');
     pending.classList.remove('hidden');
@@ -1379,6 +1451,8 @@ function pollEligibility(){
 
 function queueEligibilityFromCurrentData(data){
   FD.insuranceUnlocked=false;
+  FD.insuranceEstimate=null;
+  FD.estimate=null;
   setInsuranceLocked(false);
   $('planVerified').classList.add('hidden');
   $('groupVerified').classList.add('hidden');
@@ -1473,8 +1547,8 @@ function boot(){
 
   apiGet().then(function(res){
     if(!res.success)throw new Error(res.error||'Could not load registration.');
-    if(String(res.version||'')!=='v0.10.1'){
-      throw new Error('Front Door Gateway is '+String(res.version||'an older version')+'. Update the Gateway deployment to v0.10.1 before using this page.');
+    if(!(res.capabilities&&res.capabilities.selfPayCashPrice)){
+      throw new Error('Front Door Gateway needs the self-pay/cash-price update before using this page.');
     }
     FD.booking=res.booking||{};
     FD.data=res.intake&&res.intake.data?res.intake.data:{};
@@ -1482,6 +1556,8 @@ function boot(){
     FD.eligibility=res.eligibility||null;
     FD.discovery=res.discovery||null;
     FD.estimate=res.estimate||((res.eligibility&&res.eligibility.estimate)||null);
+    FD.insuranceEstimate=(FD.estimate&&String(FD.estimate.basis||'').toUpperCase()!=='SELF PAY CASH PRICE')?FD.estimate:null;
+    FD.cashPrice=res.cashPrice||null;
     FD.completed=!!(res.intake&&res.intake.completed);
 
     hydrate();
@@ -1577,7 +1653,13 @@ function hydrate(){
     });
   }
 
-  updateConditionalFields();renderEstimate();renderConfirmSummary();renderFinalFinancialSnapshot_();renderTelemedicineWarning_();renderAgreement();renderSignatureDate();renderPharmacySelection();renderStatusSidebar();
+  var savedChoice=String(d.paymentChoice||'').toUpperCase();
+  var sourceCarrier=String(b.insuranceCarrier||'').toUpperCase();
+  if(savedChoice==='SELF_PAY'||savedChoice==='INSURANCE')setRadio('paymentChoice',savedChoice);
+  else if(/SELF.?PAY|NO INSURANCE/.test(sourceCarrier))setRadio('paymentChoice','SELF_PAY');
+  else setRadio('paymentChoice','INSURANCE');
+  applyPaymentChoiceUI_();
+  updateConditionalFields();renderFinancialEligibility();renderConfirmSummary();renderFinalFinancialSnapshot_();renderTelemedicineWarning_();renderAgreement();renderSignatureDate();renderPharmacySelection();renderStatusSidebar();
 }
 
 function setValue(id,v){if($(id)&&v!=null)$(id).value=String(v)}
@@ -1628,7 +1710,7 @@ function renderTelemedicineWarning_(){if($('telemedicineDeclineWarning'))$('tele
 function renderFinalFinancialSnapshot_(){
   var estimate=FD.estimate||null,ready=$('finalEstimateSnapshot'),pending=$('finalEstimatePending');if(!ready||!pending)return;
   var status=String(estimate&&estimate.status||'').toUpperCase();
-  if(status==='READY'&&estimate.amount!==''&&estimate.amount!=null){ready.classList.remove('hidden');pending.classList.add('hidden');$('finalEstimateAmount').textContent='$'+Number(estimate.amount).toFixed(2);$('finalEstimateConfidence').textContent=estimate.confidence==='HIGH'?'Verified insurance benefit':'Visit estimate';$('virtualPrepayWarning').classList.toggle('hidden',!(frontDoorIsVirtual_()&&Number(estimate.amount)>0));}
+  if(status==='READY'&&estimate.amount!==''&&estimate.amount!=null){ready.classList.remove('hidden');pending.classList.add('hidden');$('finalEstimateAmount').textContent='$'+Number(estimate.amount).toFixed(2);$('finalEstimateConfidence').textContent=isSelfPay()?'Self-pay cash price':(estimate.confidence==='HIGH'?'Verified insurance benefit':'Visit estimate');$('virtualPrepayWarning').classList.toggle('hidden',!(frontDoorIsVirtual_()&&Number(estimate.amount)>0));}
   else{ready.classList.add('hidden');pending.classList.remove('hidden');}
 }
 function renderConfirmSummary(){
@@ -1646,13 +1728,14 @@ function collect(){
     state:clean($('state').value),zip:clean($('zip').value),
     emergencyName:clean($('emergencyName').value),emergencyPhone:clean($('emergencyPhone').value),
     pharmacy:clean($('pharmacy').value),pharmacyNpi:clean($('pharmacyNpi').value),pharmacyPhone:clean($('pharmacyPhone').value),pharmacyAddress:clean($('pharmacyAddress').value),
-    insuranceCarrier:clean($('insuranceCarrier').value),payerId:normalizePayerId($('payerId').value),insurancePlan:clean($('insurancePlan').value),
-    memberId:clean($('memberId').value),groupId:clean($('groupId').value),
+    paymentChoice:paymentChoice(),
+    insuranceCarrier:isSelfPay()?'Self-pay':clean($('insuranceCarrier').value),payerId:isSelfPay()?'':normalizePayerId($('payerId').value),insurancePlan:isSelfPay()?'':clean($('insurancePlan').value),
+    memberId:isSelfPay()?'':clean($('memberId').value),groupId:isSelfPay()?'':clean($('groupId').value),
     subscriberFirstName:clean($('subscriberFirstName').value),subscriberLastName:clean($('subscriberLastName').value),
     subscriberDob:clean($('subscriberDob').value),
-    insuranceCardStatus:radioValue('insuranceCardStatus'),photoIdStatus:radioValue('photoIdStatus'),
-    hasSecondaryInsurance:$('hasSecondary').checked,secondaryCarrier:clean($('secondaryCarrier').value),
-    secondaryMemberId:clean($('secondaryMemberId').value),secondaryGroupId:clean($('secondaryGroupId').value),
+    insuranceCardStatus:isSelfPay()?'not_applicable':radioValue('insuranceCardStatus'),photoIdStatus:radioValue('photoIdStatus'),
+    hasSecondaryInsurance:isSelfPay()?false:$('hasSecondary').checked,secondaryCarrier:isSelfPay()?'':clean($('secondaryCarrier').value),
+    secondaryMemberId:isSelfPay()?'':clean($('secondaryMemberId').value),secondaryGroupId:isSelfPay()?'':clean($('secondaryGroupId').value),
     healthChange:radioValue('healthChange'),noKnownAllergies:$('noKnownAllergies').checked,
     allergies:clean($('allergies').value),medications:clean($('medications').value),
     medicalHistory:qa('#historyChecks input[type="checkbox"]:checked').map(function(cb){return cb.value}),
@@ -1681,12 +1764,15 @@ function validateStep(step,data){
   }
 
   if(step===2){
-    need('insuranceCarrier','Please enter your insurance company.');
-    need('memberId','Please enter your member ID.');
-    if(!data.photoIdStatus)throw new Error('Please choose what you will do with your photo ID.');
-    if(data.hasSecondaryInsurance&&(!data.secondaryCarrier||!data.secondaryMemberId)){
-      throw new Error('Please enter the secondary insurance company and member ID.');
+    if(!data.paymentChoice)throw new Error('Please choose insurance or self-pay.');
+    if(data.paymentChoice!=='SELF_PAY'){
+      need('insuranceCarrier','Please enter your insurance company.');
+      need('memberId','Please enter your member ID.');
+      if(data.hasSecondaryInsurance&&(!data.secondaryCarrier||!data.secondaryMemberId)){
+        throw new Error('Please enter the secondary insurance company and member ID.');
+      }
     }
+    if(!data.photoIdStatus)throw new Error('Please choose what you will do with your photo ID.');
   }
 
   if(step===3){
@@ -1701,16 +1787,15 @@ function validateStep(step,data){
     if(!data.privacyAcknowledged)throw new Error('Please acknowledge the privacy notice.');
     if(!data.treatmentConsent)throw new Error('Consent to treatment is required.');
     if(frontDoorIsVirtual_()&&!data.telemedicineConsent)throw new Error('Telemedicine consent is required for a virtual/video appointment.');
-    if(!data.billingAuthorizationAccepted)throw new Error('Please authorize insurance billing and assignment of benefits.');
+    if(data.paymentChoice!=='SELF_PAY'&&!data.billingAuthorizationAccepted)throw new Error('Please authorize insurance billing and assignment of benefits.');
     if(!data.financialPolicyAcknowledged)throw new Error('Please acknowledge the financial policy.');
   }
 
   if(step===6){
     var discoveryStatus=String(FD.discovery&&FD.discovery.status||'').toUpperCase();
-    if(!insuranceIsActive()&&!discoveryPending(discoveryStatus)&&!data.insuranceCardStatus){
+    if(data.paymentChoice!=='SELF_PAY'&&!insuranceIsActive()&&!discoveryPending(discoveryStatus)&&!data.insuranceCardStatus){
       showStep(2);
-      showInsuranceCardChoices();
-      throw new Error('We could not verify your insurance automatically. Please choose how you will provide your insurance card.');
+      throw new Error('We could not verify your insurance automatically. Choose active-coverage discovery or continue without insurance.');
     }
     if(!data.agreementAccepted)throw new Error('Please review and accept the agreement you are signing.');
     if(!data.signatureName)throw new Error('Please type your full name as your electronic signature.');
@@ -1744,8 +1829,13 @@ function saveAndMove(target){
     renderStatusSidebar();
 
     if(FD.currentStep===2&&target===3){
+      if(data.paymentChoice==='SELF_PAY'){
+        FD.estimate=selfPayEstimateFromPrice_();
+        FD.busy=false;setBusy(false,'');showStep(target);toast('Saved — self-pay selected');
+        return;
+      }
       return queueEligibilityFromCurrentData(data).catch(function(err){
-        toast(err.message||'We could not start the insurance check. You can continue and staff will review it.');
+        toast(err.message||'We could not verify that insurance automatically. You can use coverage discovery or continue without insurance.');
         return null;
       }).then(function(){
         FD.busy=false;setBusy(false,'');showStep(target);toast('Saved');
@@ -1840,19 +1930,18 @@ $('completeBtn').addEventListener('click',complete);
 $('pharmacySearchBtn').addEventListener('click',searchPharmacy);
 $('changeInsuranceBtn').addEventListener('click',unlockInsuranceForChange);
 $('startDiscoveryBtn').addEventListener('click',startDiscovery);
+$('continueSelfPayBtn').addEventListener('click',function(){selectSelfPay_(true)});
+$('continueSelfPayDiscoveryBtn').addEventListener('click',function(){selectSelfPay_(true)});
+qa('input[name="paymentChoice"]').forEach(function(el){el.addEventListener('change',function(){
+  if(el.value==='SELF_PAY')selectSelfPay_(false);
+  else{FD.insuranceUnlocked=false;applyPaymentChoiceUI_();}
+})});
 $('showInsuranceCardChoicesBtn').addEventListener('click',showInsuranceCardChoices);
 $('showInsuranceCardChoicesVerifiedBtn').addEventListener('click',showInsuranceCardChoices);
 $('insuranceCarrier').addEventListener('change',syncPayerIdFromCarrier);
 $('insuranceCarrier').addEventListener('blur',syncPayerIdFromCarrier);
 $('payerId').addEventListener('change',syncCarrierFromPayerId);
 $('payerId').addEventListener('blur',syncCarrierFromPayerId);
-$('retryEligibilityBtn').addEventListener('click',function(){
-  var data=collect();
-  try{validateStep(2,data)}catch(err){toast(err.message);return}
-  queueEligibilityFromCurrentData(data).catch(function(err){
-    toast(err.message||'Could not retry coverage check.');
-  });
-});
 $('pharmacyNameSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacyLocationSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').value)&&clean($('pharmacy').value)!==clean(FD.data.pharmacy||'')){setValue('pharmacyNpi','');setValue('pharmacyPhone','');setValue('pharmacyAddress','')}renderPharmacySelection();renderStatusSidebar()});
