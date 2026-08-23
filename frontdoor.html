@@ -752,7 +752,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.11.2';
+var CLIENT_VERSION = 'v0.11.3';
 
 var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null,insuranceEstimate:null,cashPrice:null};
 
@@ -782,8 +782,11 @@ function gatewayReady(){return /^https:\/\/script\.google\.com\/macros\/s\/.+\/e
 function tokenFromUrl(){var p=new URLSearchParams(window.location.search);return clean(p.get('t')||'')}
 
 function apiGet(){
-  return fetch(GATEWAY_URL+'?action=load&t='+encodeURIComponent(FD.token))
-    .then(function(r){return r.json()});
+  var controller=(typeof AbortController!=='undefined')?new AbortController():null;
+  var timer=setTimeout(function(){if(controller)controller.abort();},12000);
+  return fetch(GATEWAY_URL+'?action=load&t='+encodeURIComponent(FD.token),controller?{signal:controller.signal}:undefined)
+    .then(function(r){clearTimeout(timer);return r.json()})
+    .catch(function(err){clearTimeout(timer);if(err&&err.name==='AbortError')throw new Error('We could not load your registration. Your appointment time is still reserved. Please refresh this page or call Lexington Podiatry.');throw err;});
 }
 
 function apiPost(action,step,data,uploads){
@@ -1593,7 +1596,7 @@ function hydrate(){
 
   if(b.source==='ZOCDOC'){
     $('zocdocPolicy').classList.remove('hidden');
-    $('zocdocCancelReminder').classList.remove('hidden');
+    if($('zocdocCancelReminder'))$('zocdocCancelReminder').classList.remove('hidden');
   }else{
     qa('.zocdoc-only').forEach(function(el){el.classList.add('hidden')});
   }
@@ -1626,9 +1629,6 @@ function hydrate(){
   setValue('insurancePlan',d.insurancePlan||b.insurancePlan);
   setValue('memberId',d.memberId||b.memberId);
   setValue('groupId',d.groupId||b.groupId);
-  setValue('subscriberFirstName',d.subscriberFirstName);
-  setValue('subscriberLastName',d.subscriberLastName);
-  setValue('subscriberDob',d.subscriberDob);
   setValue('bookingReason',b.visitReason||'');
 
   setCheck('hasSecondary',!!d.hasSecondaryInsurance);
@@ -1731,8 +1731,8 @@ function collect(){
     paymentChoice:paymentChoice(),
     insuranceCarrier:isSelfPay()?'Self-pay':clean($('insuranceCarrier').value),payerId:isSelfPay()?'':normalizePayerId($('payerId').value),insurancePlan:isSelfPay()?'':clean($('insurancePlan').value),
     memberId:isSelfPay()?'':clean($('memberId').value),groupId:isSelfPay()?'':clean($('groupId').value),
-    subscriberFirstName:clean($('subscriberFirstName').value),subscriberLastName:clean($('subscriberLastName').value),
-    subscriberDob:clean($('subscriberDob').value),
+    subscriberFirstName:clean(FD.data.subscriberFirstName||''),subscriberLastName:clean(FD.data.subscriberLastName||''),
+    subscriberDob:clean(FD.data.subscriberDob||''),
     insuranceCardStatus:isSelfPay()?'not_applicable':radioValue('insuranceCardStatus'),photoIdStatus:radioValue('photoIdStatus'),
     hasSecondaryInsurance:isSelfPay()?false:$('hasSecondary').checked,secondaryCarrier:isSelfPay()?'':clean($('secondaryCarrier').value),
     secondaryMemberId:isSelfPay()?'':clean($('secondaryMemberId').value),secondaryGroupId:isSelfPay()?'':clean($('secondaryGroupId').value),
@@ -1945,7 +1945,7 @@ $('payerId').addEventListener('blur',syncCarrierFromPayerId);
 $('pharmacyNameSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacyLocationSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').value)&&clean($('pharmacy').value)!==clean(FD.data.pharmacy||'')){setValue('pharmacyNpi','');setValue('pharmacyPhone','');setValue('pharmacyAddress','')}renderPharmacySelection();renderStatusSidebar()});
-['insuranceCarrier','payerId','memberId','subscriberFirstName','subscriberLastName','subscriberDob'].forEach(function(id){
+['insuranceCarrier','payerId','memberId'].forEach(function(id){
   $(id).addEventListener('input',function(){
     if(insuranceIsActive())return;
     $('planVerified').classList.add('hidden');
