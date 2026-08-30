@@ -137,6 +137,7 @@ footer .fl{display:flex;gap:24px;flex-wrap:wrap;}
 .verify-box .vb-sub{font-size:15px;color:var(--ink-soft);margin-bottom:24px;}
 .verify-result{margin-top:16px;padding:16px 18px;border-radius:10px;font-size:15px;}
 .verify-result.success{background:#EDF7ED;color:#2E6B2E;border:1px solid #B3DDB3;}
+.verify-result.info{background:#F4F1EA;color:var(--ink-soft);border:1px solid var(--line);}
 .verify-result.error{background:#FDF0F0;color:#8B2020;border:1px solid #EFBBBB;}
 .form-nav{display:flex;gap:14px;align-items:center;margin-top:36px;flex-wrap:wrap;}
 .btn-back{background:none;border:none;font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink-soft);cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px;}
@@ -404,7 +405,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
       </div>
       <div id="verifyResult"></div>
       <div class="secure-badge" style="margin:24px 0 0;border-top:none;border-radius:8px;">🔒 Encrypted in transit</div>
-      <div class="form-nav"><button class="btn btn-ink" onclick="verifyReturning()" id="btnVerify">Find my record</button><button class="btn btn-ink" onclick="confirmReturningCode()" id="btnConfirmCode" style="display:none;">Verify code</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
+      <div class="form-nav"><button class="btn btn-ink" onclick="verifyReturning()" id="btnVerify">Find my record</button><button class="btn btn-ink" onclick="confirmReturningCode()" id="btnConfirmCode" style="display:none;">Verify code</button><button class="btn-back" onclick="backToVisitType()">← Back</button></div>
     </div>
   </div>
 
@@ -429,7 +430,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
       <p style="font-size:15px;color:var(--ink-soft);margin-bottom:8px;">Select an available appointment time. All times are Eastern.</p>
       <div id="returningSlotContainer"><p class="loading-slots">Loading available times…</p></div>
     </div>
-    <div class="form-nav" style="margin-top:24px;"><button class="btn btn-ink" onclick="goToStep4()" id="btnReturnReview" disabled>Review &amp; confirm</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
+    <div class="form-nav" style="margin-top:24px;"><button class="btn btn-ink" onclick="goToStep4()" id="btnReturnReview" disabled>Review &amp; confirm</button><button class="btn-back" onclick="backToVisitType()">← Back</button></div>
   </div>
 
   <!-- PANEL 3 SLOTS -->
@@ -484,7 +485,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 <script>
 // Public Front Door Gateway is now also the narrow public adapter for OS2 Scheduling.
 // The old standalone Booking Backend is no longer used by this page.
-var BOOKING_CLIENT_VERSION = 'v0.16.2';
+var BOOKING_CLIENT_VERSION = 'v0.16.3';
 var FRONT_DOOR_GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
 
 var state = {
@@ -492,9 +493,13 @@ var state = {
   verifiedName: null,
   verifiedPhone: null,
   verifiedEmail: null,
+  verificationPendingName: null,
+  verificationPendingEmail: null,
   visitMode: null,
   verificationRequestId: null,
   verificationSession: null,
+  verificationIdentityAttempts: 0,
+  verificationIdentityLocked: false,
   selectedSlot: null,
   currentStep: 1,
 
@@ -542,7 +547,116 @@ function updatePatientSummary() {
   card.classList.add('show');
 }
 
+var RETURNING_VERIFY_MAX_ATTEMPTS = 3;
+
+function isEmailCodeVerification_() {
+  return !!(state.bookingConfig && state.bookingConfig.followUpVerification === 'email_code');
+}
+
+function hasVerifiedReturningPatient_() {
+  if (!state.verifiedName) return false;
+  return isEmailCodeVerification_() ? !!state.verificationSession : true;
+}
+
+function readVerificationAttempts_() {
+  try {
+    var saved = parseInt(sessionStorage.getItem('lexpodReturningVerifyAttempts') || '0', 10);
+    return isNaN(saved) ? 0 : Math.max(0, Math.min(saved, RETURNING_VERIFY_MAX_ATTEMPTS));
+  } catch (err) {
+    return 0;
+  }
+}
+
+function saveVerificationAttempts_() {
+  try {
+    sessionStorage.setItem('lexpodReturningVerifyAttempts', String(state.verificationIdentityAttempts));
+  } catch (err) {}
+}
+
+function setIdentityFieldsDisabled_(disabled) {
+  ['rpFirst','rpLast','rpDob','rpVerifyEmail','rpLast4'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.disabled = !!disabled;
+  });
+  var btn = document.getElementById('btnVerify');
+  if (btn) btn.disabled = !!disabled;
+}
+
+function restoreVerificationAttempts_() {
+  state.verificationIdentityAttempts = readVerificationAttempts_();
+  state.verificationIdentityLocked = state.verificationIdentityAttempts >= RETURNING_VERIFY_MAX_ATTEMPTS;
+  setIdentityFieldsDisabled_(state.verificationIdentityLocked);
+  if (state.verificationIdentityLocked && !state.verificationRequestId) {
+    showVerifyResult('We could not verify the record after 3 attempts. Please call the office at (212) 510-8665 for help booking.', false);
+  }
+}
+
+function recordVerificationAttempt_() {
+  state.verificationIdentityAttempts = Math.min(
+    RETURNING_VERIFY_MAX_ATTEMPTS,
+    state.verificationIdentityAttempts + 1
+  );
+  state.verificationIdentityLocked = state.verificationIdentityAttempts >= RETURNING_VERIFY_MAX_ATTEMPTS;
+  saveVerificationAttempts_();
+  return RETURNING_VERIFY_MAX_ATTEMPTS - state.verificationIdentityAttempts;
+}
+
+function undoVerificationAttempt_() {
+  state.verificationIdentityAttempts = Math.max(0, state.verificationIdentityAttempts - 1);
+  state.verificationIdentityLocked = false;
+  saveVerificationAttempts_();
+}
+
+function resetVerificationAttempts_() {
+  state.verificationIdentityAttempts = 0;
+  state.verificationIdentityLocked = false;
+  saveVerificationAttempts_();
+  setIdentityFieldsDisabled_(false);
+}
+
+function clearReturningVerification_(message) {
+  state.verifiedName = null;
+  state.verifiedPhone = null;
+  state.verifiedEmail = null;
+  state.verificationPendingName = null;
+  state.verificationPendingEmail = null;
+  state.verificationRequestId = null;
+  state.verificationSession = null;
+  state.visitMode = null;
+  state.selectedSlot = null;
+  state.bookingPayload = null;
+  document.getElementById('rpCode').value = '';
+  document.getElementById('returningCodeField').style.display = 'none';
+  document.getElementById('btnConfirmCode').style.display = 'none';
+  document.querySelectorAll('#returningModeGrid .mode-card').forEach(function(el) {
+    el.classList.remove('selected');
+  });
+  document.getElementById('btnReturnReview').disabled = true;
+  document.getElementById('patientSummaryCard').classList.remove('show');
+  document.getElementById('returningSlotContainer').innerHTML = '<p class="loading-slots">Choose in person or virtual to see available times.</p>';
+  if (message) showVerifyResult(message, false);
+  else document.getElementById('verifyResult').innerHTML = '';
+}
+
+function showReturningVerification_(message) {
+  clearReturningVerification_(message);
+  configureStepTabs();
+  setStep(2);
+  document.getElementById('panel2Returning').classList.add('active');
+  restoreVerificationAttempts_();
+}
+
+function backToVisitType() {
+  clearReturningVerification_();
+  setStep(1);
+  document.getElementById('panel1').classList.add('active');
+}
+
 function openReturningBooking() {
+  if (!hasVerifiedReturningPatient_()) {
+    showReturningVerification_('Please verify your patient record before choosing an appointment time.');
+    return;
+  }
   configureStepTabs();
   setStep(2);
   document.getElementById('panel2ReturnForm').classList.add('active');
@@ -553,6 +667,10 @@ function openReturningBooking() {
 }
 
 function selectVisitMode(btn) {
+  if (!hasVerifiedReturningPatient_()) {
+    showReturningVerification_('Your verification is missing or expired. Please verify your record again.');
+    return;
+  }
   state.visitMode = btn.getAttribute('data-mode');
   state.selectedSlot = null;
   state.bookingPayload = null;
@@ -581,6 +699,7 @@ function updatePrimaryOptions() {
 function selectType(el) {
   var type = el ? el.getAttribute('data-type') : null;
   if (!type) return;
+  if (state.patientType === 'returning' && type !== 'returning') clearReturningVerification_();
   state.patientType = type;
   state.selectedSlot = null;
   state.bookingPayload = null;
@@ -596,10 +715,11 @@ function goToStep2() {
   setStep(2);
   if (state.patientType === 'new') {
     document.getElementById('panel2New').classList.add('active');
-  } else if (state.verifiedName) {
+  } else if (hasVerifiedReturningPatient_()) {
     openReturningBooking();
   } else {
     document.getElementById('panel2Returning').classList.add('active');
+    restoreVerificationAttempts_();
   }
 }
 
@@ -630,14 +750,19 @@ function goToStep3New() {
 function verifyReturning() {
   var first = document.getElementById('rpFirst').value.trim();
   var last = document.getElementById('rpLast').value.trim();
-  var emailCodeMode = state.bookingConfig && state.bookingConfig.followUpVerification === 'email_code';
+  var emailCodeMode = isEmailCodeVerification_();
   if (emailCodeMode) {
+    if (state.verificationIdentityLocked) {
+      showVerifyResult('We could not verify the record after 3 attempts. Please call the office at (212) 510-8665 for help booking.', false);
+      return;
+    }
     var dob = document.getElementById('rpDob').value;
     var email = document.getElementById('rpVerifyEmail').value.trim();
     if (!first || !last || !dob || !email) {
       showVerifyResult('Please enter your name, date of birth, and email address.', false);
       return;
     }
+    var remaining = recordVerificationAttempt_();
     var emailBtn = document.getElementById('btnVerify');
     emailBtn.disabled = true; emailBtn.textContent = 'Sending…';
     document.getElementById('verifyResult').innerHTML = '';
@@ -648,18 +773,52 @@ function verifyReturning() {
         firstName:first,lastName:last,dob:dob,email:email
       })
     }).then(function(r){return r.json();}).then(function(data){
-      emailBtn.disabled = false; emailBtn.textContent = 'Send another code';
-      if (!data || !data.success || !data.requestId) throw new Error((data && data.error) || 'Unable to request a code.');
+      var responseMessage = String((data && data.error) || '');
+      if (!data || !data.success || !data.requestId) {
+        var explicitMismatch = !!(data && (
+          data.matched === false ||
+          data.status === 'NO VERIFIED MATCH' ||
+          data.code === 'NO_VERIFIED_MATCH' ||
+          /match|patient record/i.test(responseMessage)
+        ));
+        if (!explicitMismatch) {
+          undoVerificationAttempt_();
+          emailBtn.disabled = false;
+          emailBtn.textContent = 'Email my security code';
+          showVerifyResult(responseMessage || 'We could not check the record right now. Please try again.', false);
+          return;
+        }
+        state.verificationRequestId = null;
+        state.verificationPendingName = null;
+        state.verificationPendingEmail = null;
+        if (remaining <= 0) {
+          setIdentityFieldsDisabled_(true);
+          emailBtn.textContent = 'Attempt limit reached';
+          showVerifyResult('We could not match those details to one active patient record after 3 attempts. Please call the office at (212) 510-8665 for help booking.', false);
+        } else {
+          emailBtn.disabled = false;
+          emailBtn.textContent = 'Try again';
+          showVerifyResult('We could not match those details to one active patient record. Please check the name, date of birth, and email. ' + remaining + ' attempt' + (remaining === 1 ? '' : 's') + ' remaining.', false);
+        }
+        return;
+      }
       state.verificationRequestId = data.requestId;
-      state.verifiedName = first + ' ' + last;
-      state.verifiedEmail = email;
+      state.verificationPendingName = first + ' ' + last;
+      state.verificationPendingEmail = email;
       document.getElementById('returningCodeField').style.display = 'block';
       document.getElementById('btnConfirmCode').style.display = 'inline-flex';
-      showVerifyResult(data.message || 'If the information matches an established patient, a code has been sent to the email address on file.', true);
+      emailBtn.disabled = state.verificationIdentityLocked;
+      emailBtn.textContent = state.verificationIdentityLocked ? 'Attempt limit reached' : 'Send another code';
+      showVerifyResult(
+        'If these details match one active patient record, a security code has been sent to the email address on file.' +
+        (remaining > 0 ? ' ' + remaining + ' attempt' + (remaining === 1 ? '' : 's') + ' remaining.' : ' This was the third attempt; if the code does not arrive, please call (212) 510-8665.'),
+        'info'
+      );
       document.getElementById('rpCode').focus();
     }).catch(function(err){
+      undoVerificationAttempt_();
       emailBtn.disabled = false; emailBtn.textContent = 'Email my security code';
-      showVerifyResult((err && err.message) || 'Something went wrong. Please try again or call us.', false);
+      showVerifyResult((err && err.message) || 'We could not check the record right now. Please try again.', false);
     });
     return;
   }
@@ -710,7 +869,10 @@ function confirmReturningCode() {
       throw new Error((data && data.error) || 'The code is invalid or expired.');
     }
     state.verificationSession = data.session;
+    state.verifiedName = state.verificationPendingName;
+    state.verifiedEmail = state.verificationPendingEmail;
     state.verifiedPhone = '';
+    resetVerificationAttempts_();
     showVerifyResult('✓ Record verified — welcome back!', true);
     setTimeout(openReturningBooking,650);
   }).catch(function(err){
@@ -721,7 +883,8 @@ function confirmReturningCode() {
 
 function showVerifyResult(msg, success) {
   var el = document.getElementById('verifyResult');
-  el.innerHTML = '<div class="verify-result ' + (success ? 'success' : 'error') + '">' + msg + '</div>';
+  var kind = success === 'info' ? 'info' : (success ? 'success' : 'error');
+  el.innerHTML = '<div class="verify-result ' + kind + '">' + escapeBookingHtml(msg) + '</div>';
 }
 
 function goToStep3Returning() {
@@ -732,6 +895,12 @@ function loadSlots(containerId) {
   calViewYear = null; calViewMonth = null;
   var targetId = containerId || 'slotContainer';
   var container = document.getElementById(targetId);
+
+  if (state.patientType === 'returning' && isEmailCodeVerification_() && !state.verificationSession) {
+    showReturningVerification_('Your verification is missing or expired. Please verify your record again before choosing a time.');
+    return;
+  }
+
   container.innerHTML = '<p class="loading-slots">Loading available times…</p>';
 
   fetch(
@@ -745,12 +914,19 @@ function loadSlots(containerId) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (!data || !data.success) {
-        throw new Error((data && data.error) || 'Unable to load appointment times.');
+        var slotError = String((data && data.error) || 'Unable to load appointment times.');
+        var err = new Error(slotError);
+        err.verificationSessionError = state.patientType === 'returning' && /session|verif|expired|unauthor/i.test(slotError);
+        throw err;
       }
       renderPracticeBanners(data.activeBanners || []);
       renderSlots(data.slots || [], targetId);
     })
-    .catch(function() {
+    .catch(function(err) {
+      if (err && err.verificationSessionError) {
+        showReturningVerification_('Your verification expired before the appointment times loaded. Please verify your record again.');
+        return;
+      }
       container.innerHTML = '<p class="no-slots">Unable to load times. Please call us at <a href="tel:+12125108665">(212) 510-8665</a> to book.</p>';
     });
 }
@@ -1239,7 +1415,7 @@ function goBack(toStep) {
   if (toStep === 1) { document.getElementById('panel1').classList.add('active'); }
   else if (toStep === 2) {
     if (state.patientType === 'new') { document.getElementById('panel2New').classList.add('active'); }
-    else if (state.verifiedName) { document.getElementById('panel2ReturnForm').classList.add('active'); }
+    else if (hasVerifiedReturningPatient_()) { document.getElementById('panel2ReturnForm').classList.add('active'); }
     else { document.getElementById('panel2Returning').classList.add('active'); }
   }
   else if (toStep === 3) { document.getElementById('panel3').classList.add('active'); }
