@@ -206,6 +206,32 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   border:1px solid #7eaa8c !important;
   box-shadow:0 12px 30px rgba(43,92,59,.10);
 }
+
+/* Follow-up Front Door is a review surface, not a shortened new-patient form. */
+.followup-review{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:34px;align-items:start}
+.fu-stack{display:grid;gap:18px}
+.fu-card{border:1px solid var(--line);border-radius:16px;background:var(--paper);padding:23px}
+.fu-card.locked{background:#efede8;border-color:#d8d3ca;color:#514d47}
+.fu-card.changed{border-color:#d0a84e;box-shadow:inset 4px 0 0 #b58b2e}
+.fu-card.verified{border-color:#8fb59c;background:var(--good-bg)}
+.fu-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.fu-head h2,.fu-head h3{font-family:var(--serif);font-weight:400;line-height:1.15;margin:0}
+.fu-head h2{font-size:28px}.fu-head h3{font-size:23px}
+.fu-kicker{font-size:11px;letter-spacing:.17em;text-transform:uppercase;font-weight:800;color:var(--brass);margin-bottom:6px}
+.fu-lock{width:37px;height:37px;border:1px solid #bcb6ac;border-radius:50%;background:#e6e2da;color:#5f5a52;display:grid;place-items:center;cursor:help;font-size:17px;flex:0 0 auto}
+.fu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px}
+.fu-item{min-width:0}.fu-label{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#777168;margin-bottom:3px}.fu-value{display:block;overflow-wrap:anywhere}
+.fu-confirm{display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding-top:15px;border-top:1px solid var(--line-soft);font-weight:650;font-size:14px}
+.fu-confirm input{margin-top:5px;accent-color:var(--brass)}
+.fu-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.fu-change-panel{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.fu-status-list{display:grid;gap:10px;margin-top:14px}.fu-status{display:grid;grid-template-columns:27px 1fr;gap:9px;align-items:start;color:var(--ink-soft);font-size:14px}.fu-status-mark{width:25px;height:25px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-weight:900}.fu-status.done{color:var(--good)}.fu-status.done .fu-status-mark{background:var(--good);border-color:var(--good);color:white}
+.fu-preparing{text-align:center;padding:42px 24px}.fu-preparing h2{font-family:var(--serif);font-weight:400}.fu-source-note{font-size:12px;color:var(--ink-soft);margin-top:12px}
+.fu-empty{border:1px dashed #bab3a8;border-radius:11px;padding:13px;color:var(--ink-soft);font-size:14px}
+.fu-summary-line{display:grid;grid-template-columns:130px 1fr;gap:13px;padding:9px 0;border-bottom:1px solid var(--line-soft)}.fu-summary-line:last-child{border-bottom:0}.fu-summary-line strong{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft)}
+.fu-estimate-mount .financial-box,.fu-estimate-mount .callout{margin:16px 0 0}
+@media(max-width:900px){.followup-review{grid-template-columns:1fr}.followup-review .sidebar{display:block}.followup-review .sidebar .side-card{margin-bottom:14px}}
+@media(max-width:680px){.fu-grid{grid-template-columns:1fr}.fu-card{padding:19px}.fu-summary-line{grid-template-columns:1fr;gap:2px}}
 .initial-estimate-ready .amount{color:#245a37}
 .estimate-kicker{
   font-size:12px;
@@ -263,7 +289,91 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <div id="fatal" class="fatal hidden"></div>
 
 <main id="app" class="main hidden">
-<div class="wrap"><div class="layout"><div>
+<div class="wrap">
+
+<section id="followUpReview" class="followup-review hidden" aria-label="Follow-up Front Door review">
+  <div id="followUpPreparing" class="fu-card fu-preparing hidden">
+    <div class="fu-kicker">Follow-up Front Door</div>
+    <h2>Preparing the information we have on file…</h2>
+    <p>Your appointment is already reserved. This review will appear here as soon as your patient record is ready.</p>
+  </div>
+
+  <div id="followUpReviewMain" class="fu-stack">
+    <div class="appointment-card" style="margin-bottom:0">
+      <div class="small" id="fuSourceLabel">Follow-up appointment</div>
+      <h2 id="fuAppointmentDisplay">—</h2>
+      <p id="fuAppointmentDetails"></p>
+      <label class="fu-confirm" style="border-color:rgba(255,255,255,.16);color:var(--ivory)"><input id="fuAppointmentConfirmed" type="checkbox"><span>I reviewed these appointment details and they are correct.</span></label>
+    </div>
+
+    <div class="fu-card locked">
+      <div class="fu-head"><div><div class="fu-kicker">Information on file</div><h3>Demographics</h3></div><button class="fu-lock" type="button" id="fuDemographicsLock" title="To change demographic information, please speak with a member of the facility." aria-label="Demographics are locked. Click for help.">🔒</button></div>
+      <p class="intro" style="margin-bottom:18px">This information comes from your patient record and cannot be changed here.</p>
+      <div id="fuDemographicsSummary" class="fu-grid"></div>
+      <label class="fu-confirm"><input id="fuDemographicsConfirmed" type="checkbox"><span>I reviewed my demographic information.</span></label>
+    </div>
+
+    <div id="fuInsuranceCard" class="fu-card locked">
+      <div class="fu-head"><div><div class="fu-kicker">Previously verified</div><h3>Insurance information</h3></div><span class="fu-lock" aria-hidden="true">🔒</span></div>
+      <div id="fuInsuranceSummary"></div>
+      <div class="fu-actions">
+        <button class="btn primary" type="button" id="fuInsuranceCorrectBtn">Information is correct</button>
+        <button class="btn secondary" type="button" id="fuInsuranceChangeBtn">Report insurance change</button>
+      </div>
+      <div id="fuInsuranceEdit" class="fu-change-panel hidden">
+        <div class="callout gold"><strong>Enter the new insurance exactly as shown on the card.</strong><div style="margin-top:5px">We will verify it live before you can submit, then show a new visit estimate when the payer returns enough benefit detail.</div></div>
+        <div id="fuInsuranceFormMount"></div>
+        <div class="fu-actions"><button class="btn primary" type="button" id="fuVerifyInsuranceBtn">Verify updated insurance</button><button class="btn secondary" type="button" id="fuCancelInsuranceChangeBtn">Keep insurance on file</button></div>
+        <div id="fuEstimateMount" class="fu-estimate-mount"></div>
+      </div>
+    </div>
+
+    <div id="fuHealthCard" class="fu-card locked">
+      <div class="fu-head"><div><div class="fu-kicker">Information on file</div><h3>Health information</h3></div><span class="fu-lock" aria-hidden="true">🔒</span></div>
+      <div id="fuHealthSummary"></div>
+      <div class="fu-actions">
+        <button class="btn primary" type="button" id="fuHealthCorrectBtn">Information is correct</button>
+        <button class="btn secondary" type="button" id="fuHealthChangeBtn">Report health changes</button>
+      </div>
+      <div id="fuHealthEdit" class="fu-change-panel hidden">
+        <div class="callout gold"><strong>Tell us what is current now.</strong><div style="margin-top:5px">Update medications, allergies, or your preferred pharmacy. The office will see exactly which fields changed.</div></div>
+        <div id="fuHealthFormMount"></div>
+        <div class="fu-actions"><button class="btn primary" type="button" id="fuSaveHealthChangeBtn">Use these updates</button><button class="btn secondary" type="button" id="fuCancelHealthChangeBtn">Keep information on file</button></div>
+      </div>
+      <div id="fuHealthUnavailable" class="fu-empty hidden">We do not have a prior Front Door health response to show. Please use “Report health changes” to give us your current medications, allergies, and pharmacy.</div>
+    </div>
+
+    <div class="fu-card">
+      <div class="fu-head"><div><div class="fu-kicker">For this appointment</div><h3>Anything we need to know for this visit?</h3></div></div>
+      <textarea id="fuVisitNote" maxlength="4000" placeholder="Optional — share a new concern, change in symptoms, or anything that will help us prepare."></textarea>
+    </div>
+
+    <div class="fu-card">
+      <div class="fu-head"><div><div class="fu-kicker">Final review</div><h3>Verify and submit</h3></div></div>
+      <p class="intro">You are confirming what is correct and sending only the changes you made above.</p>
+      <button class="btn primary" type="button" id="fuSubmitBtn">Verify &amp; submit</button>
+      <span class="save-state" id="fuSaveState" style="margin-left:10px"></span>
+    </div>
+  </div>
+
+  <aside id="followUpSidebar" class="sidebar">
+    <div class="side-card">
+      <div class="fu-kicker">Review status</div>
+      <h3>Your follow-up Front Door</h3>
+      <p>Review what we already have. If something changed, update only that section.</p>
+      <div class="fu-status-list">
+        <div class="fu-status" id="fuStatusAppointment"><span class="fu-status-mark">•</span><span>Appointment details</span></div>
+        <div class="fu-status" id="fuStatusDemographics"><span class="fu-status-mark">•</span><span>Demographics reviewed</span></div>
+        <div class="fu-status" id="fuStatusInsurance"><span class="fu-status-mark">•</span><span>Insurance reviewed</span></div>
+        <div class="fu-status" id="fuStatusHealth"><span class="fu-status-mark">•</span><span>Health information reviewed</span></div>
+      </div>
+    </div>
+    <div class="side-card verified-side hidden" id="fuCoverageSide"><div class="verify-mark">✓</div><h3>Coverage active</h3><p id="fuCoverageSideText">Your updated insurance was verified.</p></div>
+    <div class="side-help">Need demographic changes or help? Call <a href="tel:+12125108665">(212) 510-8665</a>.</div>
+  </aside>
+</section>
+
+<div class="layout" id="newPatientLayout"><div>
 
   <div class="appointment-card">
     <div class="small" id="sourceLabel">Appointment request</div>
@@ -752,9 +862,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.11.3';
+var CLIENT_VERSION = 'v0.12.0';
 
-var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null,insuranceEstimate:null,cashPrice:null};
+var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null,insuranceEstimate:null,cashPrice:null,followUpMode:false,followUpStartedAt:0};
 
 function $(id){return document.getElementById(id)}
 function q(sel){return document.querySelector(sel)}
@@ -1157,6 +1267,14 @@ function applyDiscoveryResult(res){
   renderDiscoveryOffer();
   renderInsuranceCardRequirement();
   renderFinancialEligibility();
+  if(FD.followUpMode){
+    if(status==='ACTIVE'){
+      FD.data.followUpReview=FD.data.followUpReview||{};
+      FD.data.followUpReview.insuranceChanged=true;
+      FD.data.followUpReview.insuranceStatus='CHANGED — ACTIVE';
+    }
+    renderFollowUpStatus_();
+  }
 }
 
 function pollDiscovery(){
@@ -1367,7 +1485,12 @@ function renderFinancialEligibility(){
     $('estimateConfidence').textContent=
       isSelfPay()
         ? 'Self-pay cash price · scheduled visit'
-        : (estimate.confidence==='HIGH' ? 'Verified insurance benefit · initial evaluation' : 'Initial visit estimate');
+        : (estimate.confidence==='HIGH' ? 'Verified insurance benefit · '+(FD.followUpMode?'follow-up visit':'initial evaluation') : (FD.followUpMode?'Follow-up visit estimate':'Initial visit estimate'));
+
+    var kicker=q('#estimateReady .estimate-kicker');
+    var title=q('#estimateReady .section-title');
+    if(kicker)kicker.textContent=FD.followUpMode?'Follow-up visit':'Initial visit';
+    if(title)title.textContent=FD.followUpMode?'Estimated amount due for this follow-up':'Estimated amount due for your initial evaluation';
 
     var detailLines=[];
     if(isSelfPay()){
@@ -1380,7 +1503,7 @@ function renderFinancialEligibility(){
       detailLines.push(
         'Your plan returned an in-network copay of $'+
         Number(estimate.copay).toFixed(2)+
-        ' for the initial physician visit.'
+        ' for the '+(FD.followUpMode?'follow-up':'initial physician')+' visit.'
       );
     }
 
@@ -1395,7 +1518,7 @@ function renderFinancialEligibility(){
       detailLines.push(
         estimate.deductibleExplicit
           ? 'Your insurer tied this visit benefit to a deductible, so a final dollar estimate still depends on the contracted rate.'
-          : 'Your insurer did not return a deductible specifically tied to this initial visit benefit.'
+          : 'Your insurer did not return a deductible specifically tied to this '+(FD.followUpMode?'follow-up':'initial')+' visit benefit.'
       );
     }
 
@@ -1408,7 +1531,7 @@ function renderFinancialEligibility(){
       estimate.message||
       (isSelfPay()
         ? 'This cash price covers the scheduled evaluation only. Additional services are separate.'
-        : 'This estimate covers the initial evaluation only. Additional services may create additional patient responsibility.');
+        : 'This estimate covers the '+(FD.followUpMode?'scheduled follow-up':'initial evaluation')+' only. Additional services may create additional patient responsibility.');
   }else{
     ready.classList.add('hidden');
     pending.classList.remove('hidden');
@@ -1419,7 +1542,7 @@ function renderFinancialEligibility(){
         escapeHtml(estimate.message||'A contracted rate is needed before we can calculate it.');
     }else if(estimate&&estimate.message){
       pending.innerHTML=
-        '<strong>An initial-visit estimate is not available yet.</strong> '+
+        '<strong>A '+(FD.followUpMode?'follow-up':'initial-visit')+' estimate is not available yet.</strong> '+
         escapeHtml(estimate.message);
     }
   }
@@ -1535,6 +1658,210 @@ function searchPharmacy(){
   .finally(function(){btn.disabled=false;btn.textContent='Search pharmacies'});
 }
 
+function isFollowUpBooking_(){
+  var t=String(FD.booking&&FD.booking.patientType||'').toUpperCase();
+  return t==='RETURNING'||t==='FOLLOW UP'||t==='FOLLOW-UP'||t==='FOLLOWUP';
+}
+
+function followUpBaselineReady_(){
+  var b=FD.data&&FD.data.reviewBaseline;
+  return !!(b&&b.demographics&&b.insurance&&b.health);
+}
+
+function fuSummaryItem_(label,value){
+  return '<div class="fu-item"><span class="fu-label">'+escapeHtml(label)+'</span><span class="fu-value">'+escapeHtml(clean(value)||'—')+'</span></div>';
+}
+
+function fuSummaryLine_(label,value){
+  return '<div class="fu-summary-line"><strong>'+escapeHtml(label)+'</strong><span>'+escapeHtml(clean(value)||'—')+'</span></div>';
+}
+
+function fuAddress_(d){
+  return [d.address1,d.address2,[d.city,d.state,d.zip].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+}
+
+function setFollowUpStatus_(id,done,label){
+  var el=$(id);if(!el)return;
+  el.classList.toggle('done',!!done);
+  el.querySelector('.fu-status-mark').textContent=done?'✓':'•';
+  if(label)el.querySelector('span:last-child').textContent=label;
+}
+
+function renderFollowUpStatus_(){
+  if(!FD.followUpMode)return;
+  var r=FD.data.followUpReview||{};
+  setFollowUpStatus_('fuStatusAppointment',!!r.appointmentConfirmed,'Appointment details');
+  setFollowUpStatus_('fuStatusDemographics',!!r.demographicsConfirmed,'Demographics reviewed');
+  setFollowUpStatus_('fuStatusInsurance',!!r.insuranceStatus,r.insuranceChanged?(r.insuranceStatus==='CHANGED — ACTIVE'?'New insurance verified':'Insurance change needs verification'):'Insurance reviewed');
+  setFollowUpStatus_('fuStatusHealth',!!r.healthStatus,r.healthChanged?'Health updates entered':'Health information reviewed');
+  var active=r.insuranceChanged&&r.insuranceStatus==='CHANGED — ACTIVE';
+  $('fuCoverageSide').classList.toggle('hidden',!active);
+  if(active){
+    $('fuCoverageSideText').textContent='Your updated '+(clean($('insuranceCarrier').value)||'insurance')+' coverage is active. A refreshed estimate is shown with the insurance update.';
+    $('fuInsuranceCard').classList.remove('locked');$('fuInsuranceCard').classList.add('verified');
+  }
+}
+
+function mountFollowUpEditors_(){
+  var insMount=$('fuInsuranceFormMount');
+  if(insMount&&!insMount.contains($('insuranceDetailsSection'))){
+    insMount.appendChild($('insuranceDetailsSection'));
+    insMount.appendChild($('insuranceCardSection'));
+  }
+  var healthSection=q('#healthDetails > .section');
+  if(healthSection&&!$('fuHealthFormMount').contains(healthSection))$('fuHealthFormMount').appendChild(healthSection);
+  if(!$('fuEstimateMount').contains($('estimateReady'))){
+    $('fuEstimateMount').appendChild($('estimateReady'));
+    $('fuEstimateMount').appendChild($('estimatePending'));
+  }
+}
+
+function renderFollowUpReview_(){
+  var baseline=FD.data.reviewBaseline,b=FD.booking,d=baseline.demographics||{},ins=baseline.insurance||{},health=baseline.health||{};
+  FD.followUpMode=true;
+  $('newPatientLayout').classList.add('hidden');
+  $('followUpReview').classList.remove('hidden');
+  $('followUpPreparing').classList.add('hidden');
+  $('followUpReviewMain').classList.remove('hidden');
+  $('followUpSidebar').classList.remove('hidden');
+  q('.hero h1').innerHTML='Review what we have.<br><em>Tell us only what changed.</em>';
+  q('.hero p').textContent='Your appointment is already reserved. Confirm the information we have on file and update only what has changed since your last visit.';
+
+  $('fuSourceLabel').textContent=b.source==='ZOCDOC'?'Zocdoc follow-up':'Follow-up appointment';
+  $('fuAppointmentDisplay').textContent=b.appointmentDisplay||'Scheduled follow-up';
+  $('fuAppointmentDetails').textContent=[b.visitReason||'Follow-up visit',b.visitMode||'In Person'].filter(Boolean).join(' · ');
+  $('fuDemographicsSummary').innerHTML=
+    fuSummaryItem_('Name',d.name||[d.firstName,d.lastName].join(' '))+
+    fuSummaryItem_('Date of birth',d.dob)+fuSummaryItem_('Mobile phone',d.phone)+
+    fuSummaryItem_('Email',d.email)+fuSummaryItem_('Address',fuAddress_(d));
+  $('fuInsuranceSummary').innerHTML=ins.available
+    ? fuSummaryLine_('Insurance',ins.carrier)+fuSummaryLine_('Plan',ins.planName)+fuSummaryLine_('Member ID',ins.memberId)+fuSummaryLine_('Group',ins.groupNumber)+'<div class="fu-source-note">✓ '+escapeHtml(ins.statusLabel||'Previously verified and active')+'</div>'
+    : '<div class="fu-empty">'+escapeHtml(ins.statusLabel||'No active insurance is currently on file.')+'</div>';
+  $('fuHealthSummary').innerHTML=health.available
+    ? fuSummaryLine_('Allergies',health.noKnownAllergies?'No known allergies':health.allergies)+fuSummaryLine_('Medications',health.medications)+fuSummaryLine_('Pharmacy',[health.pharmacy,health.pharmacyAddress,health.pharmacyPhone].filter(Boolean).join(' · '))+'<div class="fu-source-note">'+escapeHtml(health.sourceLabel||'Most recently provided through Front Door')+'</div>'
+    : '';
+  $('fuHealthUnavailable').classList.toggle('hidden',!!health.available);
+
+  mountFollowUpEditors_();
+  var r=FD.data.followUpReview=FD.data.followUpReview||{};
+  $('fuAppointmentConfirmed').checked=!!r.appointmentConfirmed;
+  $('fuDemographicsConfirmed').checked=!!r.demographicsConfirmed;
+  $('fuVisitNote').value=clean(FD.data.followUpVisitNote||FD.data.hpi);
+  if(r.insuranceChanged){showFollowUpInsuranceChange_(false)}
+  else if(r.insuranceStatus){$('fuInsuranceCard').classList.remove('locked');$('fuInsuranceCard').classList.add('verified')}
+  if(r.healthChanged){showFollowUpHealthChange_(false)}
+  else if(r.healthStatus){$('fuHealthCard').classList.remove('locked');$('fuHealthCard').classList.add('verified')}
+  if(!health.available&&!r.healthStatus)showFollowUpHealthChange_(false);
+  renderFollowUpStatus_();
+}
+
+function showFollowUpInsuranceChange_(reset){
+  var base=FD.data.reviewBaseline.insurance||{},r=FD.data.followUpReview=FD.data.followUpReview||{};
+  r.insuranceChanged=true;r.insuranceStatus='';
+  $('fuInsuranceEdit').classList.remove('hidden');$('fuInsuranceCard').classList.remove('locked','verified');$('fuInsuranceCard').classList.add('changed');
+  if(reset!==false){
+    setValue('insuranceCarrier','');setValue('payerId','');setValue('insurancePlan','');setValue('memberId','');setValue('groupId','');
+    setRadio('insuranceCardStatus','');FD.eligibility=null;FD.estimate=null;FD.insuranceEstimate=null;
+  }else if(base.available&&!clean($('memberId').value)){
+    setValue('insuranceCarrier',base.carrier);setValue('payerId',base.payerId);setValue('insurancePlan',base.planName);setValue('memberId',base.memberId);setValue('groupId',base.groupNumber);
+  }
+  setInsuranceLocked(false);renderFollowUpStatus_();
+}
+
+function keepFollowUpInsurance_(){
+  var base=FD.data.reviewBaseline.insurance||{},r=FD.data.followUpReview=FD.data.followUpReview||{};
+  r.insuranceChanged=false;r.insuranceStatus=base.available?'CONFIRMED':'NO INSURANCE ON FILE';
+  setValue('insuranceCarrier',base.carrier);setValue('payerId',base.payerId);setValue('insurancePlan',base.planName);setValue('memberId',base.memberId);setValue('groupId',base.groupNumber);
+  $('fuInsuranceEdit').classList.add('hidden');$('fuInsuranceCard').classList.remove('locked','changed');$('fuInsuranceCard').classList.add('verified');
+  FD.eligibility=null;FD.estimate=null;FD.insuranceEstimate=null;renderFollowUpStatus_();
+}
+
+function verifyFollowUpInsurance_(){
+  var data=collect(),base=FD.data.reviewBaseline.insurance||{};
+  if(!data.insuranceCarrier||!data.memberId){toast('Enter the new insurance company and member ID first.');return}
+  var same=[clean(base.carrier),normalizePayerId(base.payerId),clean(base.memberId),clean(base.groupNumber)].join('|').toLowerCase()===
+    [data.insuranceCarrier,data.payerId,data.memberId,data.groupId].join('|').toLowerCase();
+  if(same){toast('Those details match the insurance already on file. Choose “Information is correct.”');return}
+  FD.data.followUpReview.insuranceChanged=true;FD.data.followUpReview.insuranceStatus='';
+  Object.keys(data).forEach(function(k){FD.data[k]=data[k]});
+  $('fuVerifyInsuranceBtn').disabled=true;$('fuVerifyInsuranceBtn').textContent='Checking coverage…';
+  queueEligibilityFromCurrentData(followUpCollect_()).then(function(){toast('Coverage check started. This card will turn green when the payer confirms it is active.');})
+    .catch(function(err){toast(err.message||'The coverage check could not be started.');})
+    .finally(function(){$('fuVerifyInsuranceBtn').disabled=false;$('fuVerifyInsuranceBtn').textContent='Verify updated insurance';});
+}
+
+function showFollowUpHealthChange_(reset){
+  var r=FD.data.followUpReview=FD.data.followUpReview||{};r.healthChanged=true;r.healthStatus='';
+  $('fuHealthEdit').classList.remove('hidden');$('fuHealthCard').classList.remove('locked','verified');$('fuHealthCard').classList.add('changed');
+  if(reset!==false){
+    var h=FD.data.reviewBaseline.health||{};
+    setCheck('noKnownAllergies',!!h.noKnownAllergies);setValue('allergies',h.allergies);setValue('medications',h.medications);setValue('pharmacy',h.pharmacy);setValue('pharmacyAddress',h.pharmacyAddress);setValue('pharmacyPhone',h.pharmacyPhone);setValue('pharmacyNpi',h.pharmacyNpi);updateConditionalFields();renderPharmacySelection();
+  }
+  renderFollowUpStatus_();
+}
+
+function keepFollowUpHealth_(){
+  var h=FD.data.reviewBaseline.health||{},r=FD.data.followUpReview=FD.data.followUpReview||{};
+  if(!h.available){toast('Please enter your current health information so the office has something to review.');return}
+  r.healthChanged=false;r.healthStatus='CONFIRMED';
+  setCheck('noKnownAllergies',!!h.noKnownAllergies);setValue('allergies',h.allergies);setValue('medications',h.medications);setValue('pharmacy',h.pharmacy);setValue('pharmacyAddress',h.pharmacyAddress);setValue('pharmacyPhone',h.pharmacyPhone);setValue('pharmacyNpi',h.pharmacyNpi);
+  $('fuHealthEdit').classList.add('hidden');$('fuHealthCard').classList.remove('locked','changed');$('fuHealthCard').classList.add('verified');renderFollowUpStatus_();
+}
+
+function saveFollowUpHealth_(){
+  var r=FD.data.followUpReview=FD.data.followUpReview||{};
+  r.healthChanged=true;r.healthStatus='CHANGED';
+  $('fuHealthCard').classList.remove('locked');$('fuHealthCard').classList.add('changed');
+  renderFollowUpStatus_();toast('Health updates are ready to submit.');
+}
+
+function followUpCollect_(){
+  var data=collect(),r=FD.data.followUpReview||{};
+  data.flowType='FOLLOW_UP_REVIEW';
+  data.reviewBaseline=FD.data.reviewBaseline;
+  data.followUpReview={
+    appointmentConfirmed:!!$('fuAppointmentConfirmed').checked,
+    demographicsConfirmed:!!$('fuDemographicsConfirmed').checked,
+    insuranceChanged:!!r.insuranceChanged,healthChanged:!!r.healthChanged,
+    insuranceStatus:clean(r.insuranceStatus),healthStatus:clean(r.healthStatus)
+  };
+  data.followUpVisitNote=clean($('fuVisitNote').value);data.hpi=data.followUpVisitNote;
+  return data;
+}
+
+function completeFollowUp_(){
+  if(FD.busy)return;
+  var data=followUpCollect_(),r=data.followUpReview;
+  if(!r.appointmentConfirmed){toast('Please confirm the appointment details.');return}
+  if(!r.demographicsConfirmed){toast('Please confirm that you reviewed the locked demographics.');return}
+  if(!r.insuranceStatus){toast('Please confirm the insurance information or verify a change.');return}
+  if(r.insuranceChanged&&r.insuranceStatus!=='CHANGED — ACTIVE'){toast('The updated insurance must show active coverage before submission.');return}
+  if(!r.healthStatus){toast('Please confirm the health information or enter your updates.');return}
+  FD.busy=true;$('fuSubmitBtn').disabled=true;$('fuSubmitBtn').textContent='Submitting…';$('fuSaveState').textContent='Saving securely…';
+  buildUploads(data).then(function(uploads){return apiPost('complete','FOLLOW UP REVIEW',data,uploads)}).then(function(res){
+    if(!res.success)throw new Error(res.error||'Could not complete Front Door.');
+    FD.data=data;FD.completed=true;showFollowUpComplete_();toast('Front Door complete');
+  }).catch(function(err){FD.busy=false;$('fuSubmitBtn').disabled=false;$('fuSubmitBtn').textContent='Verify & submit';$('fuSaveState').textContent='';toast(err.message||'Could not complete Front Door. Please try again.');});
+}
+
+function showFollowUpComplete_(){
+  $('followUpSidebar').classList.add('hidden');
+  $('followUpReviewMain').innerHTML='<div class="complete-box"><div class="complete-icon">✓</div><h2>Front Door complete</h2><p>Thank you. We received your review and any changes for this follow-up. Your appointment is already reserved.</p></div>';
+}
+
+function waitForFollowUpSnapshot_(){
+  FD.followUpStartedAt=FD.followUpStartedAt||Date.now();
+  $('newPatientLayout').classList.add('hidden');$('followUpReview').classList.remove('hidden');$('followUpReviewMain').classList.add('hidden');$('followUpSidebar').classList.add('hidden');$('followUpPreparing').classList.remove('hidden');
+  setTimeout(function(){
+    apiGet().then(function(res){
+      if(res.success&&res.intake&&res.intake.data){FD.data=res.intake.data;FD.completed=!!res.intake.completed}
+      if(followUpBaselineReady_()){hydrate();renderFollowUpReview_();if(FD.completed)showFollowUpComplete_();return}
+      if(Date.now()-FD.followUpStartedAt<90000){waitForFollowUpSnapshot_();return}
+      throw new Error('Your appointment is reserved, but the review information is taking longer than expected. Please refresh this page or call Lexington Podiatry.');
+    }).catch(function(err){if(Date.now()-FD.followUpStartedAt<90000){waitForFollowUpSnapshot_()}else setFatal(err.message)});
+  },3000);
+}
+
 function boot(){
   FD.token=tokenFromUrl();
 
@@ -1562,8 +1889,21 @@ function boot(){
     FD.insuranceEstimate=(FD.estimate&&String(FD.estimate.basis||'').toUpperCase()!=='SELF PAY CASH PRICE')?FD.estimate:null;
     FD.cashPrice=res.cashPrice||null;
     FD.completed=!!(res.intake&&res.intake.completed);
+    FD.followUpMode=isFollowUpBooking_();
 
     hydrate();
+    if(FD.followUpMode){
+      if(!(res.capabilities&&res.capabilities.followUpReview))throw new Error('The follow-up review update has not reached the Front Door gateway yet.');
+      $('loading').classList.add('hidden');$('app').classList.remove('hidden');
+      if(!followUpBaselineReady_()){waitForFollowUpSnapshot_();return}
+      renderFollowUpReview_();
+      if(FD.eligibility&&FD.eligibility.status&&FD.eligibility.status!=='NOT REQUESTED'){
+        applyEligibilityResult(FD.eligibility);
+        if(eligibilityPending(FD.eligibility.status))pollEligibility();
+      }
+      if(FD.completed)showFollowUpComplete_();
+      return;
+    }
     if(FD.eligibility&&FD.eligibility.status&&FD.eligibility.status!=='NOT REQUESTED'){
       applyEligibilityResult(FD.eligibility);
       if(eligibilityPending(FD.eligibility.status))pollEligibility();
@@ -1953,6 +2293,19 @@ $('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').valu
     $('payerVerified').classList.add('hidden');
   });
 });
+
+$('fuDemographicsLock').addEventListener('click',function(){toast('To change demographic information, please speak with a member of the facility at (212) 510-8665.');});
+$('fuAppointmentConfirmed').addEventListener('change',function(){FD.data.followUpReview=FD.data.followUpReview||{};FD.data.followUpReview.appointmentConfirmed=this.checked;renderFollowUpStatus_();});
+$('fuDemographicsConfirmed').addEventListener('change',function(){FD.data.followUpReview=FD.data.followUpReview||{};FD.data.followUpReview.demographicsConfirmed=this.checked;renderFollowUpStatus_();});
+$('fuInsuranceCorrectBtn').addEventListener('click',keepFollowUpInsurance_);
+$('fuInsuranceChangeBtn').addEventListener('click',function(){showFollowUpInsuranceChange_(true)});
+$('fuCancelInsuranceChangeBtn').addEventListener('click',keepFollowUpInsurance_);
+$('fuVerifyInsuranceBtn').addEventListener('click',verifyFollowUpInsurance_);
+$('fuHealthCorrectBtn').addEventListener('click',keepFollowUpHealth_);
+$('fuHealthChangeBtn').addEventListener('click',function(){showFollowUpHealthChange_(true)});
+$('fuCancelHealthChangeBtn').addEventListener('click',keepFollowUpHealth_);
+$('fuSaveHealthChangeBtn').addEventListener('click',saveFollowUpHealth_);
+$('fuSubmitBtn').addEventListener('click',completeFollowUp_);
 
 boot();
 </script>
