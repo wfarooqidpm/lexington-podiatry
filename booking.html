@@ -96,9 +96,15 @@ footer .fl{display:flex;gap:24px;flex-wrap:wrap;}
 .f-lockup{height:42px;width:auto;display:block;}
 .mobile-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--ivory);border-top:1px solid var(--line);padding:12px 20px;gap:10px;z-index:100;}
 .booking-hero{padding:72px 0 56px;border-bottom:1px solid var(--line-soft);}
+.booking-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,420px);gap:64px;align-items:start;}
 .booking-hero h1{font-family:var(--serif);font-weight:340;font-size:clamp(36px,4vw,52px);line-height:1.1;letter-spacing:-.015em;margin-top:16px;}
 .booking-hero h1 em{font-style:italic;font-weight:400;color:var(--brass);}
 .booking-hero .lede{font-size:18px;color:var(--ink-soft);margin-top:18px;max-width:36em;}
+.hero-hours{border-left:1px solid var(--line);padding-left:34px;}
+.hero-hours h2{font-family:var(--serif);font-size:20px;font-weight:400;margin-bottom:12px;}
+.hero-hours-grid{display:grid;grid-template-columns:auto 1fr;gap:5px 18px;font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
+.hero-hours-grid strong{color:var(--ink);font-weight:600;}
+.hero-hours .sc-tel{margin-top:12px;font-size:14.5px;}
 .booking-main{padding:64px 0 96px;}
 .booking-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:80px;align-items:start;}
 .steps{display:flex;gap:0;margin-bottom:48px;border-bottom:2px solid var(--line);}
@@ -148,7 +154,7 @@ footer .fl{display:flex;gap:24px;flex-wrap:wrap;}
 .sc-note{font-size:13px;color:var(--ink-soft);margin-top:14px;line-height:1.5;}
 .sc-tel{display:block;margin-top:16px;font-weight:600;font-size:16px;color:var(--brass);text-decoration:none;}
 .sc-tel:hover{color:var(--brass-deep);}
-input.invalid,select.invalid{border-color:#C04040;}
+input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 /* REASON CHECKBOXES */
 .reason-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
 .reason-cb { display: flex; align-items: center; padding: 10px 16px; border: 1.5px solid var(--line); border-radius: 999px; cursor: pointer; transition: border-color .15s, background .15s, color .15s; font-size: 14.5px; color: var(--ink-soft); user-select: none; text-transform: none; letter-spacing: 0; font-weight: 400; }
@@ -156,6 +162,16 @@ input.invalid,select.invalid{border-color:#C04040;}
 .reason-cb input[type="checkbox"] { display: none; }
 .reason-cb span { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 14.5px; }
 .reason-cb:has(input:checked) { border-color: var(--brass); background: var(--stone); color: var(--brass); font-weight: 600; }
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mode-card{border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--ivory);font-family:var(--sans);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left;transition:border-color .18s,background .18s,color .18s;}
+.mode-card span{display:block;font-size:12.5px;font-weight:400;color:var(--ink-soft);margin-top:3px;}
+.mode-card:hover{border-color:var(--champagne);background:var(--stone);}
+.mode-card.selected{border-color:var(--brass);background:var(--stone);color:var(--brass);}
+.patient-summary{display:none;}
+.patient-summary.show{display:block;}
+.patient-summary .patient-name{font-family:var(--serif);font-size:22px;color:var(--ink);margin-bottom:8px;}
+.patient-summary .patient-meta{font-size:14.5px;color:var(--ink-soft);line-height:1.55;}
+.patient-summary .patient-meta strong{color:var(--ink);font-weight:600;}
 @media(max-width:480px) { .reason-grid { grid-template-columns: 1fr; } }
 
 /* SLOT HYBRID: CALENDAR + COLLAPSIBLE */
@@ -190,9 +206,9 @@ input.invalid,select.invalid{border-color:#C04040;}
 .mini-cal-day.past { color: var(--line); }
 @media(max-width:640px) { .slot-layout { grid-template-columns: 1fr; } .mini-cal { position: static; order: -1; } .day-slots.open { grid-template-columns: repeat(2,1fr); } }
 
-@media(max-width:860px){.booking-grid{grid-template-columns:1fr;gap:48px;}.booking-sidebar{order:-1;}}
+@media(max-width:860px){.booking-hero-grid{grid-template-columns:1fr;gap:30px}.hero-hours{border-left:0;border-top:1px solid var(--line);padding:24px 0 0}.booking-grid{grid-template-columns:1fr;gap:48px;}.booking-sidebar{order:-1;}}
 @media(max-width:767px){.mobile-bar{display:flex;}nav.links{display:none;}nav.links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:var(--ivory);border-bottom:1px solid var(--line);padding:20px 32px;gap:16px;}.menu-toggle{display:block;}body{padding-bottom:72px;}.brand .sub{display:none;}.mobile-bar .btn{flex:1;text-align:center;padding:14px;}}
-@media(max-width:560px){.type-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.slot-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.type-grid,.mode-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.slot-grid{grid-template-columns:repeat(2,1fr);}}
 
 .practice-banner-wrap{display:none;background:#fff8ed;border-top:1px solid #e7d5ad;border-bottom:1px solid #e7d5ad;}
 .practice-banner-wrap.show{display:block;}
@@ -234,16 +250,29 @@ input.invalid,select.invalid{border-color:#C04040;}
 
 <main>
 <div id="practiceBannerWrap" class="practice-banner-wrap"></div>
-<div class="booking-hero"><div class="wrap">
-  <p class="eyebrow">Request an appointment</p>
-  <h1>Book your visit with<br><em>Dr. Farooqi</em></h1>
-  <p class="lede">Same-day appointments available with 2 hours notice.</p>
-</div></div>
+<div class="booking-hero"><div class="wrap"><div class="booking-hero-grid">
+  <div>
+    <p class="eyebrow">Request an appointment</p>
+    <h1>Book your visit with<br><em>Dr. Farooqi</em></h1>
+    <p class="lede">Same-day appointments available with 2 hours notice.</p>
+  </div>
+  <div class="hero-hours" aria-label="Office hours">
+    <h2>Office hours</h2>
+    <div class="hero-hours-grid">
+      <strong>Monday</strong><span>7:00 AM – 3:00 PM</span>
+      <strong>Tuesday</strong><span>8:00 AM – 5:00 PM</span>
+      <strong>Wednesday</strong><span>8:00 AM – 5:00 PM</span>
+      <strong>Thursday</strong><span>11:00 AM – 7:00 PM</span>
+      <strong>Friday</strong><span>9:00 AM – 1:00 PM · Virtual only</span>
+    </div>
+    <a class="sc-tel" href="tel:+12125108665">(212) 510-8665</a>
+  </div>
+</div></div></div>
 
 <div class="booking-main"><div class="wrap"><div class="booking-grid">
 <div class="booking-form-area">
   <div class="steps" id="stepIndicator">
-    <div class="step-tab active" id="stepTab1">Patient type</div>
+    <div class="step-tab active" id="stepTab1">Visit type</div>
     <div class="step-tab" id="stepTab2">Your info</div>
     <div class="step-tab" id="stepTab3">Pick a time</div>
     <div class="step-tab" id="stepTab4">Confirm</div>
@@ -298,7 +327,6 @@ input.invalid,select.invalid{border-color:#C04040;}
             <option value="Oxford">Oxford / UnitedHealthcare Oxford</option>
             <option value="No insurance - self pay">No insurance – self pay</option>
             <option value="No-Fault">No-Fault</option>
-            <option value="Workers Compensation">Workers' Compensation</option>
             <option value="Other">Other</option>
           </select>
           <div id="insurerWarning" style="display:none;margin-top:10px;padding:12px 16px;background:#FEF9EC;border:1px solid var(--champagne);border-radius:8px;font-size:14px;color:var(--ink-soft);line-height:1.5;">
@@ -388,12 +416,26 @@ input.invalid,select.invalid{border-color:#C04040;}
 
   <!-- PANEL 2C RETURNING SHORT FORM -->
   <div class="panel" id="panel2ReturnForm">
-    <p style="font-size:15px;color:var(--ink-soft);margin-bottom:24px;">Welcome back! Just tell us why you're coming in.</p>
-    <div class="form-group"><label for="rpEmail">Email for confirmation</label><input type="email" id="rpEmail" autocomplete="email" placeholder="jane@example.com"></div>
+    <p style="font-size:15px;color:var(--ink-soft);margin-bottom:24px;">Welcome back! Tell us about this follow-up, then choose a time.</p>
     <div class="form-group"><label for="rpReason">Reason for visit</label>
-      <select id="rpReason"><option value="">Select a reason…</option><option>Follow-up visit</option><option>Bunion / foot deformity</option><option>Heel pain / plantar fasciitis</option><option>Ingrown or fungal nail</option><option>Wart treatment</option><option>Sports injury / ankle sprain</option><option>Custom orthotics</option><option>Diabetic foot care</option><option>General foot pain</option><option>Other</option></select>
+      <select id="rpReason" onchange="handleReturningReasonChange()"><option value="">Select a reason…</option><option>General follow-up</option><option>Bunion / foot deformity</option><option>Heel pain / plantar fasciitis</option><option>Ingrown or fungal nail</option><option>Wart treatment</option><option>Sports injury / ankle sprain</option><option>Custom orthotics</option><option>Diabetic foot care</option><option>General foot pain</option><option>Other</option></select>
     </div>
-    <div class="form-nav"><button class="btn btn-ink" onclick="goToStep3Returning()">Choose a time</button><button class="btn-back" onclick="goBack(2)">← Back</button></div>
+    <div class="form-group" id="rpOtherGroup" style="display:none;">
+      <label for="rpOther">Please describe the reason</label>
+      <textarea id="rpOther" rows="3" placeholder="Tell us what you would like Dr. Farooqi to address…" style="resize:vertical;"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Appointment mode</label>
+      <div class="mode-grid" id="returningModeGrid">
+        <button type="button" class="mode-card" data-mode="In Person" onclick="selectVisitMode(this)">In person<span>Visit the Midtown office</span></button>
+        <button type="button" class="mode-card" data-mode="Virtual" onclick="selectVisitMode(this)">Virtual<span>Secure telemedicine visit</span></button>
+      </div>
+    </div>
+    <div style="margin-top:34px;">
+      <p style="font-size:15px;color:var(--ink-soft);margin-bottom:8px;">Select an available appointment time. All times are Eastern.</p>
+      <div id="returningSlotContainer"><p class="loading-slots">Loading available times…</p></div>
+    </div>
+    <div class="form-nav" style="margin-top:24px;"><button class="btn btn-ink" onclick="goToStep4()" id="btnReturnReview" disabled>Review &amp; confirm</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
   </div>
 
   <!-- PANEL 3 SLOTS -->
@@ -407,7 +449,7 @@ input.invalid,select.invalid{border-color:#C04040;}
   <div class="panel" id="panel4">
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:28px;">Please review your details before submitting.</p>
     <div id="reviewSummary" style="border:1px solid var(--line-soft);border-radius:14px;padding:28px;margin-bottom:28px;background:#fff;font-size:15.5px;line-height:1.8;"></div>
-    <div class="form-nav"><button class="btn btn-ink" onclick="submitBooking()" id="btnSubmit">Reserve time &amp; continue</button><button class="btn-back" onclick="goBack(3)">← Back</button></div>
+    <div class="form-nav"><button class="btn btn-ink" onclick="submitBooking()" id="btnSubmit">Reserve time &amp; continue</button><button class="btn-back" onclick="goBackFromReview()">← Back</button></div>
     <p style="font-size:13px;color:var(--ink-soft);margin-top:16px;">Your appointment will be placed on the schedule now. Next, you’ll continue to Front Door to complete your registration before the visit.</p>
   </div>
 
@@ -425,17 +467,14 @@ input.invalid,select.invalid{border-color:#C04040;}
 </div>
 
 <aside class="booking-sidebar">
-  <div class="sidebar-card"><h3>Office hours</h3>
-    <div class="sc-row"><span class="sc-day">Monday</span><span>7:00 AM – 3:00 PM</span></div>
-    <div class="sc-row"><span class="sc-day">Tuesday</span><span>8:00 AM – 5:00 PM</span></div>
-    <div class="sc-row"><span class="sc-day">Wednesday</span><span>8:00 AM – 5:00 PM</span></div>
-    <div class="sc-row"><span class="sc-day">Thursday</span><span>11:00 AM – 7:00 PM</span></div>
-    <div class="sc-row"><span class="sc-day">Friday</span><span>9:00 AM – 1:00 PM · Virtual only</span></div>
-    <a class="sc-tel" href="tel:+12125108665">(212) 510-8665</a>
+  <div class="sidebar-card patient-summary" id="patientSummaryCard">
+    <h3>Your appointment</h3>
+    <div class="patient-name" id="patientSummaryName"></div>
+    <div class="patient-meta"><strong id="patientSummaryType">Follow-up visit</strong><br><span id="patientSummaryMode">Choose in person or virtual</span></div>
   </div>
   <div class="sidebar-card"><h3>In-network insurance</h3>
-    <p style="font-size:14.5px;color:var(--ink-soft);line-height:1.6;">Aetna · Cigna · 1199 SEIU · Medicare</p>
-    <p class="sc-note">Self-pay and Workers' Comp also accepted.</p>
+    <p style="font-size:14.5px;color:var(--ink-soft);line-height:1.6;">Aetna · Anthem BCBS · Cigna · 1199 SEIU · Medicare</p>
+    <p class="sc-note">Self-pay also accepted.</p>
   </div>
   <div class="sidebar-card"><h3>353 Lexington Ave, Rm 1502</h3>
     <p style="font-size:14.5px;color:var(--ink-soft);line-height:1.6;">15th floor<br>Corner of 40th and Lexington Ave, 2 blocks south of Grand Central Station</p>
@@ -451,13 +490,15 @@ input.invalid,select.invalid{border-color:#C04040;}
 <script>
 // Public Front Door Gateway is now also the narrow public adapter for OS2 Scheduling.
 // The old standalone Booking Backend is no longer used by this page.
-var BOOKING_CLIENT_VERSION = 'v0.16.0';
+var BOOKING_CLIENT_VERSION = 'v0.16.2';
 var FRONT_DOOR_GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
 
 var state = {
   patientType: null,
   verifiedName: null,
   verifiedPhone: null,
+  verifiedEmail: null,
+  visitMode: null,
   verificationRequestId: null,
   verificationSession: null,
   selectedSlot: null,
@@ -491,6 +532,52 @@ function setStep(n) {
   state.currentStep = n;
 }
 
+function configureStepTabs() {
+  var returning = state.patientType === 'returning';
+  document.getElementById('stepTab1').textContent = 'Visit type';
+  document.getElementById('stepTab2').textContent = returning ? 'Appointment' : 'Your info';
+  document.getElementById('stepTab3').style.display = returning ? 'none' : '';
+}
+
+function updatePatientSummary() {
+  var card = document.getElementById('patientSummaryCard');
+  if (!card || !state.verifiedName) return;
+  document.getElementById('patientSummaryName').textContent = state.verifiedName;
+  document.getElementById('patientSummaryType').textContent = 'Follow-up visit';
+  document.getElementById('patientSummaryMode').textContent = state.visitMode || 'Choose in person or virtual';
+  card.classList.add('show');
+}
+
+function openReturningBooking() {
+  configureStepTabs();
+  setStep(2);
+  document.getElementById('panel2ReturnForm').classList.add('active');
+  updatePatientSummary();
+  state.selectedSlot = null;
+  document.getElementById('btnReturnReview').disabled = true;
+  document.getElementById('returningSlotContainer').innerHTML = '<p class="loading-slots">Choose in person or virtual to see available times.</p>';
+}
+
+function selectVisitMode(btn) {
+  state.visitMode = btn.getAttribute('data-mode');
+  state.selectedSlot = null;
+  state.bookingPayload = null;
+  document.querySelectorAll('#returningModeGrid .mode-card').forEach(function(el) {
+    el.classList.toggle('selected', el === btn);
+  });
+  document.getElementById('returningModeGrid').style.outline = 'none';
+  document.getElementById('btnReturnReview').disabled = true;
+  updatePatientSummary();
+  loadSlots('returningSlotContainer');
+}
+
+function handleReturningReasonChange() {
+  var other = document.getElementById('rpReason').value === 'Other';
+  document.getElementById('rpOtherGroup').style.display = other ? 'block' : 'none';
+  if (!other) document.getElementById('rpOther').value = '';
+  state.bookingPayload = null;
+}
+
 function updatePrimaryOptions() {
   var checked = document.querySelectorAll('input[name="npReasons"]:checked');
   var group = document.getElementById('primaryConcernGroup');
@@ -501,8 +588,12 @@ function selectType(el) {
   var type = el ? el.getAttribute('data-type') : null;
   if (!type) return;
   state.patientType = type;
+  state.selectedSlot = null;
+  state.bookingPayload = null;
   document.getElementById('cardNew').classList.toggle('selected', type === 'new');
   document.getElementById('cardReturning').classList.toggle('selected', type === 'returning');
+  if (type === 'new') document.getElementById('patientSummaryCard').classList.remove('show');
+  configureStepTabs();
   document.getElementById('btnStep1Next').disabled = false;
 }
 
@@ -511,6 +602,8 @@ function goToStep2() {
   setStep(2);
   if (state.patientType === 'new') {
     document.getElementById('panel2New').classList.add('active');
+  } else if (state.verifiedName) {
+    openReturningBooking();
   } else {
     document.getElementById('panel2Returning').classList.add('active');
   }
@@ -537,7 +630,7 @@ function goToStep3New() {
   if (!valid) { return; }
   setStep(3);
   document.getElementById('panel3').classList.add('active');
-  loadSlots();
+  loadSlots('slotContainer');
 }
 
 function verifyReturning() {
@@ -565,7 +658,7 @@ function verifyReturning() {
       if (!data || !data.success || !data.requestId) throw new Error((data && data.error) || 'Unable to request a code.');
       state.verificationRequestId = data.requestId;
       state.verifiedName = first + ' ' + last;
-      document.getElementById('rpEmail').value = email;
+      state.verifiedEmail = email;
       document.getElementById('returningCodeField').style.display = 'block';
       document.getElementById('btnConfirmCode').style.display = 'inline-flex';
       showVerifyResult(data.message || 'If the information matches an established patient, a code has been sent to the email address on file.', true);
@@ -592,10 +685,7 @@ function verifyReturning() {
         state.verifiedName = first + ' ' + last;
         state.verifiedPhone = data.phone;
         showVerifyResult('✓ Found you — welcome back, ' + first + '!', true);
-        setTimeout(function() {
-          setStep(2);
-          document.getElementById('panel2ReturnForm').classList.add('active');
-        }, 900);
+        setTimeout(openReturningBooking, 900);
       } else {
         showVerifyResult("We couldn’t find a match. Double-check your name and number, or call us at (212) 510-8665.", false);
       }
@@ -628,7 +718,7 @@ function confirmReturningCode() {
     state.verificationSession = data.session;
     state.verifiedPhone = '';
     showVerifyResult('✓ Record verified — welcome back!', true);
-    setTimeout(function(){setStep(2);document.getElementById('panel2ReturnForm').classList.add('active');},650);
+    setTimeout(openReturningBooking,650);
   }).catch(function(err){
     btn.disabled = false; btn.textContent = 'Verify code';
     showVerifyResult((err && err.message) || 'The code is invalid or expired.', false);
@@ -641,26 +731,19 @@ function showVerifyResult(msg, success) {
 }
 
 function goToStep3Returning() {
-  var valid = true;
-  ['rpEmail','rpReason'].forEach(function(id) {
-    var el = document.getElementById(id);
-    el.classList.remove('invalid');
-    if (!el.value.trim()) { el.classList.add('invalid'); valid = false; }
-  });
-  if (!valid) return;
-  setStep(3);
-  document.getElementById('panel3').classList.add('active');
-  loadSlots();
+  openReturningBooking();
 }
 
-function loadSlots() {
+function loadSlots(containerId) {
   calViewYear = null; calViewMonth = null;
-  var container = document.getElementById('slotContainer');
+  var targetId = containerId || 'slotContainer';
+  var container = document.getElementById(targetId);
   container.innerHTML = '<p class="loading-slots">Loading available times…</p>';
 
   fetch(
     FRONT_DOOR_GATEWAY_URL +
     '?action=slots&patientType=' + encodeURIComponent(state.patientType) +
+    (state.visitMode ? '&visitMode=' + encodeURIComponent(state.visitMode) : '') +
     (state.patientType === 'returning' && state.verificationSession ? '&session=' + encodeURIComponent(state.verificationSession) : '') +
     '&_=' + Date.now(),
     {cache:'no-store'}
@@ -671,7 +754,7 @@ function loadSlots() {
         throw new Error((data && data.error) || 'Unable to load appointment times.');
       }
       renderPracticeBanners(data.activeBanners || []);
-      renderSlots(data.slots || []);
+      renderSlots(data.slots || [], targetId);
     })
     .catch(function() {
       container.innerHTML = '<p class="no-slots">Unable to load times. Please call us at <a href="tel:+12125108665">(212) 510-8665</a> to book.</p>';
@@ -735,8 +818,8 @@ function handleBookingPayerIdChange() {
 document.getElementById('npPayerId').addEventListener('change', handleBookingPayerIdChange);
 document.getElementById('npPayerId').addEventListener('blur', handleBookingPayerIdChange);
 
-function renderSlots(slots) {
-  var container = document.getElementById('slotContainer');
+function renderSlots(slots, containerId) {
+  var container = document.getElementById(containerId || 'slotContainer');
   allSlots = slots || [];
 
   if (!allSlots.length) {
@@ -879,11 +962,40 @@ function selectSlot(btn) {
   document.querySelectorAll('.slot-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
   state.selectedSlot = { iso: btn.dataset.iso, label: btn.dataset.label };
+  state.bookingPayload = null;
   document.getElementById('btnStep3Next').disabled = false;
+  document.getElementById('btnReturnReview').disabled = false;
+}
+
+function returningReasonText() {
+  var reason = document.getElementById('rpReason').value;
+  if (reason !== 'Other') return reason;
+  return document.getElementById('rpOther').value.trim();
+}
+
+function validateReturningAppointment() {
+  var valid = true;
+  var reason = document.getElementById('rpReason');
+  var other = document.getElementById('rpOther');
+  var modeGrid = document.getElementById('returningModeGrid');
+  reason.classList.remove('invalid');
+  other.classList.remove('invalid');
+  modeGrid.style.outline = 'none';
+
+  if (!reason.value) { reason.classList.add('invalid'); valid = false; }
+  if (reason.value === 'Other' && !other.value.trim()) { other.classList.add('invalid'); valid = false; }
+  if (!state.visitMode) {
+    modeGrid.style.outline = '2px solid #C04040';
+    modeGrid.style.borderRadius = '12px';
+    valid = false;
+  }
+  if (!state.selectedSlot) valid = false;
+  return valid;
 }
 
 function goToStep4() {
   if (!state.selectedSlot) return;
+  if (state.patientType === 'returning' && !validateReturningAppointment()) return;
   setStep(4);
   document.getElementById('panel4').classList.add('active');
   var summary = '';
@@ -900,9 +1012,9 @@ function goToStep4() {
               '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
               '<b>Type:</b> New patient (' + bookingDurationLabel('new') + ')';
   } else {
-    summary = '<b>Name:</b> ' + state.verifiedName + '<br>' +
-              '<b>Email:</b> ' + document.getElementById('rpEmail').value + '<br>' +
-              '<b>Reason:</b> ' + document.getElementById('rpReason').value + '<br>' +
+    summary = '<b>Name:</b> ' + escapeBookingHtml(state.verifiedName) + '<br>' +
+              '<b>Reason:</b> ' + escapeBookingHtml(returningReasonText()) + '<br>' +
+              '<b>Mode:</b> ' + escapeBookingHtml(state.visitMode) + '<br>' +
               '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
               '<b>Type:</b> Follow-up (' + bookingDurationLabel('returning') + ')';
   }
@@ -944,8 +1056,9 @@ function buildWebsiteBookingPayload() {
     payload.firstName = state.verifiedName.split(' ')[0];
     payload.lastName = state.verifiedName.split(' ').slice(1).join(' ');
     payload.phone = state.verifiedPhone;
-    payload.email = document.getElementById('rpEmail').value.trim();
-    payload.reason = document.getElementById('rpReason').value;
+    payload.email = state.verifiedEmail || '';
+    payload.reason = returningReasonText();
+    payload.visitMode = state.visitMode;
     payload.verificationSession = state.verificationSession || '';
   }
 
@@ -1137,6 +1250,10 @@ function goBack(toStep) {
     else { document.getElementById('panel2Returning').classList.add('active'); }
   }
   else if (toStep === 3) { document.getElementById('panel3').classList.add('active'); }
+}
+
+function goBackFromReview() {
+  goBack(state.patientType === 'returning' ? 2 : 3);
 }
 
 loadBookingConfig();
