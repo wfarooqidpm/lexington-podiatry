@@ -397,7 +397,7 @@ input.invalid,select.invalid{border-color:#C04040;}
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:28px;">Please review your details before submitting.</p>
     <div id="reviewSummary" style="border:1px solid var(--line-soft);border-radius:14px;padding:28px;margin-bottom:28px;background:#fff;font-size:15.5px;line-height:1.8;"></div>
     <div class="form-nav"><button class="btn btn-ink" onclick="submitBooking()" id="btnSubmit">Reserve time &amp; continue</button><button class="btn-back" onclick="goBack(3)">← Back</button></div>
-    <p style="font-size:13px;color:var(--ink-soft);margin-top:16px;">Next, you’ll continue to Front Door to complete the registration and confirmation required for your appointment.</p>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:16px;">Your appointment will be placed on the schedule now. Next, you’ll continue to Front Door to complete your registration before the visit.</p>
   </div>
 
   <!-- PANEL 5 CONFIRMATION -->
@@ -978,10 +978,12 @@ function reserveWebsiteAndStartFrontDoor() {
     state.websiteBookingId = newWebsiteBookingId();
   }
 
-  // v0.8.3: this ONE gateway call now does both controlled website actions:
+  // This ONE gateway call performs both controlled website booking actions:
   // 1) verifies the slot is still offered and creates the private Google
   //    Calendar source hold WITHOUT adding the patient as a guest / emailing;
-  // 2) creates the WEBSITE Front Door row and opaque patient token.
+  // 2) creates the WEBSITE Front Door row and opaque patient token. Private
+  //    OS2 then lands and verifies the Charm appointment independently of
+  //    whether Front Door registration has been completed.
   //
   // The old booking endpoint is intentionally not POSTed anymore.
   return fetch(FRONT_DOOR_GATEWAY_URL, {
