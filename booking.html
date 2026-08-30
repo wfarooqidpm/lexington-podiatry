@@ -363,15 +363,26 @@ input.invalid,select.invalid{border-color:#C04040;}
   <div class="panel" id="panel2Returning">
     <div class="verify-box">
       <div class="vb-title">Let's find your record</div>
-      <div class="vb-sub">Enter your name and the last 4 digits of your phone number on file.</div>
+      <div class="vb-sub" id="returningVerifyInstructions">Enter your name and the last 4 digits of your phone number on file.</div>
       <div class="form-row">
         <div class="form-group"><label for="rpFirst">First name</label><input type="text" id="rpFirst" autocomplete="given-name" placeholder="Jane"></div>
         <div class="form-group"><label for="rpLast">Last name</label><input type="text" id="rpLast" autocomplete="family-name" placeholder="Smith"></div>
       </div>
-      <div class="form-group"><label for="rpLast4">Last 4 digits of phone</label><input type="text" id="rpLast4" maxlength="4" inputmode="numeric" placeholder="e.g. 4087"><div class="form-note">The number you used when booking before</div></div>
+      <div id="returningEmailCodeFields" style="display:none;">
+        <div class="form-row">
+          <div class="form-group"><label for="rpDob">Date of birth</label><input type="date" id="rpDob" autocomplete="bday"></div>
+          <div class="form-group"><label for="rpVerifyEmail">Email address</label><input type="email" id="rpVerifyEmail" autocomplete="email" placeholder="jane@example.com"></div>
+        </div>
+      </div>
+      <div class="form-group" id="returningLegacyPhoneField"><label for="rpLast4">Last 4 digits of phone</label><input type="text" id="rpLast4" maxlength="4" inputmode="numeric" placeholder="e.g. 4087"><div class="form-note">The number you used when booking before</div></div>
+      <div class="form-group" id="returningCodeField" style="display:none;margin-top:18px;">
+        <label for="rpCode">6-digit security code</label>
+        <input type="text" id="rpCode" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="000000">
+        <div class="form-note">The code expires in 10 minutes.</div>
+      </div>
       <div id="verifyResult"></div>
       <div class="secure-badge" style="margin:24px 0 0;border-top:none;border-radius:8px;">🔒 Encrypted in transit</div>
-      <div class="form-nav"><button class="btn btn-ink" onclick="verifyReturning()" id="btnVerify">Find my record</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
+      <div class="form-nav"><button class="btn btn-ink" onclick="verifyReturning()" id="btnVerify">Find my record</button><button class="btn btn-ink" onclick="confirmReturningCode()" id="btnConfirmCode" style="display:none;">Verify code</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
     </div>
   </div>
 
@@ -440,13 +451,15 @@ input.invalid,select.invalid{border-color:#C04040;}
 <script>
 // Public Front Door Gateway is now also the narrow public adapter for OS2 Scheduling.
 // The old standalone Booking Backend is no longer used by this page.
-var BOOKING_CLIENT_VERSION = 'v0.10.1';
+var BOOKING_CLIENT_VERSION = 'v0.16.0';
 var FRONT_DOOR_GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
 
 var state = {
   patientType: null,
   verifiedName: null,
   verifiedPhone: null,
+  verificationRequestId: null,
+  verificationSession: null,
   selectedSlot: null,
   currentStep: 1,
 
@@ -530,6 +543,39 @@ function goToStep3New() {
 function verifyReturning() {
   var first = document.getElementById('rpFirst').value.trim();
   var last = document.getElementById('rpLast').value.trim();
+  var emailCodeMode = state.bookingConfig && state.bookingConfig.followUpVerification === 'email_code';
+  if (emailCodeMode) {
+    var dob = document.getElementById('rpDob').value;
+    var email = document.getElementById('rpVerifyEmail').value.trim();
+    if (!first || !last || !dob || !email) {
+      showVerifyResult('Please enter your name, date of birth, and email address.', false);
+      return;
+    }
+    var emailBtn = document.getElementById('btnVerify');
+    emailBtn.disabled = true; emailBtn.textContent = 'Sending…';
+    document.getElementById('verifyResult').innerHTML = '';
+    fetch(FRONT_DOOR_GATEWAY_URL, {
+      method:'POST',
+      body:JSON.stringify({
+        action:'followup-verification-start',
+        firstName:first,lastName:last,dob:dob,email:email
+      })
+    }).then(function(r){return r.json();}).then(function(data){
+      emailBtn.disabled = false; emailBtn.textContent = 'Send another code';
+      if (!data || !data.success || !data.requestId) throw new Error((data && data.error) || 'Unable to request a code.');
+      state.verificationRequestId = data.requestId;
+      state.verifiedName = first + ' ' + last;
+      document.getElementById('rpEmail').value = email;
+      document.getElementById('returningCodeField').style.display = 'block';
+      document.getElementById('btnConfirmCode').style.display = 'inline-flex';
+      showVerifyResult(data.message || 'If the information matches an established patient, a code has been sent to the email address on file.', true);
+      document.getElementById('rpCode').focus();
+    }).catch(function(err){
+      emailBtn.disabled = false; emailBtn.textContent = 'Email my security code';
+      showVerifyResult((err && err.message) || 'Something went wrong. Please try again or call us.', false);
+    });
+    return;
+  }
   var last4 = document.getElementById('rpLast4').value.trim();
   if (!first || !last || last4.length !== 4) {
     showVerifyResult('Please fill in all fields and enter exactly 4 digits.', false);
@@ -560,6 +606,35 @@ function verifyReturning() {
     });
 }
 
+function confirmReturningCode() {
+  var code = document.getElementById('rpCode').value.trim();
+  if (!state.verificationRequestId || !/^\d{6}$/.test(code)) {
+    showVerifyResult('Enter the 6-digit code from your email.', false);
+    return;
+  }
+  var btn = document.getElementById('btnConfirmCode');
+  btn.disabled = true; btn.textContent = 'Verifying…';
+  fetch(FRONT_DOOR_GATEWAY_URL, {
+    method:'POST',
+    body:JSON.stringify({
+      action:'followup-verification-confirm',
+      requestId:state.verificationRequestId,
+      code:code
+    })
+  }).then(function(r){return r.json();}).then(function(data){
+    if (!data || !data.success || !data.verified || !data.session) {
+      throw new Error((data && data.error) || 'The code is invalid or expired.');
+    }
+    state.verificationSession = data.session;
+    state.verifiedPhone = '';
+    showVerifyResult('✓ Record verified — welcome back!', true);
+    setTimeout(function(){setStep(2);document.getElementById('panel2ReturnForm').classList.add('active');},650);
+  }).catch(function(err){
+    btn.disabled = false; btn.textContent = 'Verify code';
+    showVerifyResult((err && err.message) || 'The code is invalid or expired.', false);
+  });
+}
+
 function showVerifyResult(msg, success) {
   var el = document.getElementById('verifyResult');
   el.innerHTML = '<div class="verify-result ' + (success ? 'success' : 'error') + '">' + msg + '</div>';
@@ -586,6 +661,7 @@ function loadSlots() {
   fetch(
     FRONT_DOOR_GATEWAY_URL +
     '?action=slots&patientType=' + encodeURIComponent(state.patientType) +
+    (state.patientType === 'returning' && state.verificationSession ? '&session=' + encodeURIComponent(state.verificationSession) : '') +
     '&_=' + Date.now(),
     {cache:'no-store'}
   )
@@ -870,6 +946,7 @@ function buildWebsiteBookingPayload() {
     payload.phone = state.verifiedPhone;
     payload.email = document.getElementById('rpEmail').value.trim();
     payload.reason = document.getElementById('rpReason').value;
+    payload.verificationSession = state.verificationSession || '';
   }
 
   return payload;
@@ -910,6 +987,14 @@ function loadBookingConfig() {
     var returningLabel = document.getElementById('returningDurationLabel');
     if (newLabel) newLabel.textContent = Number(data.newDurationMinutes || 30) + ' min appointment';
     if (returningLabel) returningLabel.textContent = Number(data.returningDurationMinutes || 15) + ' min appointment';
+
+    var emailCode = data.followUpVerification === 'email_code';
+    document.getElementById('returningEmailCodeFields').style.display = emailCode ? 'block' : 'none';
+    document.getElementById('returningLegacyPhoneField').style.display = emailCode ? 'none' : 'block';
+    document.getElementById('returningVerifyInstructions').textContent = emailCode
+      ? 'Enter the information from your established patient record. We’ll email a one-time security code to the address on file.'
+      : 'Enter your name and the last 4 digits of your phone number on file.';
+    document.getElementById('btnVerify').textContent = emailCode ? 'Email my security code' : 'Find my record';
 
     renderPracticeBanners(data.activeBanners || []);
     return data;
@@ -959,9 +1044,9 @@ function verifyFrontDoorGatewayVersion() {
   return fetch(FRONT_DOOR_GATEWAY_URL + '?action=health&_=' + Date.now(), {cache:'no-store'})
     .then(function(r){ return r.json(); })
     .then(function(data){
-      if (!data.success || String(data.version || '') !== 'v0.10.1') {
+      if (!data.success || String(data.version || '') !== 'v0.16.0') {
         throw new Error(
-          'Front Door Gateway is not on v0.10.1 yet. The appointment was not submitted.'
+          'Front Door Gateway is not on v0.16.0 yet. The appointment was not submitted.'
         );
       }
       return data;
