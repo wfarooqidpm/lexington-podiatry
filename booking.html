@@ -179,17 +179,11 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 .slot-days { }
 .day-group { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
 .day-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 18px; cursor: pointer; background: var(--ivory);
-  font-weight: 600; font-size: 15px; transition: background .15s;
-  user-select: none;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 18px;background:var(--stone);color:var(--brass);
+  font-weight:600;font-size:15px;
 }
-.day-header:hover { background: var(--stone); }
-.day-header.active { background: var(--stone); color: var(--brass); }
-.day-header .day-arrow { font-size: 12px; transition: transform .2s; color: var(--ink-soft); }
-.day-header.active .day-arrow { transform: rotate(180deg); }
-.day-slots { display: none; padding: 12px 14px 14px; border-top: 1px solid var(--line-soft); }
-.day-slots.open { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.day-slots { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px 14px;border-top:1px solid var(--line-soft); }
 .mini-cal { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; position: sticky; top: 100px; }
 .mini-cal-header { background: var(--walnut); color: var(--ivory); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
 .cal-nav-btn { background: none; border: none; color: var(--ivory); font-size: 18px; cursor: pointer; padding: 0 6px; line-height: 1; opacity: .8; transition: opacity .15s; }
@@ -204,7 +198,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 .mini-cal-day.today { border: 1px solid var(--champagne); }
 .mini-cal-day.empty { color: transparent; }
 .mini-cal-day.past { color: var(--line); }
-@media(max-width:640px) { .slot-layout { grid-template-columns: 1fr; } .mini-cal { position: static; order: -1; } .day-slots.open { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:640px) { .slot-layout { grid-template-columns: 1fr; } .mini-cal { position: static; order: -1; } .day-slots { grid-template-columns: repeat(2,1fr); } }
 
 @media(max-width:860px){.booking-hero-grid{grid-template-columns:1fr;gap:30px}.hero-hours{border-left:0;border-top:1px solid var(--line);padding:24px 0 0}.booking-grid{grid-template-columns:1fr;gap:48px;}.booking-sidebar{order:-1;}}
 @media(max-width:767px){.mobile-bar{display:flex;}nav.links{display:none;}nav.links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:var(--ivory);border-bottom:1px solid var(--line);padding:20px 32px;gap:16px;}.menu-toggle{display:block;}body{padding-bottom:72px;}.brand .sub{display:none;}.mobile-bar .btn{flex:1;text-align:center;padding:14px;}}
@@ -449,16 +443,16 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
   <div class="panel" id="panel4">
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:28px;">Please review your details before submitting.</p>
     <div id="reviewSummary" style="border:1px solid var(--line-soft);border-radius:14px;padding:28px;margin-bottom:28px;background:#fff;font-size:15.5px;line-height:1.8;"></div>
-    <div class="form-nav"><button class="btn btn-ink" onclick="submitBooking()" id="btnSubmit">Reserve time &amp; continue</button><button class="btn-back" onclick="goBackFromReview()">← Back</button></div>
-    <p style="font-size:13px;color:var(--ink-soft);margin-top:16px;">Your appointment will be placed on the schedule now. Next, you’ll continue to Front Door to complete your registration before the visit.</p>
+    <div class="form-nav"><button class="btn btn-ink" onclick="submitBooking()" id="btnSubmit">Create appointment &amp; continue</button><button class="btn-back" onclick="goBackFromReview()">← Back</button></div>
+    <p style="font-size:13px;color:var(--ink-soft);margin-top:16px;">Your appointment will be created on the schedule now and will remain booked even if you do not finish Front Door. Next, you’ll continue to Front Door to complete your registration before the visit.</p>
   </div>
 
   <!-- PANEL 5 CONFIRMATION -->
   <div class="panel" id="panel5">
     <div class="confirm-box">
       <div class="cb-icon">✓</div>
-      <h2>Appointment requested</h2>
-      <p class="cb-detail">Thank you — your time has been reserved. Continue registration to confirm your appointment.</p>
+      <h2>Appointment booked</h2>
+      <p class="cb-detail">Thank you — your appointment is on the schedule. Continue to Front Door to complete your registration.</p>
       <div class="cb-slot" id="confirmedSlot"></div>
       <p class="cb-detail">Our team will confirm your appointment shortly.</p>
       <p style="margin-top:14px;font-weight:600;font-size:16px;"><a href="tel:+12125108665" style="color:var(--brass);text-decoration:none;">(212) 510-8665</a></p>
@@ -761,8 +755,12 @@ function loadSlots(containerId) {
     });
 }
 
-// All slots stored globally for calendar sync
+// Appointment-date state shared by the slot list and mini calendar.
 var allSlots = [];
+var slotGroupsByDate = {};
+var slotDateOrder = [];
+var activeSlotDateIndex = 0;
+var activeSlotContainerId = 'slotContainer';
 
 var BOOKING_PAYER_MAP = {
   'Aetna':'60054',
@@ -821,71 +819,53 @@ document.getElementById('npPayerId').addEventListener('blur', handleBookingPayer
 function renderSlots(slots, containerId) {
   var container = document.getElementById(containerId || 'slotContainer');
   allSlots = slots || [];
+  activeSlotContainerId = containerId || 'slotContainer';
 
   if (!allSlots.length) {
     container.innerHTML = '<p class="no-slots">No online appointments are currently available. Please call us at <a href="tel:+12125108665">(212) 510-8665</a>.</p>';
     return;
   }
 
-  // Group by date
-  var byDate = {};
-  var dateOrder = [];
+  // Group by date, but display only the calendar's selected date.
+  slotGroupsByDate = {};
+  slotDateOrder = [];
+  activeSlotDateIndex = 0;
   allSlots.forEach(function(s) {
-    if (!byDate[s.dateLabel]) { byDate[s.dateLabel] = []; dateOrder.push(s.dateLabel); }
-    byDate[s.dateLabel].push(s);
+    if (!slotGroupsByDate[s.dateLabel]) {
+      slotGroupsByDate[s.dateLabel] = [];
+      slotDateOrder.push(s.dateLabel);
+    }
+    slotGroupsByDate[s.dateLabel].push(s);
   });
 
-  // Build layout: collapsible days on left, mini calendar on right
-  var daysHtml = '<div class="slot-days">';
-  dateOrder.forEach(function(date, idx) {
-    var safeid = 'day-' + idx;
-    daysHtml += '<div class="day-group" id="grp-' + safeid + '">';
-    daysHtml += '<div class="day-header' + (idx === 0 ? ' active' : '') + '" onclick="toggleDay(\'' + safeid + '\')" id="hdr-' + safeid + '">';
-    daysHtml += '<span>' + date + '</span><span class="day-arrow">▼</span></div>';
-    daysHtml += '<div class="day-slots' + (idx === 0 ? ' open' : '') + '" id="slots-' + safeid + '">';
-    byDate[date].forEach(function(s) {
-      daysHtml += '<button class="slot-btn" data-iso="' + s.iso + '" data-label="' + s.dateLabel + ' at ' + s.timeLabel + '" data-dayid="' + safeid + '" onclick="selectSlot(this)">' + s.timeLabel + '</button>';
-    });
-    daysHtml += '</div></div>';
-  });
-  daysHtml += '</div>';
-
-  // Build mini calendar
-  var calHtml = buildMiniCal(dateOrder);
-
-  container.innerHTML = '<div class="slot-layout">' + daysHtml + calHtml + '</div>';
+  container.innerHTML = '<div class="slot-layout"><div class="slot-days" id="activeSlotDay">' +
+    renderActiveSlotDay_() + '</div>' + buildMiniCal(slotDateOrder) + '</div>';
 }
 
-function toggleDay(id) {
-  var hdr = document.getElementById('hdr-' + id);
-  var slots = document.getElementById('slots-' + id);
-  var isOpen = slots.classList.contains('open');
-  // Close all
-  document.querySelectorAll('.day-slots').forEach(function(el) { el.classList.remove('open'); });
-  document.querySelectorAll('.day-header').forEach(function(el) { el.classList.remove('active'); });
-  document.querySelectorAll('.mini-cal-day').forEach(function(el) { el.classList.remove('selected-day'); });
-  if (!isOpen) {
-    slots.classList.add('open');
-    hdr.classList.add('active');
-    // Highlight on mini cal
-    var calDay = document.querySelector('.mini-cal-day[data-dayid="' + id + '"]');
-    if (calDay) calDay.classList.add('selected-day');
-  }
+function renderActiveSlotDay_() {
+  var date = slotDateOrder[activeSlotDateIndex];
+  var slots = slotGroupsByDate[date] || [];
+  var html = '<div class="day-group"><div class="day-header"><span>' + date + '</span></div><div class="day-slots">';
+  slots.forEach(function(s) {
+    html += '<button class="slot-btn" data-iso="' + s.iso + '" data-label="' + s.dateLabel + ' at ' + s.timeLabel + '" onclick="selectSlot(this)">' + s.timeLabel + '</button>';
+  });
+  return html + '</div></div>';
 }
 
 function jumpToDay(id) {
-  // Close all, open this one
-  document.querySelectorAll('.day-slots').forEach(function(el) { el.classList.remove('open'); });
-  document.querySelectorAll('.day-header').forEach(function(el) { el.classList.remove('active'); });
-  document.querySelectorAll('.mini-cal-day').forEach(function(el) { el.classList.remove('selected-day'); });
-  var slots = document.getElementById('slots-' + id);
-  var hdr = document.getElementById('hdr-' + id);
-  if (slots) { slots.classList.add('open'); hdr.classList.add('active'); }
-  var calDay = document.querySelector('.mini-cal-day[data-dayid="' + id + '"]');
-  if (calDay) calDay.classList.add('selected-day');
-  // Scroll to day group
-  var grp = document.getElementById('grp-' + id);
-  if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  var idx = parseInt(String(id).replace('day-', ''), 10);
+  if (isNaN(idx) || !slotDateOrder[idx]) return;
+  activeSlotDateIndex = idx;
+  state.selectedSlot = null;
+  state.bookingPayload = null;
+  document.getElementById('btnStep3Next').disabled = true;
+  document.getElementById('btnReturnReview').disabled = true;
+
+  var dayEl = document.querySelector('#' + activeSlotContainerId + ' #activeSlotDay');
+  if (dayEl) dayEl.innerHTML = renderActiveSlotDay_();
+  document.querySelectorAll('#' + activeSlotContainerId + ' .mini-cal-day').forEach(function(el) {
+    el.classList.toggle('selected-day', el.getAttribute('data-dayid') === id);
+  });
 }
 
 // Track which month the mini-cal is showing
@@ -896,7 +876,11 @@ var calAvailableLabels = [];
 function buildMiniCal(availableDateLabels) {
   calAvailableLabels = availableDateLabels;
   var now = new Date();
-  if (calViewYear === null) { calViewYear = now.getFullYear(); calViewMonth = now.getMonth(); }
+  if (calViewYear === null) {
+    var firstIso = allSlots[0] && String(allSlots[0].iso || '').match(/^(\d{4})-(\d{2})-/);
+    calViewYear = firstIso ? parseInt(firstIso[1], 10) : now.getFullYear();
+    calViewMonth = firstIso ? parseInt(firstIso[2], 10) - 1 : now.getMonth();
+  }
   return renderMiniCal(now);
 }
 
@@ -912,13 +896,14 @@ function renderMiniCal(now) {
   var year = calViewYear;
   var month = calViewMonth;
 
-  // Build availMap from stored labels
+  // Build the available-date map from slot timestamps so year boundaries work.
   var availMap = {};
   calAvailableLabels.forEach(function(label, idx) {
-    var parts = label.split(' ');
-    var dayNum = parseInt(parts[parts.length - 1]);
-    var monStr = parts[parts.length - 2];
-    availMap[monStr + '-' + dayNum] = 'day-' + idx;
+    var firstSlot = (slotGroupsByDate[label] || [])[0];
+    var isoDate = firstSlot && String(firstSlot.iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (isoDate && parseInt(isoDate[1], 10) === year && parseInt(isoDate[2], 10) === month + 1) {
+      availMap[parseInt(isoDate[3], 10)] = 'day-' + idx;
+    }
   });
 
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -943,16 +928,19 @@ function renderMiniCal(now) {
     html += '<div class="mini-cal-day empty"></div>';
   }
   for (var d = 1; d <= daysInMonth; d++) {
-    var key = monthName + '-' + d;
     var isToday = (d === now.getDate() && isCurrentMonth);
     var isPast = isCurrentMonth && (d < now.getDate());
-    var dayId = availMap[key];
+    var dayId = availMap[d];
     var cls = 'mini-cal-day';
     var onclick = '';
-    if (dayId) { cls += ' available'; onclick = ' onclick="jumpToDay(\'' + dayId + '\')"'; }
+    if (dayId) {
+      cls += ' available';
+      if (dayId === 'day-' + activeSlotDateIndex) cls += ' selected-day';
+      onclick = ' onclick="jumpToDay(\'' + dayId + '\')"';
+    }
     else if (isPast) { cls += ' past'; }
     if (isToday) { cls += ' today'; }
-    html += '<div class="' + cls + '"' + onclick + '>' + d + '</div>';
+    html += '<div class="' + cls + '" data-dayid="' + (dayId || '') + '"' + onclick + '>' + d + '</div>';
   }
   html += '</div></div>';
   return html;
@@ -1157,9 +1145,14 @@ function verifyFrontDoorGatewayVersion() {
   return fetch(FRONT_DOOR_GATEWAY_URL + '?action=health&_=' + Date.now(), {cache:'no-store'})
     .then(function(r){ return r.json(); })
     .then(function(data){
-      if (!data.success || String(data.version || '') !== 'v0.16.0') {
+      var versionMatch = String(data.version || '').match(/^v(\d+)\.(\d+)\.(\d+)$/);
+      var supportedVersion = versionMatch && (
+        parseInt(versionMatch[1], 10) > 0 ||
+        parseInt(versionMatch[2], 10) >= 16
+      );
+      if (!data.success || !supportedVersion || data.schedulingSource !== 'OS2') {
         throw new Error(
-          'Front Door Gateway is not on v0.16.0 yet. The appointment was not submitted.'
+          'Front Door scheduling is not ready. The appointment was not submitted.'
         );
       }
       return data;
@@ -1178,9 +1171,9 @@ function reserveWebsiteAndStartFrontDoor() {
 
   // This ONE gateway call performs both controlled website booking actions:
   // 1) verifies the slot is still offered and creates the private Google
-  //    Calendar source hold WITHOUT adding the patient as a guest / emailing;
+  //    Calendar source record WITHOUT adding the patient as a guest / emailing;
   // 2) creates the WEBSITE Front Door row and opaque patient token. Private
-  //    OS2 then lands and verifies the Charm appointment independently of
+  //    OS2 immediately creates and verifies the Charm appointment independently of
   //    whether Front Door registration has been completed.
   //
   // The old booking endpoint is intentionally not POSTed anymore.
@@ -1195,7 +1188,7 @@ function reserveWebsiteAndStartFrontDoor() {
   .then(function(r) { return r.json(); })
   .then(function(data) {
     if (!data.success || !data.token) {
-      throw new Error(data.error || 'The appointment could not be reserved.');
+      throw new Error(data.error || 'The appointment could not be created.');
     }
 
     state.bookingCommitted = true;
@@ -1214,7 +1207,7 @@ function submitBooking() {
   btn.disabled = true;
   btn.textContent = state.bookingCommitted
     ? 'Opening registration…'
-    : 'Reserving time…';
+    : 'Creating appointment…';
 
   if (!state.bookingPayload) {
     state.bookingPayload = buildWebsiteBookingPayload();
@@ -1229,7 +1222,7 @@ function submitBooking() {
     btn.disabled = false;
     btn.textContent = state.bookingCommitted
       ? 'Continue registration'
-      : 'Reserve time & continue';
+      : 'Create appointment & continue';
 
     alert(
       (err && err.message
