@@ -442,7 +442,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="section-title">How would you like to handle this visit?</div>
       <div class="payment-choice">
         <label class="choice"><input type="radio" name="paymentChoice" value="INSURANCE"><span><strong>Use my insurance</strong><span>We’ll check the plan information you provide and show an estimate when the payer returns enough detail.</span></span></label>
+        <label class="choice"><input type="radio" name="paymentChoice" value="STAFF_HELP"><span><strong>Unsure? Let our staff help</strong><span>Bring your insurance information to the office and we’ll help sort it out when you arrive.</span></span></label>
         <label class="choice"><input type="radio" name="paymentChoice" value="SELF_PAY"><span><strong>Self-pay</strong><span>Skip insurance verification and use Lexington Podiatry’s cash price for this visit.</span></span></label>
+      </div>
+      <div id="staffHelpBox" class="callout gold hidden" style="margin-top:14px">
+        <strong>We’ll help with your insurance at the office.</strong>
+        <div style="margin-top:6px">No insurance check will run now. If your coverage is not active for this visit, the visit price is $120.</div>
       </div>
       <div id="selfPayPriceBox" class="selfpay-callout hidden">
         <strong>Self-pay price</strong>
@@ -552,6 +557,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
             <div class="field"><label for="insuranceFront">Insurance card — front</label><input id="insuranceFront" type="file" accept="image/jpeg,image/png,application/pdf"></div>
             <div class="field"><label for="insuranceBack">Insurance card — back</label><input id="insuranceBack" type="file" accept="image/jpeg,image/png,application/pdf"></div>
           </div>
+          <button class="btn primary" type="button" id="analyzeInsuranceCardBtn" style="margin-top:12px">Read card &amp; check coverage</button>
+          <div id="insuranceAnalyzeStatus" class="note" style="margin-top:8px"></div>
         </div>
       </div>
     </div>
@@ -862,7 +869,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
-var CLIENT_VERSION = 'v0.12.0';
+var CLIENT_VERSION = 'v0.13.0';
 
 var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null,insuranceEstimate:null,cashPrice:null,followUpMode:false,followUpStartedAt:0};
 
@@ -949,6 +956,10 @@ function paymentChoice(){
   return radioValue('paymentChoice')||'INSURANCE';
 }
 function isSelfPay(){ return paymentChoice()==='SELF_PAY'; }
+function needsStaffInsuranceHelp(){ return paymentChoice()==='STAFF_HELP'; }
+function staffHelpEstimate_(){
+  return {status:'READY',amount:120,currency:'USD',confidence:'STAFF REVIEW',basis:'INSURANCE NOT VERIFIED',message:'If insurance is not active for this visit, the visit price is $120.'};
+}
 function frontDoorPatientIsNew_(){
   var t=String(FD.booking&&FD.booking.patientType||'').toUpperCase();
   return !(t==='RETURNING'||t==='FOLLOW UP'||t==='FOLLOW-UP'||t==='FOLLOWUP');
@@ -972,11 +983,13 @@ function selectSelfPay_(showMessage){
 }
 function applyPaymentChoiceUI_(){
   var self=isSelfPay();
-  $('insuranceDetailsSection').classList.toggle('hidden',self);
-  $('insuranceCardSection').classList.toggle('hidden',self);
-  $('secondaryInsuranceSection').classList.toggle('hidden',self);
+  var help=needsStaffInsuranceHelp();
+  $('insuranceDetailsSection').classList.toggle('hidden',self||help);
+  $('insuranceCardSection').classList.toggle('hidden',self||help);
+  $('secondaryInsuranceSection').classList.toggle('hidden',self||help);
   $('insuranceBillingPolicyCard').classList.toggle('hidden',self);
   $('selfPayPriceBox').classList.toggle('hidden',!self);
+  $('staffHelpBox').classList.toggle('hidden',!help);
   if(self){
     $('hasSecondary').checked=false;
     $('secondaryFields').classList.add('hidden');
@@ -992,6 +1005,11 @@ function applyPaymentChoiceUI_(){
     $('financialPolicyAckText').textContent='I understand the self-pay price shown for my scheduled visit and that additional services may have additional charges.';
     $('estimateIntro').textContent='Here is Lexington Podiatry’s cash price for your scheduled visit.';
     FD.estimate=selfPayEstimateFromPrice_();
+  }else if(help){
+    FD.estimate=staffHelpEstimate_();
+    $('estimateIntro').textContent='Insurance still needs to be reviewed by our staff before your visit.';
+    $('financialPolicyText').textContent='We will review your insurance at the office. If coverage is not active for this visit, the visit price is $120. Additional services may have additional charges.';
+    $('financialPolicyAckText').textContent='I understand that if my insurance is not active for this visit, the visit price is $120.';
   }else{
     FD.estimate=FD.insuranceEstimate||null;
     $('financialPolicyText').textContent='Insurance benefits and estimates are not guarantees of payment. Amounts known to be your responsibility are due at the time of service. You remain responsible for patient amounts assigned by your health plan after the claim is processed.';
@@ -1995,7 +2013,7 @@ function hydrate(){
 
   var savedChoice=String(d.paymentChoice||'').toUpperCase();
   var sourceCarrier=String(b.insuranceCarrier||'').toUpperCase();
-  if(savedChoice==='SELF_PAY'||savedChoice==='INSURANCE')setRadio('paymentChoice',savedChoice);
+  if(savedChoice==='SELF_PAY'||savedChoice==='INSURANCE'||savedChoice==='STAFF_HELP'||d.insuranceAssistanceRequested)setRadio('paymentChoice',d.insuranceAssistanceRequested?'STAFF_HELP':savedChoice);
   else if(/SELF.?PAY|NO INSURANCE/.test(sourceCarrier))setRadio('paymentChoice','SELF_PAY');
   else setRadio('paymentChoice','INSURANCE');
   applyPaymentChoiceUI_();
@@ -2069,6 +2087,7 @@ function collect(){
     emergencyName:clean($('emergencyName').value),emergencyPhone:clean($('emergencyPhone').value),
     pharmacy:clean($('pharmacy').value),pharmacyNpi:clean($('pharmacyNpi').value),pharmacyPhone:clean($('pharmacyPhone').value),pharmacyAddress:clean($('pharmacyAddress').value),
     paymentChoice:paymentChoice(),
+    insuranceAssistanceRequested:needsStaffInsuranceHelp(),
     insuranceCarrier:isSelfPay()?'Self-pay':clean($('insuranceCarrier').value),payerId:isSelfPay()?'':normalizePayerId($('payerId').value),insurancePlan:isSelfPay()?'':clean($('insurancePlan').value),
     memberId:isSelfPay()?'':clean($('memberId').value),groupId:isSelfPay()?'':clean($('groupId').value),
     subscriberFirstName:clean(FD.data.subscriberFirstName||''),subscriberLastName:clean(FD.data.subscriberLastName||''),
@@ -2105,7 +2124,7 @@ function validateStep(step,data){
 
   if(step===2){
     if(!data.paymentChoice)throw new Error('Please choose insurance or self-pay.');
-    if(data.paymentChoice!=='SELF_PAY'){
+    if(data.paymentChoice!=='SELF_PAY'&&!data.insuranceAssistanceRequested){
       need('insuranceCarrier','Please enter your insurance company.');
       need('memberId','Please enter your member ID.');
       if(data.hasSecondaryInsurance&&(!data.secondaryCarrier||!data.secondaryMemberId)){
@@ -2133,7 +2152,7 @@ function validateStep(step,data){
 
   if(step===6){
     var discoveryStatus=String(FD.discovery&&FD.discovery.status||'').toUpperCase();
-    if(data.paymentChoice!=='SELF_PAY'&&!insuranceIsActive()&&!discoveryPending(discoveryStatus)&&!data.insuranceCardStatus){
+    if(data.paymentChoice!=='SELF_PAY'&&!data.insuranceAssistanceRequested&&!insuranceIsActive()&&!discoveryPending(discoveryStatus)&&!data.insuranceCardStatus){
       showStep(2);
       throw new Error('We could not verify your insurance automatically. Choose active-coverage discovery or continue without insurance.');
     }
@@ -2151,7 +2170,8 @@ function showStep(step){
   qa('.panel').forEach(function(p){p.classList.toggle('active',Number(p.getAttribute('data-panel'))===step)});
   qa('.progress button').forEach(function(btn){
     var n=Number(btn.getAttribute('data-step'));
-    btn.classList.toggle('active',n===step);btn.classList.toggle('done',n<step);
+    btn.classList.toggle('active',n===step);btn.classList.toggle('done',n<=Number(FD.savedStep||1)&&n!==step);
+    btn.setAttribute('aria-current',n===step?'step':'false');
   });
   window.scrollTo({top:q('.main').offsetTop-10,behavior:'smooth'});
 }
@@ -2172,6 +2192,11 @@ function saveAndMove(target){
       if(data.paymentChoice==='SELF_PAY'){
         FD.estimate=selfPayEstimateFromPrice_();
         FD.busy=false;setBusy(false,'');showStep(target);toast('Saved — self-pay selected');
+        return;
+      }
+      if(data.insuranceAssistanceRequested){
+        FD.estimate=staffHelpEstimate_();
+        FD.busy=false;setBusy(false,'');showStep(target);toast('Saved — staff will review your insurance');
         return;
       }
       return queueEligibilityFromCurrentData(data).catch(function(err){
@@ -2248,9 +2273,31 @@ function fileToUpload(file,kind){
   });
 }
 
+function analyzeInsuranceCard(){
+  if(FD.busy)return;
+  var files=[];
+  if($('insuranceFront').files[0])files.push(fileToUpload($('insuranceFront').files[0],'insurance_front'));
+  if($('insuranceBack').files[0])files.push(fileToUpload($('insuranceBack').files[0],'insurance_back'));
+  if(!files.length){toast('Choose an insurance card image or PDF first.');return;}
+  FD.busy=true;setBusy(true,'Reading card…');$('insuranceAnalyzeStatus').textContent='Reading the card securely…';
+  Promise.all(files).then(function(uploads){return apiPost('insurance-analyze','2',collect(),uploads)}).then(function(res){
+    if(!res.success)throw new Error(res.error||'The card could not be read.');
+    var x=res.extracted||{};
+    if(x.insuranceCarrier)setValue('insuranceCarrier',x.insuranceCarrier);
+    if(x.payerId)setValue('payerId',x.payerId);
+    if(x.memberId)setValue('memberId',x.memberId);
+    if(x.groupId)setValue('groupId',x.groupId);
+    setRadio('insuranceCardStatus','upload');updateConditionalFields();
+    $('insuranceAnalyzeStatus').textContent=x.memberId?'Card details found. Checking coverage…':'We could not read every field. Please review the fields below.';
+    return queueEligibilityFromCurrentData(collect());
+  }).then(function(){
+    FD.busy=false;setBusy(false,'');$('insuranceAnalyzeStatus').textContent='Card read complete. Review the information below and continue.';
+  }).catch(function(err){FD.busy=false;setBusy(false,'');$('insuranceAnalyzeStatus').textContent='Please review or enter the card details below.';toast(err.message||'The card could not be read.');});
+}
+
 qa('[data-next]').forEach(function(btn){btn.addEventListener('click',function(){saveAndMove(Number(btn.getAttribute('data-next')))})});
 qa('[data-back]').forEach(function(btn){btn.addEventListener('click',function(){showStep(Number(btn.getAttribute('data-back')))})});
-qa('.progress button').forEach(function(btn){btn.addEventListener('click',function(){var step=Number(btn.getAttribute('data-step'));if(step<=FD.currentStep)showStep(step)})});
+qa('.progress button').forEach(function(btn){btn.addEventListener('click',function(){showStep(Number(btn.getAttribute('data-step')))})});
 qa('input[name="insuranceCardStatus"],input[name="photoIdStatus"],input[name="healthChange"]').forEach(function(el){el.addEventListener('change',updateConditionalFields)});
 $('hasSecondary').addEventListener('change',updateConditionalFields);
 $('noKnownAllergies').addEventListener('change',updateConditionalFields);
@@ -2276,6 +2323,7 @@ qa('input[name="paymentChoice"]').forEach(function(el){el.addEventListener('chan
   if(el.value==='SELF_PAY')selectSelfPay_(false);
   else{FD.insuranceUnlocked=false;applyPaymentChoiceUI_();}
 })});
+$('analyzeInsuranceCardBtn').addEventListener('click',analyzeInsuranceCard);
 $('showInsuranceCardChoicesBtn').addEventListener('click',showInsuranceCardChoices);
 $('showInsuranceCardChoicesVerifiedBtn').addEventListener('click',showInsuranceCardChoices);
 $('insuranceCarrier').addEventListener('change',syncPayerIdFromCarrier);
@@ -2306,6 +2354,9 @@ $('fuHealthChangeBtn').addEventListener('click',function(){showFollowUpHealthCha
 $('fuCancelHealthChangeBtn').addEventListener('click',keepFollowUpHealth_);
 $('fuSaveHealthChangeBtn').addEventListener('click',saveFollowUpHealth_);
 $('fuSubmitBtn').addEventListener('click',completeFollowUp_);
+
+// Insurance cards come first; manual entry remains immediately below as a fallback.
+(function(){var card=$('insuranceCardSection'),details=$('insuranceDetailsSection');if(card&&details&&details.parentNode)details.parentNode.insertBefore(card,details);})();
 
 boot();
 </script>
