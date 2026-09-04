@@ -1063,7 +1063,8 @@ function renderInsuranceCardRequirement(){
   var status=String(FD.eligibility&&FD.eligibility.status||'').toUpperCase();
   var choice=radioValue('insuranceCardStatus');
 
-  $('insuranceCardDefaultNote').classList.toggle('hidden',active||(!eligibilityPending(status)&&status&&status!=='NOT REQUESTED'&&status!=='EDITING'));
+  // Card-first workflow: show upload/bring choices before manual data entry.
+  $('insuranceCardDefaultNote').classList.add('hidden');
   $('insuranceCardVerifiedNote').classList.toggle('hidden',!active);
 
   var discoveryStatus=String(FD.discovery&&FD.discovery.status||'').toUpperCase();
@@ -1081,7 +1082,7 @@ function renderInsuranceCardRequirement(){
     $('insuranceCardVerifiedRadio').checked=true;
   }
 
-  if(needsHelp&&!choice){
+  if((!active||needsHelp)&&!choice){
     $('insuranceCardChoicesWrap').classList.remove('hidden');
   }
 }
