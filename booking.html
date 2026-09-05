@@ -205,10 +205,17 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 @media(max-width:767px){.mobile-bar{display:flex;}nav.links{display:none;}nav.links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:var(--ivory);border-bottom:1px solid var(--line);padding:20px 32px;gap:16px;}.menu-toggle{display:block;}body{padding-bottom:72px;}.brand .sub{display:none;}.mobile-bar .btn{flex:1;text-align:center;padding:14px;}}
 @media(max-width:560px){.type-grid,.mode-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.slot-grid{grid-template-columns:repeat(2,1fr);}}
 
-.practice-banner-wrap{display:none;background:#fff8ed;border-top:1px solid #e7d5ad;border-bottom:1px solid #e7d5ad;}
+.practice-banner-wrap{display:none;background:#b42318;border-top:1px solid #8f1b13;border-bottom:1px solid #8f1b13;box-shadow:0 4px 16px rgba(120,18,10,.18);overflow:hidden;}
 .practice-banner-wrap.show{display:block;}
-.practice-banner{max-width:1180px;margin:0 auto;padding:12px 24px;color:#70430d;font-size:14px;line-height:1.5;text-align:center;}
-.practice-banner + .practice-banner{border-top:1px solid #eadfc8;}
+.practice-banner{position:relative;overflow:hidden;color:#fff;font-size:15px;font-weight:800;line-height:1.35;letter-spacing:.035em;text-transform:uppercase;}
+.practice-banner + .practice-banner{border-top:1px solid rgba(255,255,255,.35);}
+.practice-banner-track{display:flex;width:max-content;will-change:transform;animation:practice-banner-scroll 16s linear infinite;}
+.practice-banner:hover .practice-banner-track{animation-play-state:paused;}
+.practice-banner-message{display:flex;align-items:center;justify-content:center;gap:13px;min-width:100vw;padding:13px 42px;white-space:nowrap;}
+.practice-banner-message::before,.practice-banner-message::after{content:'✦';color:#ffd166;font-size:13px;}
+@keyframes practice-banner-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(max-width:640px){.practice-banner{font-size:13px}.practice-banner-message{padding:12px 24px}.practice-banner-track{animation-duration:13s}}
+@media(prefers-reduced-motion:reduce){.practice-banner-track{width:100%;animation:none}.practice-banner-message{min-width:100%;white-space:normal;text-align:center}.practice-banner-message[aria-hidden="true"]{display:none}}
 
 </style>
 <!-- Google tag (gtag.js) -->
@@ -1295,7 +1302,13 @@ function renderPracticeBanners(banners) {
   }
 
   wrap.innerHTML = list.map(function(x){
-    return '<div class="practice-banner">' + escapeBookingHtml(String(x.message || '')) + '</div>';
+    var message = escapeBookingHtml(String(x.message || ''));
+    return '<div class="practice-banner" role="status" aria-label="Practice announcement: ' + message + '">' +
+      '<div class="practice-banner-track">' +
+        '<span class="practice-banner-message">' + message + '</span>' +
+        '<span class="practice-banner-message" aria-hidden="true">' + message + '</span>' +
+      '</div>' +
+    '</div>';
   }).join('');
   wrap.classList.add('show');
 }
