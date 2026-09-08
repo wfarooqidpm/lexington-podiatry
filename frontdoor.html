@@ -434,7 +434,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="field"><label for="address2">Address line 2</label><input id="address2" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
       <div class="grid3">
         <div class="field"><label for="city">City <span class="req">*</span></label><input id="city" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
-        <div class="field"><label for="state">State <span class="req">*</span></label><input id="state" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off" placeholder="NY"></div>
+        <div class="field"><label for="state">State <span class="req">*</span></label><select id="state" autocomplete="address-level1" required><option value="">Select state</option><option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="DC">District of Columbia</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY" selected>New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option><option value="AS">American Samoa</option><option value="GU">Guam</option><option value="MP">Northern Mariana Islands</option><option value="PR">Puerto Rico</option><option value="VI">U.S. Virgin Islands</option><option value="AA">Armed Forces Americas</option><option value="AE">Armed Forces Europe</option><option value="AP">Armed Forces Pacific</option></select></div>
         <div class="field"><label for="zip">ZIP code <span class="req">*</span></label><input id="zip" data-lpignore="true" data-1p-ignore="true" type="text" inputmode="numeric" autocomplete="off"></div>
       </div>
     </div>
@@ -1095,17 +1095,13 @@ function setVerifiedDemographicsLocked_(locked){
     'lastName',
     'dob',
     'phone',
-    'email',
-    'address1',
-    'address2',
-    'city',
-    'state',
-    'zip'
+    'email'
   ].forEach(function(id){
     var el=$(id);
     if(!el)return;
 
     el.readOnly=!!locked;
+    if(el.tagName==='SELECT')el.disabled=!!locked;
     el.setAttribute('aria-readonly',locked?'true':'false');
     el.classList.toggle('verified-input',!!locked);
   });
@@ -2040,6 +2036,8 @@ function hydrate(){
    'allergies','medications','medicalOther','surgicalHistory','hpi','secondaryCarrier',
    'secondaryMemberId','secondaryGroupId','signatureName'].forEach(function(id){setValue(id,d[id])});
 
+  setValue('state',fd239StateValue(d.state));
+
   setValue('insuranceCarrier',carrier);
   setValue('payerId',d.payerId||b.payerId);
   setValue('insurancePlan',d.insurancePlan||b.insurancePlan);
@@ -2418,6 +2416,11 @@ $('fuSubmitBtn').addEventListener('click',completeFollowUp_);
 
 /* Four-section registration; saves and downstream sync have separate lifetimes. */
 var FD230={keys:['personal','insurance','contract','additional'],labels:['Personal details','Insurance','Contract','Additional information'],queue:Promise.resolve(),timers:{},submitting:{},signed:false,uploads:{},insuranceKey:'',serial:{},polling:false};
+function fd239StateValue(value){
+ var v=String(value||'').trim();if(!v)return 'NY';
+ var options=Array.from($('state').options),match=options.find(function(o){return o.value.toUpperCase()===v.toUpperCase()||o.textContent.toUpperCase()===v.toUpperCase();});
+ return match?match.value:'';
+}
 function fd230PolicyKey(d){return [d.paymentChoice,d.insuranceCarrier,d.payerId,d.memberId,d.insurancePlan,d.groupId,d.firstName,d.lastName,d.dob,d.subscriberFirstName,d.subscriberLastName,d.subscriberDob].map(function(x){return String(x||'').trim().toLowerCase()}).join('|')}
 function fd230Progress(){
  var p=FD.data.sectionProgress||{},d=FD.data||{};
@@ -2492,6 +2495,7 @@ function fd230Save(section,submit){
  clearTimeout(FD230.timers[section]);
  var snapshot=collect(),signing=section==='contract'&&submit,sequence=(FD230.serial[section]||0)+1;FD230.serial[section]=sequence;
  var button=$(signing?'sectionSignBtn':'sectionSubmit-'+section),note=$('sectionNote-'+section);
+ if(submit&&section==='personal'){var missing=['firstName','lastName','dob','phone','email','address1','city','state','zip'].filter(function(k){return !String(snapshot[k]||'').trim();});if(missing.length){note.textContent='Please complete the highlighted personal details, then Save & continue.';missing.forEach(function(k){$(k).setAttribute('aria-invalid','true')});$(missing[0]).focus();return;}['firstName','lastName','dob','phone','email','address1','city','state','zip'].forEach(function(k){$(k).removeAttribute('aria-invalid')});}
  if(signing){try{if(!FD.agreement||!Array.isArray(FD.agreement.sections)||!FD.agreement.sections.length)throw new Error('Please reload so the contract text is available before signing.');['confirmationPolicyAccepted','noShowPolicyAccepted','privacyAcknowledged','treatmentConsent','financialPolicyAcknowledged','agreementAccepted'].forEach(function(k){if(!snapshot[k])throw new Error('Please review the contract acknowledgements before signing.');});if(!snapshot.signatureName)throw new Error('Please type your name to sign.');if(frontDoorIsVirtual_()&&!snapshot.telemedicineConsent)throw new Error('Please accept telemedicine consent for your video visit.');}catch(e){note.textContent=e.message;return;}}
  if(submit){FD230.submitting[section]=true;button.disabled=true;}note.textContent=signing?'Saving your signed contract…':'Saving…';
  var timer=setTimeout(function(){note.textContent='This is taking longer than expected. Your entries remain here; you can work in another section.'},12000);
@@ -2502,7 +2506,7 @@ function fd230Save(section,submit){
   note.textContent=signing?'Contract signed and saved.':submit?'Submitted. You can add missing details later.':'Draft saved.';
   if(submit){
    // Downstream work never blocks the next section or contract submission.
-   var sync=fd230Request('section-sync',section,{},false).catch(function(){});
+   var sync=fd230Request('section-sync',section,{},false).catch(function(){if(section==='personal')note.textContent='Your details are saved. Office sync is pending; staff can review them.';});
    if(section==='insurance'&&snapshot.paymentChoice!=='SELF_PAY'&&snapshot.insuranceCarrier&&snapshot.memberId){FD230.insuranceKey=fd230PolicyKey(snapshot);sync.then(function(){if(FD230.insuranceKey!==fd230PolicyKey(collect()))return;return queueEligibilityFromCurrentData(snapshot)}).then(fd230Render).catch(function(){fd230Render()});}
    var next=FD230.keys[FD230.keys.indexOf(section)+1];if(next)fd230Open(next);
   }
@@ -2536,4 +2540,5 @@ boot();
 </script>
 </body>
 </html>
+
 
