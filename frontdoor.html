@@ -501,7 +501,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         <div id="eligibilityText" style="margin-top:5px"></div>
         <div id="eligibilityDetails" class="hidden" style="margin-top:12px"></div>
         <div id="insuranceLockNote" class="insurance-lock-note hidden">
-          <span>Your verified insurance details are locked to prevent accidental changes.</span>
+          <span>These insurance details were checked. You can edit any field below; changes will need a new check.</span>
           <button class="btn secondary" type="button" id="changeInsuranceBtn">Change insurance</button>
         </div>
       </div>
@@ -1023,9 +1023,9 @@ function setInsuranceLocked(locked){
   ['insuranceCarrier','payerId','memberId','insurancePlan','groupId'].forEach(function(id){
     var el=$(id);
     if(!el)return;
-    el.readOnly=!!locked;
-    el.setAttribute('aria-readonly',locked?'true':'false');
-    el.classList.toggle('verified-input',!!locked);
+    el.readOnly=false;
+    el.setAttribute('aria-readonly','false');
+    el.classList.remove('verified-input');
   });
 
   setVerifiedDemographicsLocked_(locked);
@@ -1103,8 +1103,7 @@ function unlockInsuranceForChange(){
   $('payerVerified').classList.add('hidden');
   $('insuranceCardVerifiedRadio').checked=false;
 
-  setValue('insurancePlan','');
-  setValue('groupId','');
+  // Preserve imported values while the patient edits their insurance.
 
   FD.discovery=null;
   if(FD.discoveryTimer){
@@ -1122,7 +1121,7 @@ function unlockInsuranceForChange(){
 
   applyEligibilityResult(FD.eligibility);
   renderInsuranceCardRequirement();
-  toast('Insurance unlocked. Update it and we’ll verify again.');
+  toast('Insurance updated. We’ll check the new details when you continue.');
 }
 
 function renderVerifiedSideCard(res){
@@ -2334,9 +2333,9 @@ $('payerId').addEventListener('blur',syncCarrierFromPayerId);
 $('pharmacyNameSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacyLocationSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();searchPharmacy()}});
 $('pharmacy').addEventListener('input',function(){if(clean($('pharmacyNpi').value)&&clean($('pharmacy').value)!==clean(FD.data.pharmacy||'')){setValue('pharmacyNpi','');setValue('pharmacyPhone','');setValue('pharmacyAddress','')}renderPharmacySelection();renderStatusSidebar()});
-['insuranceCarrier','payerId','memberId'].forEach(function(id){
+['insuranceCarrier','payerId','memberId','insurancePlan','groupId'].forEach(function(id){
   $(id).addEventListener('input',function(){
-    if(insuranceIsActive())return;
+    if(insuranceIsActive())unlockInsuranceForChange();
     $('planVerified').classList.add('hidden');
     $('groupVerified').classList.add('hidden');
     $('payerVerified').classList.add('hidden');
@@ -2363,3 +2362,4 @@ boot();
 </script>
 </body>
 </html>
+
