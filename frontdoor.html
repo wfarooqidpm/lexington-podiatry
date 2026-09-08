@@ -912,17 +912,56 @@ function toast(msg){
 function setFatal(msg){
   $('loading').classList.add('hidden');$('app').classList.add('hidden');
   $('fatal').textContent=msg;$('fatal').classList.remove('hidden');
+  if(/could not load|failed to fetch|connection|network/i.test(String(msg))){
+    var retry=document.createElement('button');retry.type='button';retry.className='btn secondary';
+    retry.textContent='Try loading again';retry.style.marginTop='16px';
+    retry.onclick=function(){retry.disabled=true;$('fatal').classList.add('hidden');$('loading').classList.remove('hidden');$('loading').textContent='Loading your secure registration…';boot();};
+    $('fatal').appendChild(document.createElement('br'));$('fatal').appendChild(retry);
+  }
 }
 
 function gatewayReady(){return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(GATEWAY_URL)}
 function tokenFromUrl(){var p=new URLSearchParams(window.location.search);return clean(p.get('t')||'')}
 
+// v235: allow Apps Script cold starts and retry only transient read failures.
 function apiGet(){
-  var controller=(typeof AbortController!=='undefined')?new AbortController():null;
-  var timer=setTimeout(function(){if(controller)controller.abort();},12000);
-  return fetch(GATEWAY_URL+'?action=load&t='+encodeURIComponent(FD.token),controller?{signal:controller.signal}:undefined)
-    .then(function(r){clearTimeout(timer);return r.json()})
-    .catch(function(err){clearTimeout(timer);if(err&&err.name==='AbortError')throw new Error('We could not load your registration. Your appointment time is still reserved. Please refresh this page or call Lexington Podiatry.');throw err;});
+  function progress(text){
+    var el=$('loading');if(el&&!el.classList.contains('hidden'))el.textContent=text;
+  }
+  function attempt(number){
+    var controller=typeof AbortController!=='undefined'?new AbortController():null;
+    var deadline,notice;
+    var timeout=new Promise(function(resolve,reject){
+      deadline=setTimeout(function(){
+        var error=new Error('Registration connection timed out.');error.retryable=true;
+        reject(error);if(controller)controller.abort();
+      },45000);
+    });
+    notice=setTimeout(function(){progress('Still connecting securely. Please keep this page open…');},8000);
+    var request=Promise.resolve().then(function(){
+      return fetch(GATEWAY_URL+'?action=load&t='+encodeURIComponent(FD.token),{cache:'no-store',signal:controller?controller.signal:undefined});
+    }).then(function(response){
+      if(!response.ok){
+        var error=new Error('The registration service could not be reached.');
+        error.retryable=response.status===429||response.status>=500;
+        throw error;
+      }
+      return response.json();
+    });
+    return Promise.race([request,timeout]).then(function(result){
+      clearTimeout(deadline);clearTimeout(notice);return result;
+    },function(error){
+      clearTimeout(deadline);clearTimeout(notice);
+      var retryable=error.retryable===true||error.name==='TypeError'||error.name==='AbortError';
+      if(retryable&&number===0){
+        progress('The connection is taking longer than usual. Retrying securely…');
+        return new Promise(function(resolve){setTimeout(resolve,1500);}).then(function(){return attempt(1);});
+      }
+      if(retryable)throw new Error('We could not load your registration after retrying. Your appointment is still reserved. Please try loading again or call Lexington Podiatry.');
+      throw error;
+    });
+  }
+  return attempt(0);
 }
 
 function apiPost(action,step,data,uploads){
