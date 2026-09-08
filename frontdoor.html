@@ -257,6 +257,25 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .estimate-detail-list{margin:10px 0 0 18px;padding:0;color:#405047;font-size:13px;line-height:1.55}
 .estimate-detail-list li{margin:0 0 7px 0}
 
+/* One continuous form, with its status outside the working sections. */
+.four-sections .progress,.four-sections .panel>.nav-actions,.four-sections .layout>.sidebar>.side-card,.four-sections .frontdoor-side-intro,.four-sections #completePanel,.four-sections #finalEstimateSnapshot,.four-sections #confirmSummary,.four-sections .panel>h2,.four-sections #verifiedDemographicsNotice{display:none!important}
+.four-sections .layout{grid-template-columns:minmax(0,1fr) 260px;gap:32px}
+.four-sections .panel{display:block!important}.four-sections .panel>.intro{font-size:15px}
+.intake-layer{margin:0 0 18px;border:1px solid var(--line);border-radius:16px;background:var(--paper);padding:0;scroll-margin-top:110px;overflow:hidden}
+.intake-layer>summary{display:flex;align-items:center;gap:13px;list-style:none;padding:21px 23px;font-family:var(--serif);font-size:25px;font-weight:400;color:var(--ink)}
+.intake-layer>summary:after{content:'+';margin-left:auto;color:var(--brass)}.intake-layer[open]>summary:after{content:'−'}
+.intake-layer[open]>summary{border-bottom:1px solid var(--line-soft)}
+.section-number{font:700 13px var(--sans);color:var(--brass);border:1px solid var(--champagne);border-radius:50%;width:31px;height:31px;display:grid;place-items:center}
+.section-body{padding:22px}.section-body .section{padding:16px;background:var(--ivory)}.section-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:22px}.section-actions .save-state{flex:1;min-width:180px}
+#sectionProgress230{display:flex;flex-direction:column;position:relative;padding:12px 0}
+#sectionProgress230:before{content:'';position:absolute;left:18px;top:34px;bottom:40px;width:2px;background:var(--line)}
+.section-track-item{border:0;background:none;display:flex;gap:13px;align-items:center;text-align:left;padding:15px 0;position:relative;cursor:pointer;color:var(--ink)}
+.section-track-item strong{display:block;font-size:14px}.section-track-item small{display:block;font-size:12px;color:var(--ink-soft);margin-top:3px}
+.section-track-dot{display:grid;place-items:center;width:38px;height:38px;flex-shrink:0;border-radius:50%;background:#ad3636;color:white;font:700 14px var(--sans);border:4px solid var(--ivory)}
+.section-track-item.green .section-track-dot{background:#247653}.section-track-item.yellow .section-track-dot{background:#e0ad30;color:#32260b}.section-track-item.black .section-track-dot{background:#151515}
+@media(max-width:900px){.four-sections .layout{display:flex;flex-direction:column;gap:18px}.four-sections .layout>div{width:100%}.four-sections .layout>.sidebar{order:-1;position:sticky;top:0;z-index:20;width:100%;display:block;background:var(--ivory);border-bottom:1px solid var(--line);padding:4px 0}.four-sections .layout>.sidebar>.side-help{display:none}#sectionProgress230{flex-direction:row;justify-content:space-between;padding:2px 0}#sectionProgress230:before{left:12%;right:12%;top:24px;height:2px;width:auto;bottom:auto}.section-track-item{flex:1;flex-direction:column;text-align:center;gap:3px;padding:3px 1px}.section-track-item strong{font-size:11px}.section-track-item small{font-size:10px;line-height:1.2}.section-track-dot{width:35px;height:35px}.section-body{padding:16px}.intake-layer>summary{padding:17px;font-size:22px}.section-actions .btn{width:100%}}
+
+.four-sections #section-personal .req,.four-sections #section-insurance .req,.four-sections #section-additional .req{display:none}.four-sections #discoveryOffer .note{display:none}
 </style>
 </head>
 
@@ -510,7 +529,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
       <div id="discoveryOffer" class="discovery-offer hidden">
         <strong>We could not verify that insurance automatically.</strong>
-        <div class="note" style="margin-top:6px">Choose one of these two paths. We won’t keep asking you to retry the same insurance check.</div>
+        <div class="note" style="margin-top:6px">You can continue to your contract while our office follows up on coverage.</div>
         <div class="nav-actions" style="justify-content:flex-start;margin-top:12px">
           <button class="btn secondary" type="button" id="startDiscoveryBtn">Find my active coverage</button>
           <button class="btn primary" type="button" id="continueSelfPayBtn">Continue without insurance</button>
@@ -2357,6 +2376,122 @@ $('fuSubmitBtn').addEventListener('click',completeFollowUp_);
 
 // Insurance cards come first; manual entry remains immediately below as a fallback.
 (function(){var card=$('insuranceCardSection'),details=$('insuranceDetailsSection');if(card&&details&&details.parentNode)details.parentNode.insertBefore(card,details);})();
+
+/* Four-section registration; saves and downstream sync have separate lifetimes. */
+var FD230={keys:['personal','insurance','contract','additional'],labels:['Personal details','Insurance','Contract','Additional information'],queue:Promise.resolve(),timers:{},submitting:{},signed:false,uploads:{},insuranceKey:'',serial:{},polling:false};
+function fd230PolicyKey(d){return [d.paymentChoice,d.insuranceCarrier,d.payerId,d.memberId,d.insurancePlan,d.groupId,d.firstName,d.lastName,d.dob,d.subscriberFirstName,d.subscriberLastName,d.subscriberDob].map(function(x){return String(x||'').trim().toLowerCase()}).join('|')}
+function fd230Progress(){
+ var p=FD.data.sectionProgress||{},d=FD.data||{};
+ return FD230.keys.map(function(k){
+  if(k==='contract')return FD230.signed?'green':d.signatureName||d.agreementAccepted?'yellow':'red';
+  if(k==='insurance'){
+   if(paymentChoice()==='SELF_PAY'&&p.insurance&&p.insurance.submittedAt)return 'green';
+   var entered=clean($('insuranceCarrier').value)||clean($('memberId').value);if(!entered)return 'red';
+   var status=String(FD.eligibility&&FD.eligibility.status||'').toUpperCase();
+   if(status==='ACTIVE'&&!FD.insuranceUnlocked&&fd230PolicyKey(collect())===FD230.insuranceKey)return 'green';
+   if(/INACTIVE|REJECT|FAILED|ERROR|NOT_FOUND/.test(status))return 'black';
+   return 'yellow';
+  }
+  if(p[k]&&p[k].submittedAt)return 'green';
+  if(FD.completed&&d.flowVersion!=='FOUR_SECTIONS')return 'green';
+  if(p[k]&&p[k].savedAt)return 'yellow';
+  if(k==='personal'&&(d.address1||d.phone||FD.booking.firstName))return 'yellow';
+  if(k==='additional'&&(d.pharmacy||d.medications||d.hpi||(d.medicalHistory||[]).length))return 'yellow';
+  return 'red';
+ });
+}
+function fd230Render(){
+ if(!$('sectionProgress230'))return;
+ var states=fd230Progress();
+ $('sectionProgress230').innerHTML=FD230.keys.map(function(k,i){var state=states[i],status=state==='green'?(k==='insurance'&&paymentChoice()!=='SELF_PAY'?'Verified':'Submitted'):state==='yellow'?(k==='insurance'?'Entered · not verified':'Saved · not submitted'):state==='black'?'Verification failed':'Not entered';
+ return '<button type="button" class="section-track-item '+state+'" onclick="fd230Open(\''+k+'\')" aria-label="'+FD230.labels[i]+': '+status+'"><span class="section-track-dot">'+(state==='green'?'✓':i+1)+'</span><span><strong>'+FD230.labels[i]+'</strong><small>'+status+'</small></span></button>';
+ }).join('');
+ if(FD230.signed){$('sectionSignBtn').disabled=true;$('sectionSignBtn').textContent='Contract signed';$('sectionNote-contract').textContent='Your signed contract is saved. You can continue adding information below.';}
+}
+function fd230Open(key){var box=$('section-'+key);if(!box)return;box.open=true;box.scrollIntoView({behavior:'smooth',block:'start'});}
+function fd230Build(){
+ document.body.classList.add('four-sections');
+ var host=q('.layout > div'),panels={};qa('.panel[data-panel]').forEach(function(p){panels[p.dataset.panel]=p});
+ var placement={personal:['1'],insurance:['2','5'],contract:['4','6'],additional:['3']};
+ FD230.keys.forEach(function(k,i){var box=document.createElement('details');box.id='section-'+k;box.className='intake-layer';box.open=i===0;
+ var head=document.createElement('summary');head.innerHTML='<span class="section-number">'+(i+1)+'</span>'+FD230.labels[i];box.appendChild(head);
+ var content=document.createElement('div');content.className='section-body';box.appendChild(content);
+ placement[k].forEach(function(n){content.appendChild(panels[n]);});
+ var actions=document.createElement('div');actions.className='section-actions';
+ var button=document.createElement('button');button.type='button';button.className='btn primary';button.id=k==='contract'?'sectionSignBtn':'sectionSubmit-'+k;
+ button.textContent=k==='contract'?'Sign contract & continue':k==='additional'?'Submit additional information':'Save & continue';
+ button.addEventListener('click',function(){fd230Save(k,true)});actions.appendChild(button);
+ var note=document.createElement('span');note.id='sectionNote-'+k;note.className='save-state';note.setAttribute('role','status');actions.appendChild(note);content.appendChild(actions);host.appendChild(box);
+ box.addEventListener('input',function(e){if(e.target.type==='file')return;
+ if(k==='personal'||k==='insurance'){if(FD230.insuranceKey!==fd230PolicyKey(collect())){FD.insuranceUnlocked=true;FD.eligibility=null;}}
+ if(FD.data.sectionProgress&&FD.data.sectionProgress[k])FD.data.sectionProgress[k].submittedAt='';fd230Render();clearTimeout(FD230.timers[k]);FD230.timers[k]=setTimeout(function(){fd230Save(k,false)},900);});
+ box.addEventListener('change',function(e){if(e.target.type==='file')fd230UploadFiles();});
+ });
+ var aside=q('.layout > .sidebar'),rail=document.createElement('nav');rail.id='sectionProgress230';rail.setAttribute('aria-label','Registration progress');aside.prepend(rail);
+ q('.hero p').textContent='Save what you can in each section. Missing details can be added later, and insurance checks will not hold up your contract.';
+ $('completePanel').classList.add('hidden');
+ // A signature is an intentional action; restored typed text is never auto-signed.
+ fd230Render();
+}
+function fd230Request(action,section,data,submit,uploads){
+ var controller=typeof AbortController!=='undefined'?new AbortController():null;
+ var timer=setTimeout(function(){if(controller)controller.abort()},action==='sign-contract'?45000:25000);
+ return fetch(GATEWAY_URL,{method:'POST',signal:controller?controller.signal:undefined,body:JSON.stringify({action:action,token:FD.token,step:section,submit:!!submit,clientVersion:'v0.23.0',data:data||{},uploads:uploads||[]})}).then(function(r){return r.json()}).then(function(r){if(!r.success)throw new Error(r.error||'Could not save yet. Please try again.');return r}).catch(function(e){if(e.name==='AbortError')throw new Error('The save is taking longer than expected. Please check again.');throw e}).finally(function(){clearTimeout(timer)});
+}
+function fd230CheckContract(attempt){
+ if(FD230.polling||FD230.signed)return;FD230.polling=true;
+ fd230Request('contract-status','contract',{},false).then(function(res){
+  if(res.contractSigned){FD230.signed=true;FD.data.sectionProgress=res.sectionProgress||FD.data.sectionProgress;fd230Render();fd230Request('section-sync','contract',{},false).catch(function(){});}
+  else if(res.pending&&attempt<12){$('sectionNote-contract').textContent='Your signature is processing. You can continue with the other sections.';setTimeout(function(){fd230CheckContract(attempt+1)},5000);}
+  else{$('sectionNote-contract').textContent='Your entries are saved. Click Sign contract to retry or check its status.';}
+ }).catch(function(){$('sectionNote-contract').textContent='Could not confirm the signed document yet. Click Sign contract to check again.';}).finally(function(){FD230.polling=false;});
+}
+
+function fd230Save(section,submit){
+ if(FD230.signed&&section==='contract')return;
+ if(submit&&FD230.submitting[section])return;
+ clearTimeout(FD230.timers[section]);
+ var snapshot=collect(),signing=section==='contract'&&submit,sequence=(FD230.serial[section]||0)+1;FD230.serial[section]=sequence;
+ var button=$(signing?'sectionSignBtn':'sectionSubmit-'+section),note=$('sectionNote-'+section);
+ if(signing){try{if(!FD.agreement||!Array.isArray(FD.agreement.sections)||!FD.agreement.sections.length)throw new Error('Please reload so the contract text is available before signing.');['confirmationPolicyAccepted','noShowPolicyAccepted','privacyAcknowledged','treatmentConsent','financialPolicyAcknowledged','agreementAccepted'].forEach(function(k){if(!snapshot[k])throw new Error('Please review the contract acknowledgements before signing.');});if(!snapshot.signatureName)throw new Error('Please type your name to sign.');if(frontDoorIsVirtual_()&&!snapshot.telemedicineConsent)throw new Error('Please accept telemedicine consent for your video visit.');}catch(e){note.textContent=e.message;return;}}
+ if(submit){FD230.submitting[section]=true;button.disabled=true;}note.textContent=signing?'Saving your signed contract…':'Saving…';
+ var timer=setTimeout(function(){note.textContent='This is taking longer than expected. Your entries remain here; you can work in another section.'},12000);
+ FD230.queue=FD230.queue.catch(function(){}).then(function(){if(!submit&&sequence!==FD230.serial[section])return null;return fd230Request(signing?'sign-contract':'section-save',section,snapshot,submit)}).then(function(res){
+  if(!res)return;
+  if(signing&&!res.contractSigned){note.textContent='Your signature is processing. You can continue below.';fd230CheckContract(0);fd230Open('additional');return;}
+  FD.data=Object.assign({},FD.data,snapshot,{sectionProgress:res.sectionProgress||FD.data.sectionProgress||{}});FD230.signed=!!(FD230.signed||res.contractSigned);fd230Render();
+  note.textContent=signing?'Contract signed and saved.':submit?'Submitted. You can add missing details later.':'Draft saved.';
+  if(submit){
+   // Downstream work never blocks the next section or contract submission.
+   var sync=fd230Request('section-sync',section,{},false).catch(function(){});
+   if(section==='insurance'&&snapshot.paymentChoice!=='SELF_PAY'&&snapshot.insuranceCarrier&&snapshot.memberId){FD230.insuranceKey=fd230PolicyKey(snapshot);sync.then(function(){if(FD230.insuranceKey!==fd230PolicyKey(collect()))return;return queueEligibilityFromCurrentData(snapshot)}).then(fd230Render).catch(function(){fd230Render()});}
+   var next=FD230.keys[FD230.keys.indexOf(section)+1];if(next)fd230Open(next);
+  }
+ }).catch(function(e){note.textContent=e.message+' Your entries are still on this page.';if(signing)fd230CheckContract(0);}).finally(function(){clearTimeout(timer);if(submit){FD230.submitting[section]=false;button.disabled=section==='contract'&&FD230.signed;}});
+}
+function fd230UploadFiles(){
+ ['insuranceFront','insuranceBack','photoIdFile'].forEach(function(id){var el=$(id),file=el&&el.files[0];if(!file)return;var key=[file.name,file.size,file.lastModified].join('|');if(FD230.uploads[id]===key)return;
+ var kind={insuranceFront:'insurance_front',insuranceBack:'insurance_back',photoIdFile:'photo_id'}[id];
+ fileToUpload(file,kind).then(function(upload){return fd230Request('section-upload','insurance',{},false,[upload])}).then(function(res){FD230.uploads[id]=key;FD.uploadsOnFile=res.uploadsOnFile;$('sectionNote-insurance').textContent='Upload saved.';}).catch(function(){ $('sectionNote-insurance').textContent='Upload not received yet. You can retry it or continue and bring it to the office.';});
+ });
+}
+var fd230OldSidebar=renderStatusSidebar;renderStatusSidebar=function(){fd230OldSidebar();fd230Render();};
+var fd230OldEligibility=applyEligibilityResult;applyEligibilityResult=function(res){if(FD230.insuranceKey&&fd230PolicyKey(collect())!==FD230.insuranceKey)return;fd230OldEligibility(res);fd230Render();};
+setInsuranceLocked=function(){['insuranceCarrier','payerId','memberId','insurancePlan','groupId'].forEach(function(id){var el=$(id);el.readOnly=false;el.setAttribute('aria-readonly','false');el.classList.remove('verified-input');});setVerifiedDemographicsLocked_(false);};
+showStep=function(step){fd230Open(({1:'personal',2:'insurance',3:'additional',4:'contract',5:'insurance',6:'contract'})[step]||'personal');};
+boot=function(){
+ FD.token=tokenFromUrl();if(!/^[a-f0-9]{64}$/i.test(FD.token)){setFatal('Please use the Front Door link sent by Lexington Podiatry.');return;}
+ apiGet().then(function(res){if(!res.success)throw new Error(res.error||'Could not load registration.');
+ FD.booking=res.booking||{};FD.data=res.intake&&res.intake.data||{};FD.agreement=res.agreement||null;FD.eligibility=res.eligibility||null;FD.discovery=res.discovery||null;FD.estimate=res.estimate||null;FD.cashPrice=res.cashPrice||null;FD.completed=!!(res.intake&&res.intake.completed);FD.followUpMode=false;FD230.signed=!!(res.intake&&res.intake.contractSigned);
+ FD.uploadsOnFile=res.intake&&res.intake.uploadsOnFile||[];hydrate();
+ ['noKnownAllergies','medicationHistoryConsent','telemedicineConsent'].forEach(function(k){if(!Object.prototype.hasOwnProperty.call(FD.data,k))setCheck(k,false)});updateConditionalFields();FD230.insuranceKey=fd230PolicyKey(collect());fd230Build();
+ if(FD.eligibility&&FD.eligibility.status){applyEligibilityResult(FD.eligibility);if(eligibilityPending(FD.eligibility.status))pollEligibility();}
+ $('loading').classList.add('hidden');$('app').classList.remove('hidden');fd230Render();if(FD230.signed)fd230Open('additional');
+ }).catch(function(e){setFatal(e.message||'Could not load your registration. Please try again.');});
+};
+
+// Background card reading must never disable controls in unrelated sections.
+setBusy=function(on,msg){var b=$('analyzeInsuranceCardBtn');if(b)b.disabled=!!on;};
 
 boot();
 </script>
