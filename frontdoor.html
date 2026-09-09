@@ -2561,6 +2561,7 @@ function fd240Benefits(res){
 var fd240ApplyEligibility=applyEligibilityResult;
 applyEligibilityResult=function(res){
  if(FD230.insuranceKey&&FD230.insuranceKey!==fd230PolicyKey(collect()))return;
+ if(res&&res.estimate&&res.estimate.status==='PAYER VALIDATION REQUIRED')res.estimate.message='Your coverage details are shown above. The office will confirm your visit estimate.';
  fd240ApplyEligibility(res);FD240VerifiedKey=res&&res.status==='ACTIVE'?fd230PolicyKey(collect()):'';FD230.insuranceKey=fd230PolicyKey(collect());fd240Benefits(res);renderInsuranceCardRequirement();
  $('insuranceLockNote').classList.add('hidden');
 };
