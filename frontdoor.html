@@ -455,7 +455,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
   <section class="panel" data-panel="2">
     <h2>Insurance</h2>
-    <p class="intro">You don’t need to know a payer ID, deductible amount, or insurance billing code. If a payer ID is printed on your card, you can enter it to help us route the verification accurately.</p>
+    <p class="intro">Review the insurance details we have on file and edit anything that has changed. You do not need to re-enter information or upload a card we already have.</p>
 
     <div class="section">
       <div class="section-title">How would you like to handle this visit?</div>
@@ -2536,9 +2536,52 @@ boot=function(){
 // Background card reading must never disable controls in unrelated sections.
 setBusy=function(on,msg){var b=$('analyzeInsuranceCardBtn');if(b)b.disabled=!!on;};
 
+/* v240: review office-supplied insurance without repeating the upload. */
+function fd240HasCard(){return (FD.uploadsOnFile||[]).some(function(k){return /^insurance_(front|back)$/.test(k);});}
+var fd240CardRequirement=renderInsuranceCardRequirement;
+renderInsuranceCardRequirement=function(){
+ fd240CardRequirement();
+ var section=$('insuranceCardSection'),receipt=$('officeCardReceipt');
+ if(!receipt){receipt=document.createElement('div');receipt.id='officeCardReceipt';receipt.className='callout eligibility-success';receipt.setAttribute('role','status');receipt.innerHTML='<div style="font-size:44px;line-height:1;color:#187447" aria-hidden="true">✓</div><strong>Insurance card uploaded</strong><div>We already have your card. Review the details above and edit anything that has changed.</div>';section.insertBefore(receipt,section.firstChild);}
+ var onFile=fd240HasCard();receipt.classList.toggle('hidden',!onFile);
+ Array.from(section.children).forEach(function(el){if(el!==receipt)el.classList.toggle('office-card-covered',onFile);});
+};
+function fd240Benefits(res){
+ var box=$('officeBenefits');if(!box){box=document.createElement('div');box.id='officeBenefits';box.className='callout';$('insuranceDetailsSection').appendChild(box);}
+ var b=res&&res.benefits||{},parts=[];
+ function money(v){return Number(v).toLocaleString('en-US',{style:'currency',currency:'USD'});}
+ if(res&&res.status==='ACTIVE'){
+  if(b.copay!=null)parts.push('Specialist office copay: '+money(b.copay));
+  if(b.coinsurance!=null)parts.push('Office coinsurance: '+Number(b.coinsurance)+'%');
+  if(b.deductible!=null)parts.push('Individual in-network deductible remaining: '+money(b.deductible));
+ }
+ box.replaceChildren();box.classList.toggle('hidden',!parts.length);
+ if(parts.length){var h=document.createElement('strong');h.textContent='Your coverage check';box.appendChild(h);parts.forEach(function(t){var p=document.createElement('div');p.textContent=t;box.appendChild(p);});var note=document.createElement('p');note.className='note';note.textContent='Payer results as of '+new Date(res.checkedAt).toLocaleDateString()+'. These benefits are not a final bill; services provided may have different benefits.';box.appendChild(note);}
+}
+var fd240ApplyEligibility=applyEligibilityResult;
+applyEligibilityResult=function(res){
+ if(FD230.insuranceKey&&FD230.insuranceKey!==fd230PolicyKey(collect()))return;
+ fd240ApplyEligibility(res);FD240VerifiedKey=res&&res.status==='ACTIVE'?fd230PolicyKey(collect()):'';FD230.insuranceKey=fd230PolicyKey(collect());fd240Benefits(res);renderInsuranceCardRequirement();
+ $('insuranceLockNote').classList.add('hidden');
+};
+var FD240VerifiedKey='';
+var fd240QueueEligibility=queueEligibilityFromCurrentData;
+queueEligibilityFromCurrentData=function(data){
+ if(FD.eligibility&&FD.eligibility.status==='ACTIVE'&&FD240VerifiedKey===fd230PolicyKey(data)&&Date.now()-new Date(FD.eligibility.checkedAt).getTime()<86400000)return Promise.resolve(FD.eligibility);
+ return fd240QueueEligibility(data);
+};
+var fd240Render=fd230Render;
+fd230Render=function(){fd240Render();if(FD.insuranceUnlocked||FD240VerifiedKey&&FD240VerifiedKey!==fd230PolicyKey(collect()))fd240Benefits(null);renderInsuranceCardRequirement();};
+(function(){
+ var style=document.createElement('style');style.textContent='.office-card-covered{display:none!important}#officeCardReceipt{display:grid;gap:8px;text-align:center;padding:24px;background:#eef8f2;border:1px solid #b8ddc8}#officeCardReceipt.hidden{display:none}';document.head.appendChild(style);
+ var details=$('insuranceDetailsSection'),card=$('insuranceCardSection'),panel=details.parentNode,payment=panel.querySelector('.payment-choice').closest('.section');
+ panel.insertBefore(details,payment);panel.insertBefore(card,payment);
+})();
+
 boot();
 </script>
 </body>
 </html>
+
 
 
