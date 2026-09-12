@@ -348,51 +348,6 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
         <div class="form-group"><label for="npPhone">Phone number</label><input type="tel" id="npPhone" autocomplete="tel" inputmode="tel" placeholder="(212) 333-4444"><div class="phone-error" id="npPhoneError">Please enter a valid phone number for the selected country.</div></div>
       </div>
       <div class="form-group"><label for="npEmail">Email address</label><input type="email" id="npEmail" autocomplete="email" placeholder="jane@example.com"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="npInsurer">Insurance carrier</label>
-          <select id="npInsurer" onchange="handleInsurerChange(this)">
-            <option value="">Select your insurance…</option>
-            <option value="1199 SEIU">1199 SEIU</option>
-            <option value="Aetna">Aetna</option>
-            <option value="Anthem BCBS" data-warning="true">Anthem BCBS</option>
-            <option value="Cigna">Cigna</option>
-            <option value="Medicare">Medicare</option>
-            <option value="Medicare Advantage">Medicare Advantage</option>
-            <option value="No-Fault">No-Fault</option>
-            <option value="No insurance - self pay">No insurance – self pay</option>
-            <option value="Oxford UnitedHealthcare">Oxford UnitedHealthcare</option>
-            <option value="UnitedHealthcare" data-warning="true">UnitedHealthcare</option>
-            <option value="Other">Other</option>
-          </select>
-          <div id="insurerWarning" style="display:none;margin-top:10px;padding:12px 16px;background:#FEF9EC;border:1px solid var(--champagne);border-radius:8px;font-size:14px;color:var(--ink-soft);line-height:1.5;">
-            ⚠️ We accept PPO plans for this insurance, but are not formally contracted. Please confirm your plan type before booking.
-          </div>
-          <div id="medicareAdvantageGroup" style="display:none;margin-top:12px;">
-            <label for="npMedicareAdvantagePlan">Medicare Advantage plan</label>
-            <select id="npMedicareAdvantagePlan">
-              <option value="">Select your plan…</option>
-              <option value="Aetna Medicare Advantage">Aetna Medicare Advantage</option>
-              <option value="Anthem Medicare Advantage">Anthem Medicare Advantage</option>
-              <option value="EmblemHealth Medicare Advantage">EmblemHealth Medicare Advantage</option>
-              <option value="Fidelis Care Medicare Advantage">Fidelis Care Medicare Advantage</option>
-              <option value="Healthfirst Medicare Advantage">Healthfirst Medicare Advantage</option>
-              <option value="Humana Medicare Advantage">Humana Medicare Advantage</option>
-              <option value="MetroPlusHealth Medicare Advantage">MetroPlusHealth Medicare Advantage</option>
-              <option value="UnitedHealthcare Medicare Advantage">UnitedHealthcare Medicare Advantage</option>
-              <option value="Wellcare Medicare Advantage">Wellcare Medicare Advantage</option>
-              <option value="Other Medicare Advantage">Other</option>
-            </select>
-          </div>
-          <div id="insurerOtherGroup" style="display:none;margin-top:12px;">
-            <input type="text" id="insurerOther" placeholder="Please enter your insurance carrier…">
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="npInsId">Member ID</label>
-          <input type="text" id="npInsId" placeholder="Insurance member ID">
-        </div>
-      </div>
       <div class="secure-badge">🔒 Encrypted in transit</div>
     </div>
     <div class="form-nav"><button class="btn btn-ink" onclick="validateNewInfoAndReview()">Review &amp; confirm</button><button class="btn-back" onclick="goBack(2)">← Back</button></div>
@@ -804,14 +759,6 @@ function validateNewInfoAndReview() {
     phoneInput.classList.remove('invalid');
     phoneError.classList.remove('show');
   }
-  var insurer = document.getElementById('npInsConvenience');
-  var maPlan = document.getElementById('npMedicareAdvantagePlan');
-  if (insurer.value === 'Medicare Advantage' && !maPlan.value) {
-    maPlan.classList.add('invalid');
-    valid = false;
-  } else {
-    maPlan.classList.remove('invalid');
-  }
   if (!valid) return;
   goToStep4();
 }
@@ -1007,20 +954,6 @@ var slotDateOrder = [];
 var activeSlotDateIndex = 0;
 var activeSlotContainerId = 'slotContainer';
 
-function handleInsurerChange(sel) {
-  var warning = document.getElementById('insurerWarning');
-  var otherGroup = document.getElementById('insurerOtherGroup');
-  var advantageGroup = document.getElementById('medicareAdvantageGroup');
-  var opt = sel.options[sel.selectedIndex];
-  var val = sel.value;
-  warning.style.display = (opt && opt.getAttribute('data-warning') === 'true') ? 'block' : 'none';
-  otherGroup.style.display = (val === 'Other') ? 'block' : 'none';
-  advantageGroup.style.display = (val === 'Medicare Advantage') ? 'block' : 'none';
-  if (val !== 'Other') document.getElementById('insurerOther').value = '';
-  if (val !== 'Medicare Advantage') document.getElementById('npMedicareAdvantagePlan').value = '';
-  state.bookingPayload = null;
-}
-
 function renderSlots(slots, containerId) {
   var container = document.getElementById(containerId || 'slotContainer');
   allSlots = slots || [];
@@ -1180,17 +1113,10 @@ function goToStep4() {
   document.getElementById('panel4').classList.add('active');
   var summary = '';
   if (state.patientType === 'new') {
-    var insurerValue = document.getElementById('npInsurer').value;
-    var insurerDisplay = insurerValue === 'Other'
-      ? (document.getElementById('insurerOther').value.trim() || 'Other')
-      : (insurerValue === 'Medicare Advantage'
-          ? document.getElementById('npMedicareAdvantagePlan').value
-          : (insurerValue || 'Not provided'));
     summary = '<b>Name:</b> ' + document.getElementById('npFirst').value + ' ' + document.getElementById('npLast').value + '<br>' +
               '<b>Date of birth:</b> ' + document.getElementById('npDob').value + '<br>' +
               '<b>Phone:</b> ' + bookingPhoneNumber_('INTERNATIONAL') + '<br>' +
               '<b>Email:</b> ' + document.getElementById('npEmail').value + '<br>' +
-              '<b>Insurance:</b> ' + insurerDisplay + ' · ' + (document.getElementById('npInsId').value || 'Not provided') + '<br>' +
               '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
               '<b>Type:</b> New patient (' + bookingDurationLabel('new') + ')';
   } else {
@@ -1217,16 +1143,9 @@ function buildWebsiteBookingPayload() {
     payload.phone = bookingPhoneNumber_('E164');
     payload.email = document.getElementById('npEmail').value.trim();
 
-    var insurerVal = document.getElementById('npInsurer').value.trim();
-    payload.insurer = insurerVal === 'Other'
-      ? (document.getElementById('insurerOther').value.trim() || 'Other')
-      : insurerVal;
-
-    payload.insId = document.getElementById('npInsId').value.trim();
+    payload.insurer = '';
+    payload.insId = '';
     payload.payerId = '';
-    if (insurerVal === 'Medicare Advantage') {
-      payload.insurer = document.getElementById('npMedicareAdvantagePlan').value.trim();
-    }
     payload.reason = 'New patient visit';
     payload.notes = '';
 
