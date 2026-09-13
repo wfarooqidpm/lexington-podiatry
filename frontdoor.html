@@ -278,6 +278,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 @media(max-width:900px){.four-sections .layout{display:flex;flex-direction:column;gap:18px}.four-sections .layout>div{width:100%}.four-sections .layout>.sidebar{order:-1;position:sticky;top:0;z-index:20;width:100%;display:block;background:var(--ivory);border-bottom:1px solid var(--line);padding:4px 0}.four-sections .layout>.sidebar>.side-help{display:none}#sectionProgress230{flex-direction:row;justify-content:space-between;padding:2px 0}#sectionProgress230:before{left:12%;right:12%;top:24px;height:2px;width:auto;bottom:auto}.section-track-item{flex:1;flex-direction:column;text-align:center;gap:3px;padding:3px 1px}.section-track-item strong{font-size:11px}.section-track-item small{font-size:10px;line-height:1.2}.section-track-dot{width:35px;height:35px}.section-body{padding:16px}.intake-layer>summary{padding:17px;font-size:22px}.section-actions .btn{width:100%}}
 
 .four-sections #section-personal .req,.four-sections #section-insurance .req,.four-sections #section-additional .req{display:none}.four-sections #discoveryOffer .note{display:none}
+.registration-received{display:none;text-align:center;border:1px solid #b8d5c2;background:var(--good-bg);padding:30px 22px;border-radius:18px;margin:0 0 22px}
+.registration-received.show{display:block}.closed-door{font-size:46px;line-height:1;margin-bottom:10px}.registration-received h2{font-family:var(--serif);font-size:31px;font-weight:400;margin:0 0 7px}.registration-received p{max-width:580px;margin:0 auto;color:#3d5f4c}
+.intake-layer.optional-card{border-color:#9fc4d2;background:#f5fafc}.intake-layer.optional-card>summary{color:#25596b}.intake-layer.optional-card .section-number{border-radius:999px;width:auto;padding:0 10px;border-color:#9fc4d2;color:#25596b}
+.medical-card-view{display:none}.medical-card-view.show{display:block;border:1px solid #9fc4d2;background:#eaf3f7;border-radius:15px;padding:22px}.medical-card-view h3{font-family:var(--serif);font-size:25px;font-weight:400;color:#25596b;margin:0}.medical-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}.medical-card-item{background:rgba(255,255,255,.7);border:1px solid rgba(79,140,162,.28);border-radius:11px;padding:13px}.medical-card-item strong{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#4f6d78;margin-bottom:4px}.medical-card-item span{font-size:14px;color:#253f48;white-space:pre-line}.medical-card-view .btn{background:#25596b;color:white}.optional-skip{font-size:13px;color:var(--ink-soft);margin-top:9px}.default-choice{border:1px solid #b9d6c3;background:#eef6f0;border-radius:11px;padding:12px 13px;margin-bottom:14px;font-weight:700}.default-choice input{accent-color:var(--good)}
+@media(max-width:680px){.medical-card-grid{grid-template-columns:1fr}.registration-received{padding:25px 17px}}
 </style>
 </head>
 
@@ -629,9 +634,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div id="healthDetails">
       <div class="section">
         <div class="section-title">Allergies & medications</div>
-        <label class="check" style="margin-bottom:13px"><input id="noKnownAllergies" type="checkbox" checked><span>No known allergies</span></label>
+        <label class="check default-choice"><input id="noKnownAllergies" type="checkbox" checked><span>No food or drug allergies</span></label>
         <div class="field" id="allergyField"><label for="allergies">Allergies</label><textarea id="allergies" placeholder="Medication, food, adhesive, latex, or other allergies"></textarea></div>
-        <div class="field"><label for="medications">Current medications</label><textarea id="medications" placeholder="One medication per line is fine. Include dose if known."></textarea></div>
+        <label class="check default-choice"><input id="noCurrentMedications" type="checkbox" checked><span>Not currently taking medications</span></label>
+        <div class="field" id="medicationsField"><label for="medications">Current medications</label><textarea id="medications" placeholder="One medication per line is fine. Include dose if known."></textarea></div>
         <div class="field">
           <label>Preferred pharmacy</label>
           <div class="grid2">
@@ -655,6 +661,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
       <div class="section">
         <div class="section-title">Medical history</div>
+        <label class="check default-choice"><input id="noMedicalHistory" type="checkbox" checked><span>No past medical history</span></label>
+        <div id="medicalHistoryFields">
         <div class="check-grid" id="historyChecks">
           <label class="check"><input type="checkbox" value="Hypertension"><span>High blood pressure (hypertension)</span></label>
           <label class="check"><input type="checkbox" value="Hyperlipidemia"><span>High cholesterol (hyperlipidemia)</span></label>
@@ -682,7 +690,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           <label class="check"><input type="checkbox" value="Seizure Disorder"><span>Seizure disorder</span></label>
         </div>
         <div class="field" style="margin-top:16px"><label for="medicalOther">Other medical conditions</label><input id="medicalOther" type="text"></div>
-        <div class="field"><label for="surgicalHistory">Surgical history</label><textarea id="surgicalHistory" placeholder="Previous operations and approximate dates, if known"></textarea></div>
+        </div>
+        <label class="check default-choice"><input id="noSurgicalHistory" type="checkbox" checked><span>No past surgical history</span></label>
+        <div class="field" id="surgicalHistoryField"><label for="surgicalHistory">Surgical history</label><textarea id="surgicalHistory" placeholder="Previous operations and approximate dates, if known"></textarea></div>
       </div>
     </div>
 
@@ -933,8 +943,8 @@ function demoFrontDoorResponse_(){
     success:true,
     capabilities:{selfPayCashPrice:true,followUpReview:true},
     booking:{source:'WEBSITE',patientType:'NEW',appointmentDisplay:'Tuesday, September 15 at 10:00 AM',visitReason:'',firstName:'Alex',lastName:'Morgan',dob:'1988-04-12',phone:'+1 (212) 555-0147',email:'alex.morgan@example.com',insuranceCarrier:''},
-    intake:{completed:false,currentStep:1,data:{firstName:'Alex',lastName:'Morgan',dob:'1988-04-12',phone:'+1 (212) 555-0147',email:'alex.morgan@example.com',state:'NY',noKnownAllergies:true,medicationHistoryConsent:true,telemedicineConsent:true}},
-    agreement:null,
+    intake:{completed:false,currentStep:1,data:{firstName:'Alex',lastName:'Morgan',dob:'1988-04-12',phone:'+1 (212) 555-0147',email:'alex.morgan@example.com',state:'NY',noKnownAllergies:true,noCurrentMedications:true,noMedicalHistory:true,noSurgicalHistory:true,medicationHistoryConsent:true,telemedicineConsent:true}},
+    agreement:{version:'Demo',sections:[{title:'Demo patient agreement',paragraphs:['This preview uses a shortened sample agreement. Nothing entered here is saved or sent to the office.']}]},
     eligibility:{status:'NOT REQUESTED'},
     discovery:{status:'NOT REQUESTED'},
     cashPrice:{amount:120,label:'New patient visit'}
@@ -2068,6 +2078,9 @@ function hydrate(){
 
   setCheck('hasSecondary',!!d.hasSecondaryInsurance);
   setCheck('noKnownAllergies',Object.prototype.hasOwnProperty.call(d,'noKnownAllergies') ? !!d.noKnownAllergies : true);
+  setCheck('noCurrentMedications',Object.prototype.hasOwnProperty.call(d,'noCurrentMedications') ? !!d.noCurrentMedications : !clean(d.medications));
+  setCheck('noMedicalHistory',Object.prototype.hasOwnProperty.call(d,'noMedicalHistory') ? !!d.noMedicalHistory : !(Array.isArray(d.medicalHistory)&&d.medicalHistory.length)&&!clean(d.medicalOther));
+  setCheck('noSurgicalHistory',Object.prototype.hasOwnProperty.call(d,'noSurgicalHistory') ? !!d.noSurgicalHistory : !clean(d.surgicalHistory));
   setCheck('confirmationPolicyAccepted',!!d.confirmationPolicyAccepted);
   setCheck('noShowPolicyAccepted',!!d.noShowPolicyAccepted);
   setCheck('privacyAcknowledged',!!d.privacyAcknowledged);
@@ -2109,6 +2122,9 @@ function updateConditionalFields(){
   $('insuranceUploads').classList.toggle('hidden',radioValue('insuranceCardStatus')!=='upload');
   $('photoUpload').classList.toggle('hidden',radioValue('photoIdStatus')!=='upload');
   $('allergyField').classList.toggle('hidden',$('noKnownAllergies').checked);
+  $('medicationsField').classList.toggle('hidden',$('noCurrentMedications').checked);
+  $('medicalHistoryFields').classList.toggle('hidden',$('noMedicalHistory').checked);
+  $('surgicalHistoryField').classList.toggle('hidden',$('noSurgicalHistory').checked);
 
   var patientType=String(FD.booking.patientType||'').toUpperCase();
   var returning=patientType==='RETURNING'||patientType==='FOLLOW UP'||patientType==='FOLLOW-UP'||patientType==='FOLLOWUP';
@@ -2173,9 +2189,10 @@ function collect(){
     hasSecondaryInsurance:isSelfPay()?false:$('hasSecondary').checked,secondaryCarrier:isSelfPay()?'':clean($('secondaryCarrier').value),
     secondaryMemberId:isSelfPay()?'':clean($('secondaryMemberId').value),secondaryGroupId:isSelfPay()?'':clean($('secondaryGroupId').value),
     healthChange:radioValue('healthChange'),noKnownAllergies:$('noKnownAllergies').checked,
-    allergies:clean($('allergies').value),medications:clean($('medications').value),
-    medicalHistory:qa('#historyChecks input[type="checkbox"]:checked').map(function(cb){return cb.value}),
-    medicalOther:clean($('medicalOther').value),surgicalHistory:clean($('surgicalHistory').value),hpi:clean($('hpi').value),
+    noCurrentMedications:$('noCurrentMedications').checked,noMedicalHistory:$('noMedicalHistory').checked,noSurgicalHistory:$('noSurgicalHistory').checked,
+    allergies:$('noKnownAllergies').checked?'':clean($('allergies').value),medications:$('noCurrentMedications').checked?'':clean($('medications').value),
+    medicalHistory:$('noMedicalHistory').checked?[]:qa('#historyChecks input[type="checkbox"]:checked').map(function(cb){return cb.value}),
+    medicalOther:$('noMedicalHistory').checked?'':clean($('medicalOther').value),surgicalHistory:$('noSurgicalHistory').checked?'':clean($('surgicalHistory').value),hpi:clean($('hpi').value),
     confirmationPolicyAccepted:$('confirmationPolicyAccepted').checked,noShowPolicyAccepted:$('noShowPolicyAccepted').checked,
     privacyAcknowledged:$('privacyAcknowledged').checked,treatmentConsent:$('treatmentConsent').checked,
     medicationHistoryConsent:$('medicationHistoryConsent').checked,telemedicineConsent:$('telemedicineConsent').checked,
@@ -2436,7 +2453,7 @@ $('fuSubmitBtn').addEventListener('click',completeFollowUp_);
 (function(){var card=$('insuranceCardSection'),details=$('insuranceDetailsSection');if(card&&details&&details.parentNode)details.parentNode.insertBefore(card,details);})();
 
 /* Four-section registration; saves and downstream sync have separate lifetimes. */
-var FD230={keys:['personal','insurance','contract','additional'],labels:['Personal details','Insurance','Contract','Additional information'],queue:Promise.resolve(),timers:{},submitting:{},signed:false,uploads:{},insuranceKey:'',serial:{},polling:false};
+var FD230={keys:['personal','insurance','contract','additional'],labels:['Demographics','Insurance','Contract','Medical card'],queue:Promise.resolve(),timers:{},submitting:{},signed:false,medicalLocked:false,uploads:{},insuranceKey:'',serial:{},polling:false};
 function fd239StateValue(value){
  var v=String(value||'').trim();if(!v)return 'NY';
  var options=Array.from($('state').options),match=options.find(function(o){return o.value.toUpperCase()===v.toUpperCase()||o.textContent.toUpperCase()===v.toUpperCase();});
@@ -2467,22 +2484,24 @@ function fd230Render(){
  if(!$('sectionProgress230'))return;
  var states=fd230Progress();
  $('sectionProgress230').innerHTML=FD230.keys.map(function(k,i){var state=states[i],status=state==='green'?(k==='insurance'&&paymentChoice()!=='SELF_PAY'?'Verified':'Submitted'):state==='yellow'?(k==='insurance'?'Entered · not verified':'Saved · not submitted'):state==='black'?'Verification failed':'Not entered';
- return '<button type="button" class="section-track-item '+state+'" onclick="fd230Open(\''+k+'\')" aria-label="'+FD230.labels[i]+': '+status+'"><span class="section-track-dot">'+(state==='green'?'✓':i+1)+'</span><span><strong>'+FD230.labels[i]+'</strong><small>'+status+'</small></span></button>';
+ return '<button type="button" class="section-track-item '+state+'" onclick="fd230Open(\''+k+'\')" aria-label="'+FD230.labels[i]+': '+status+'"><span class="section-track-dot">'+(state==='green'?'✓':k==='additional'?'+':i+1)+'</span><span><strong>'+(k==='additional'?'+ Medical card':FD230.labels[i])+'</strong><small>'+(k==='additional'?(state==='green'?'Saved':'Optional'):status)+'</small></span></button>';
  }).join('');
- if(FD230.signed){$('sectionSignBtn').disabled=true;$('sectionSignBtn').textContent='Contract signed';$('sectionNote-contract').textContent='Your signed contract is saved. You can continue adding information below.';}
+ if(FD230.signed){$('sectionSignBtn').disabled=true;$('sectionSignBtn').textContent='Contract signed';$('sectionNote-contract').textContent='Your signed contract is saved.';fd230ShowRegistrationReceived();}
 }
 function fd230Open(key){var box=$('section-'+key);if(!box)return;box.open=true;box.scrollIntoView({behavior:'smooth',block:'start'});}
 function fd230Build(){
  document.body.classList.add('four-sections');
  var host=q('.layout > div'),panels={};qa('.panel[data-panel]').forEach(function(p){panels[p.dataset.panel]=p});
+ var received=document.createElement('section');received.id='registrationReceived';received.className='registration-received';received.setAttribute('role','status');received.innerHTML='<div class="closed-door" aria-hidden="true">🚪</div><h2>Registration received</h2><p>Your demographics, insurance information, and signed contract have been submitted. You are ready to come into the office.</p>';host.appendChild(received);
  var placement={personal:['1'],insurance:['2','5'],contract:['4','6'],additional:['3']};
  FD230.keys.forEach(function(k,i){var box=document.createElement('details');box.id='section-'+k;box.className='intake-layer';box.open=i===0;
- var head=document.createElement('summary');head.innerHTML='<span class="section-number">'+(i+1)+'</span>'+FD230.labels[i];box.appendChild(head);
+ if(k==='additional')box.classList.add('optional-card');
+ var head=document.createElement('summary');head.innerHTML='<span class="section-number">'+(k==='additional'?'+':i+1)+'</span>'+FD230.labels[i]+(k==='additional'?' <small style="font:600 12px var(--sans);color:var(--ink-soft)">optional · may be updated later</small>':'');box.appendChild(head);
  var content=document.createElement('div');content.className='section-body';box.appendChild(content);
  placement[k].forEach(function(n){content.appendChild(panels[n]);});
  var actions=document.createElement('div');actions.className='section-actions';
  var button=document.createElement('button');button.type='button';button.className='btn primary';button.id=k==='contract'?'sectionSignBtn':'sectionSubmit-'+k;
- button.textContent=k==='contract'?'Sign contract & continue':k==='additional'?'Submit additional information':'Save & continue';
+ button.textContent=k==='contract'?'Sign & submit registration':k==='additional'?'Save medical card':'Save & continue';
  button.addEventListener('click',function(){fd230Save(k,true)});actions.appendChild(button);
  var note=document.createElement('span');note.id='sectionNote-'+k;note.className='save-state';note.setAttribute('role','status');actions.appendChild(note);content.appendChild(actions);host.appendChild(box);
  box.addEventListener('input',function(e){if(e.target.type==='file')return;
@@ -2490,13 +2509,38 @@ function fd230Build(){
  if(FD.data.sectionProgress&&FD.data.sectionProgress[k])FD.data.sectionProgress[k].submittedAt='';fd230Render();clearTimeout(FD230.timers[k]);FD230.timers[k]=setTimeout(function(){fd230Save(k,false)},900);});
  box.addEventListener('change',function(e){if(e.target.type==='file')fd230UploadFiles();});
  });
+ var additionalBody=$('section-additional').querySelector('.section-body');
+ var card=document.createElement('div');card.id='medicalCardView';card.className='medical-card-view';card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><div class="eyebrow">Your information</div><h3>Medical card</h3></div><span aria-hidden="true" style="font-size:25px">🔒</span></div><div class="medical-card-grid" id="medicalCardGrid"></div><button type="button" class="btn" id="medicalCardUpdate">Update medical card</button>';additionalBody.appendChild(card);
+ $('medicalCardUpdate').addEventListener('click',function(){FD230.medicalLocked=false;fd230RenderMedicalCard();});
  var aside=q('.layout > .sidebar'),rail=document.createElement('nav');rail.id='sectionProgress230';rail.setAttribute('aria-label','Registration progress');aside.prepend(rail);
- q('.hero p').textContent='Save what you can in each section. Missing details can be added later, and insurance checks will not hold up your contract.';
+ q('.hero p').textContent='Complete demographics, insurance, and your contract. Your medical card is optional and can be updated at any time.';
  $('completePanel').classList.add('hidden');
  // A signature is an intentional action; restored typed text is never auto-signed.
  fd230Render();
 }
+function fd230ShowRegistrationReceived(){
+ var received=$('registrationReceived');if(received)received.classList.add('show');
+ ['personal','insurance','contract'].forEach(function(k){var box=$('section-'+k);if(box)box.open=false;});
+ var additional=$('section-additional');if(additional)additional.open=true;
+}
+function fd230MedicalText(snapshot){
+ var history=snapshot.noMedicalHistory?'No past medical history':(snapshot.medicalHistory||[]).concat(snapshot.medicalOther?[snapshot.medicalOther]:[]).join(', ')||'Not provided';
+ return [
+  ['Medical history',history],
+  ['Surgical history',snapshot.noSurgicalHistory?'No past surgical history':snapshot.surgicalHistory||'Not provided'],
+  ['Medications',snapshot.noCurrentMedications?'Not currently taking medications':snapshot.medications||'Not provided'],
+  ['Allergies',snapshot.noKnownAllergies?'No food or drug allergies':snapshot.allergies||'Not provided'],
+  ['Preferred pharmacy',snapshot.pharmacy||'Not selected']
+ ];
+}
+function fd230RenderMedicalCard(){
+ var section=$('section-additional'),view=$('medicalCardView');if(!section||!view)return;
+ Array.from(section.querySelector('.section-body').children).forEach(function(el){if(el!==view)el.classList.toggle('hidden',FD230.medicalLocked);});
+ view.classList.toggle('show',FD230.medicalLocked);
+ if(FD230.medicalLocked)$('medicalCardGrid').innerHTML=fd230MedicalText(collect()).map(function(x){return '<div class="medical-card-item"><strong>'+escapeHtml(x[0])+'</strong><span>'+escapeHtml(x[1])+'</span></div>';}).join('');
+}
 function fd230Request(action,section,data,submit,uploads){
+ if(FD.demo)return Promise.resolve({success:true,status:'DEMO',data:data||{},contractSigned:action==='sign-contract',sectionProgress:Object.assign({},FD.data.sectionProgress||{},submit?{[section]:{savedAt:new Date().toISOString(),submittedAt:new Date().toISOString()}}:{[section]:{savedAt:new Date().toISOString(),submittedAt:''}})});
  var controller=typeof AbortController!=='undefined'?new AbortController():null;
  var timer=setTimeout(function(){if(controller)controller.abort()},action==='sign-contract'?45000:25000);
  return fetch(GATEWAY_URL,{method:'POST',signal:controller?controller.signal:undefined,body:JSON.stringify({action:action,token:FD.token,step:section,submit:!!submit,clientVersion:'v0.23.0',data:data||{},uploads:uploads||[]})}).then(function(r){return r.json()}).then(function(r){if(!r.success)throw new Error(r.error||'Could not save yet. Please try again.');return r}).catch(function(e){if(e.name==='AbortError')throw new Error('The save is taking longer than expected. Please check again.');throw e}).finally(function(){clearTimeout(timer)});
@@ -2522,14 +2566,16 @@ function fd230Save(section,submit){
  var timer=setTimeout(function(){note.textContent='This is taking longer than expected. Your entries remain here; you can work in another section.'},12000);
  FD230.queue=FD230.queue.catch(function(){}).then(function(){if(!submit&&sequence!==FD230.serial[section])return null;return fd230Request(signing?'sign-contract':'section-save',section,snapshot,submit)}).then(function(res){
   if(!res)return;
-  if(signing&&!res.contractSigned){note.textContent='Your signature is processing. You can continue below.';fd230CheckContract(0);fd230Open('additional');return;}
+  if(signing&&!res.contractSigned){note.textContent='Your signature is processing. You may complete the optional medical card while we confirm it.';fd230CheckContract(0);fd230Open('additional');return;}
   FD.data=Object.assign({},FD.data,snapshot,{sectionProgress:res.sectionProgress||FD.data.sectionProgress||{}});FD230.signed=!!(FD230.signed||res.contractSigned);fd230Render();
-  note.textContent=signing?'Contract signed and saved.':submit?'Submitted. You can add missing details later.':'Draft saved.';
+  note.textContent=signing?'Registration submitted. You are ready for the office.':submit?(section==='additional'?'Medical card saved.':'Submitted. You can add missing details later.'):'Draft saved.';
   if(submit){
    // Downstream work never blocks the next section or contract submission.
    var sync=fd230Request('section-sync',section,{},false).catch(function(){if(section==='personal')note.textContent='Your details are saved. Office sync is pending; staff can review them.';});
    if(section==='insurance'&&snapshot.paymentChoice!=='SELF_PAY'&&snapshot.insuranceCarrier&&snapshot.memberId){FD230.insuranceKey=fd230PolicyKey(snapshot);sync.then(function(){if(FD230.insuranceKey!==fd230PolicyKey(collect()))return;return queueEligibilityFromCurrentData(snapshot)}).then(fd230Render).catch(function(){fd230Render()});}
-   var next=FD230.keys[FD230.keys.indexOf(section)+1];if(next)fd230Open(next);
+   if(signing){fd230ShowRegistrationReceived();fd230Open('additional');}
+   else if(section==='additional'){FD230.medicalLocked=true;fd230RenderMedicalCard();}
+   else{var next=FD230.keys[FD230.keys.indexOf(section)+1];if(next)fd230Open(next);}
   }
  }).catch(function(e){note.textContent=e.message+' Your entries are still on this page.';if(signing)fd230CheckContract(0);}).finally(function(){clearTimeout(timer);if(submit){FD230.submitting[section]=false;button.disabled=section==='contract'&&FD230.signed;}});
 }
@@ -2544,11 +2590,12 @@ var fd230OldEligibility=applyEligibilityResult;applyEligibilityResult=function(r
 setInsuranceLocked=function(){['insuranceCarrier','payerId','memberId','insurancePlan','groupId'].forEach(function(id){var el=$(id);el.readOnly=false;el.setAttribute('aria-readonly','false');el.classList.remove('verified-input');});setVerifiedDemographicsLocked_(false);};
 showStep=function(step){fd230Open(({1:'personal',2:'insurance',3:'additional',4:'contract',5:'insurance',6:'contract'})[step]||'personal');};
 boot=function(){
- FD.token=tokenFromUrl();if(!/^[a-f0-9]{64}$/i.test(FD.token)){setFatal('Please use the Front Door link sent by Lexington Podiatry.');return;}
+ FD.demo=demoFromUrl();FD.token=FD.demo?'DEMO':tokenFromUrl();if(!FD.demo&&!/^[a-f0-9]{64}$/i.test(FD.token)){setFatal('Please use the Front Door link sent by Lexington Podiatry.');return;}
  apiGet().then(function(res){if(!res.success)throw new Error(res.error||'Could not load registration.');
  FD.booking=res.booking||{};FD.data=res.intake&&res.intake.data||{};FD.agreement=res.agreement||null;FD.eligibility=res.eligibility||null;FD.discovery=res.discovery||null;FD.estimate=res.estimate||null;FD.cashPrice=res.cashPrice||null;FD.completed=!!(res.intake&&res.intake.completed);FD.followUpMode=false;FD230.signed=!!(res.intake&&res.intake.contractSigned);
  FD.uploadsOnFile=res.intake&&res.intake.uploadsOnFile||[];hydrate();
- ['noKnownAllergies','medicationHistoryConsent','telemedicineConsent'].forEach(function(k){if(!Object.prototype.hasOwnProperty.call(FD.data,k))setCheck(k,false)});updateConditionalFields();FD230.insuranceKey=fd230PolicyKey(collect());fd230Build();
+ ['noKnownAllergies','noCurrentMedications','noMedicalHistory','noSurgicalHistory'].forEach(function(k){if(!Object.prototype.hasOwnProperty.call(FD.data,k))setCheck(k,true)});updateConditionalFields();FD230.insuranceKey=fd230PolicyKey(collect());fd230Build();
+ ['noKnownAllergies','noCurrentMedications','noMedicalHistory','noSurgicalHistory'].forEach(function(k){$(k).addEventListener('change',updateConditionalFields)});
  if(FD.eligibility&&FD.eligibility.status){applyEligibilityResult(FD.eligibility);if(eligibilityPending(FD.eligibility.status))pollEligibility();}
  $('loading').classList.add('hidden');$('app').classList.remove('hidden');fd230Render();if(FD230.signed)fd230Open('additional');
  }).catch(function(e){setFatal(e.message||'Could not load your registration. Please try again.');});
@@ -2604,6 +2651,3 @@ boot();
 </script>
 </body>
 </html>
-
-
-
