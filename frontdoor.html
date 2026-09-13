@@ -41,7 +41,9 @@ a{color:inherit}.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
 .hero h1 em{font-weight:400;color:var(--brass)}
 .hero p{margin:14px 0 0;color:var(--ink-soft);max-width:700px;font-size:18px}
 .loading,.fatal{max-width:720px;margin:60px auto;padding:30px;border:1px solid var(--line);border-radius:16px;background:var(--paper)}
-.fatal{border-color:#e0b8b8;background:var(--bad-bg);color:var(--bad)}.hidden{display:none!important}
+.fatal{border-color:#e0b8b8;background:var(--bad-bg);color:var(--bad)}
+.demo-notice{margin:0 0 22px;padding:12px 16px;border:1px solid var(--champagne);border-radius:10px;background:var(--champagne-soft);color:var(--brass-deep);font-size:14px;font-weight:700;text-align:center}
+.hidden{display:none!important}
 .main{padding:44px 0 88px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:52px;align-items:start}
 .appointment-card{background:var(--walnut);color:var(--ivory);border-radius:16px;padding:24px;margin-bottom:28px}
 .appointment-card .small{color:var(--champagne);font-size:11px;text-transform:uppercase;letter-spacing:.17em;font-weight:700}
@@ -309,6 +311,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <main id="app" class="main hidden">
 <div class="wrap">
+<div id="demoNotice" class="demo-notice hidden">Demo preview — this fictional patient’s information is not saved or sent to the office.</div>
 
 <section id="followUpReview" class="followup-review hidden" aria-label="Follow-up Front Door review">
   <div id="followUpPreparing" class="fu-card fu-preparing hidden">
@@ -890,7 +893,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
 var CLIENT_VERSION = 'v0.13.0';
 
-var FD = {token:'',booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null,insuranceEstimate:null,cashPrice:null,followUpMode:false,followUpStartedAt:0};
+var FD = {token:'',demo:false,booking:null,data:{},agreement:null,currentStep:1,savedStep:1,completed:false,busy:false,eligibility:null,discovery:null,eligibilityTimer:null,eligibilityStartedAt:0,discoveryTimer:null,discoveryStartedAt:0,insuranceUnlocked:false,estimate:null,insuranceEstimate:null,cashPrice:null,followUpMode:false,followUpStartedAt:0};
 
 function $(id){return document.getElementById(id)}
 function q(sel){return document.querySelector(sel)}
@@ -922,9 +925,24 @@ function setFatal(msg){
 
 function gatewayReady(){return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(GATEWAY_URL)}
 function tokenFromUrl(){var p=new URLSearchParams(window.location.search);return clean(p.get('t')||'')}
+function demoFromUrl(){var p=new URLSearchParams(window.location.search);return p.get('demo')==='1'}
 
 // v235: allow Apps Script cold starts and retry only transient read failures.
+function demoFrontDoorResponse_(){
+  return {
+    success:true,
+    capabilities:{selfPayCashPrice:true,followUpReview:true},
+    booking:{source:'WEBSITE',patientType:'NEW',appointmentDisplay:'Tuesday, September 15 at 10:00 AM',visitReason:'',firstName:'Alex',lastName:'Morgan',dob:'1988-04-12',phone:'+1 (212) 555-0147',email:'alex.morgan@example.com',insuranceCarrier:''},
+    intake:{completed:false,currentStep:1,data:{firstName:'Alex',lastName:'Morgan',dob:'1988-04-12',phone:'+1 (212) 555-0147',email:'alex.morgan@example.com',state:'NY',noKnownAllergies:true,medicationHistoryConsent:true,telemedicineConsent:true}},
+    agreement:null,
+    eligibility:{status:'NOT REQUESTED'},
+    discovery:{status:'NOT REQUESTED'},
+    cashPrice:{amount:120,label:'New patient visit'}
+  };
+}
+
 function apiGet(){
+  if(FD.demo)return Promise.resolve(demoFrontDoorResponse_());
   function progress(text){
     var el=$('loading');if(el&&!el.classList.contains('hidden'))el.textContent=text;
   }
@@ -965,6 +983,7 @@ function apiGet(){
 }
 
 function apiPost(action,step,data,uploads){
+  if(FD.demo)return Promise.resolve({success:true,status:'DEMO',data:data||{}});
   return fetch(GATEWAY_URL,{
     method:'POST',
     body:JSON.stringify({action:action,token:FD.token,step:step,clientVersion:CLIENT_VERSION,data:data,uploads:uploads||[]})
@@ -1935,14 +1954,15 @@ function waitForFollowUpSnapshot_(){
 }
 
 function boot(){
-  FD.token=tokenFromUrl();
+  FD.demo=demoFromUrl();
+  FD.token=FD.demo?'DEMO':tokenFromUrl();
 
-  if(!gatewayReady()){
+  if(!FD.demo&&!gatewayReady()){
     setFatal('Front Door is not connected yet. The gateway deployment URL still needs to be added to this page.');
     return;
   }
 
-  if(!/^[a-f0-9]{64}$/i.test(FD.token)){
+  if(!FD.demo&&!/^[a-f0-9]{64}$/i.test(FD.token)){
     setFatal('This Front Door link is invalid or incomplete. Please use the link sent by Lexington Podiatry.');
     return;
   }
@@ -1963,6 +1983,7 @@ function boot(){
     FD.completed=!!(res.intake&&res.intake.completed);
     FD.followUpMode=isFollowUpBooking_();
 
+    if(FD.demo)$('demoNotice').classList.remove('hidden');
     hydrate();
     if(FD.followUpMode){
       if(!(res.capabilities&&res.capabilities.followUpReview))throw new Error('The follow-up review update has not reached the Front Door gateway yet.');
