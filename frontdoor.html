@@ -2902,7 +2902,7 @@ fd250Init=function(){fd253Init();if(!FD.demo)return;
  $('pharmacySearchBtn').before(locationFields);$('pharmacyState').innerHTML=$('state').innerHTML;setValue('pharmacyState',FD.data.state||'NY');var oldSearch=$('pharmacySearchBtn'),newSearch=oldSearch.cloneNode(true);oldSearch.replaceWith(newSearch);newSearch.textContent='Search';newSearch.addEventListener('click',searchPharmacy);
  $('bookingReason').closest('.field').classList.add('hidden');var visit=document.createElement('div');visit.id='visitReasonChoices';visit.className='check-grid';['Foot consultation','Heel pain','Foot pain','Ingrown toenail','Fungal toenail','Bunion','Hammertoe','Plantar wart','Callus / corn','Ankle pain','Orthotics','Other'].forEach(function(reason){var label=document.createElement('label');label.className='choice';var cb=document.createElement('input');cb.type='checkbox';cb.value=reason;cb.checked=(FD.data.visitReasons||[]).indexOf(reason)>=0;label.appendChild(cb);label.appendChild(document.createTextNode(reason));visit.appendChild(label);});$('bookingReason').closest('.field').before(visit);
  $('hpi').previousElementSibling.textContent='Anything else you would like us to know?';
- $('section-additional').open=true;if(new URLSearchParams(location.search).get('test')==='filled')FD230.medicalLocked=true;updateConditionalFields();fd230RenderMedicalCard();
+ $('section-additional').open=!!FD230.signed;if(new URLSearchParams(location.search).get('test')==='filled')FD230.medicalLocked=true;updateConditionalFields();fd230RenderMedicalCard();
 };
 var fd253Pharmacy=searchPharmacy;
 searchPharmacy=function(){if(!FD.demo)return fd253Pharmacy();var city=clean($('pharmacyCity').value),state=$('pharmacyState').value,zip=clean($('pharmacyZip').value),results=$('pharmacyResults');if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a town/city and state, or a five-digit ZIP code.';return;}var where=zip||city+', '+state;results.replaceChildren();['Example Community Pharmacy','Example Care Pharmacy'].forEach(function(name,i){var btn=document.createElement('button');btn.type='button';btn.className='pharmacy-result';btn.textContent=name+' — DEMO · '+(100+i*10)+' Example Street, '+where;btn.onclick=function(){setValue('pharmacy',name+' — DEMO');setValue('pharmacyAddress',(100+i*10)+' Example Street, '+where);setValue('pharmacyNpi','');setValue('pharmacyPhone','');renderPharmacySelection();results.replaceChildren();$('pharmacy').dispatchEvent(new Event('input',{bubbles:true}));};results.appendChild(btn);});};
@@ -2981,7 +2981,7 @@ demoFrontDoorResponse_=function(){
  return r;
 };
 var fd266Init=fd250Init;
-fd250Init=function(){fd266Init();if(FD.demo&&new URLSearchParams(location.search).get('test')==='blank'){FD230.medicalLocked=false;fd230Open('personal');}};
+fd250Init=function(){fd266Init();if(FD.demo&&new URLSearchParams(location.search).get('test')==='blank'){FD230.medicalLocked=false;['insurance','contract','additional'].forEach(function(k){$('section-'+k).open=false;});fd230Open('personal');}};
 boot();
 </script>
 </body>
