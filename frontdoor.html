@@ -2970,6 +2970,18 @@ setInterval(function(){if(FD.demo)fd257RefreshLock();},15000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&FD.demo)fd257RefreshLock();});
 var fd263Demo=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd263Demo();if(new URLSearchParams(location.search).get('id')==='uploaded')r.intake.uploadsOnFile=['photo_id'];return r;};
+/* Blank demo starts a fresh intake while retaining the normal form defaults. */
+var fd266Demo=demoFrontDoorResponse_;
+demoFrontDoorResponse_=function(){
+ var r=fd266Demo();
+ if(new URLSearchParams(location.search).get('test')!=='blank')return r;
+ ['firstName','lastName','dob','phone','email','insuranceCarrier','visitReason'].forEach(function(k){r.booking[k]='';});
+ r.intake={completed:false,contractSigned:false,currentStep:1,uploadsOnFile:[],data:{state:'NY',sectionProgress:{},noKnownAllergies:true,noCurrentMedications:true,noMedicalHistory:true,noSurgicalHistory:true,medicationHistoryConsent:true,telemedicineConsent:true}};
+ r.eligibility={status:'NOT REQUESTED'};r.discovery={status:'NOT REQUESTED'};r.estimate=null;
+ return r;
+};
+var fd266Init=fd250Init;
+fd250Init=function(){fd266Init();if(FD.demo&&new URLSearchParams(location.search).get('test')==='blank'){FD230.medicalLocked=false;fd230Open('personal');}};
 boot();
 </script>
 </body>
