@@ -321,7 +321,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 #completedMedicalCard .snapshot-services{grid-template-columns:1fr 1fr}#completedMedicalCard .snapshot-tile{margin:0}#completedMedicalCard .snapshot-tile:nth-child(2){background:#edf7f7;border-color:#bad5d2}.snapshot-editor>summary{list-style:none;cursor:pointer;color:inherit}.snapshot-editor>summary::-webkit-details-marker{display:none}.snapshot-secondary{border-top:1px solid #c6d7cb;padding-top:8px;margin-top:8px}.snapshot-tile p{font-size:12px;margin:5px 0}.snapshot-edit-body{padding-top:12px}.snapshot-edit-label{display:block;font-size:12px;margin:8px 0 4px}.snapshot-edit-body input:not([type=checkbox]),.snapshot-edit-body select{width:100%;min-width:0}.snapshot-actions{display:flex;gap:8px;margin-top:10px}.snapshot-edit-body .btn{padding:7px 14px;font-size:13px}.reschedule-button{display:inline-flex;align-items:center;gap:9px;background:var(--champagne-soft);color:var(--walnut);border:0;border-radius:9px;padding:9px 14px;font:700 14px var(--sans);margin-top:12px;cursor:pointer}.reschedule-button:hover{background:var(--champagne)}#summarySchedule{grid-column:1/-1}.snapshot-appointment .snapshot-edit-body{background:var(--paper);color:var(--ink);padding:12px;border-radius:9px}.snapshot-appointment #summarySchedule .btn{background:var(--champagne-soft);margin-top:10px}
 @media(max-width:480px){#completedMedicalCard .snapshot-services{grid-template-columns:1fr}.snapshot-tile h3{font-size:17px}}
-</style>
+.reschedule-button:disabled{opacity:.55;cursor:not-allowed}#rescheduleLockNotice a{color:var(--champagne-soft);text-decoration:underline}</style>
 </head>
 
 <body>
@@ -2893,8 +2893,9 @@ function fd254Summary(){
  else if(key==='visit'){setValue('hpi',$('edit-hpi').value);var reasons=$('edit-visitReason').value.split(',').map(clean).filter(Boolean);qa('#visitReasonChoices input').forEach(function(cb){cb.checked=reasons.indexOf(cb.value)>=0;});reasons.forEach(function(reason){if(!qa('#visitReasonChoices input').some(function(cb){return cb.value===reason;})){var cb=document.createElement('input');cb.type='checkbox';cb.value=reason;cb.checked=true;$('visitReasonChoices').appendChild(cb);}});}
  else {var i=Number(key.split('-')[1]),value=$('summary-health-'+i).value,ids=['allergies','medicalOther','medications','surgicalHistory','familyHistory'],checks=['noKnownAllergies','noMedicalHistory','noCurrentMedications','noSurgicalHistory'];setValue(ids[i],value);if(checks[i])setCheck(checks[i],false);if(i===1)qa('#historyChecks input').forEach(function(cb){cb.checked=false;});}
  FD.data=Object.assign({},FD.data,collect());fd254Summary();};});
- $('summaryReschedule').onclick=function(){var box=$('summarySchedule'),open=box.classList.contains('hidden');box.classList.toggle('hidden',!open);this.setAttribute('aria-expanded',String(open));};
- $('summaryConfirmTime').onclick=function(){FD.booking.appointmentDisplay=$('summaryTime').value;fd254Summary();};
+ fd257RefreshLock();
+ $('summaryReschedule').onclick=function(){if(fd257Locked(FD.booking,Date.now())){fd257RefreshLock();return;}var box=$('summarySchedule'),open=box.classList.contains('hidden');box.classList.toggle('hidden',!open);this.setAttribute('aria-expanded',String(open));};
+ $('summaryConfirmTime').onclick=function(){if(fd257Locked(FD.booking,Date.now())){fd257RefreshLock();return;}FD.booking.appointmentDisplay=$('summaryTime').value;FD.booking.appointmentStart=$('summaryTime').selectedIndex===0?'2026-09-16T11:00:00-04:00':'2026-09-17T14:00:00-04:00';fd254Summary();};
  $('summaryPharmSearch').onclick=function(){var city=clean($('edit-pharmCity').value),state=$('edit-pharmState').value,zip=clean($('edit-pharmZip').value),results=$('summaryPharmResults');results.replaceChildren();if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a city and state, or a five-digit ZIP.';return;}['Example Community Pharmacy','Example Care Pharmacy'].forEach(function(name,i){var btn=document.createElement('button');btn.type='button';btn.className='pharmacy-result';var address=(100+i*10)+' Example Street, '+(zip||city+', '+state);btn.textContent=name+' — DEMO · '+address;btn.onclick=function(){setValue('pharmacy',name+' — DEMO');setValue('pharmacyAddress',address);setValue('pharmacyNpi','');setValue('pharmacyPhone','');FD.data=Object.assign({},FD.data,collect());fd254Summary();};results.appendChild(btn);});};
 }
 var fd254Init=fd250Init;
@@ -2909,6 +2910,13 @@ fd230Render=function(){fd254Render();if(FD.demo&&$('sectionProgress230'))$('sect
 var fd254Save=fd230Save;
 fd230Save=function(section,submit){var result=fd254Save(section,submit);if(FD.demo&&submit)FD230.queue.then(function(){FD230.medicalLocked=false;fd230RenderMedicalCard();fd254Summary();});return result;};
 
+// Cutoff preview uses an absolute timestamp, never the formatted display string.
+function fd257Locked(booking,now){var start=Date.parse(booking.appointmentStart||'');return !Number.isFinite(start)||start-now<=4*60*60*1000;}
+function fd257RefreshLock(){var btn=$('summaryReschedule');if(!btn)return;var locked=fd257Locked(FD.booking,Date.now());btn.disabled=locked;var notice=$('rescheduleLockNotice');if(!notice){notice=document.createElement('p');notice.id='rescheduleLockNotice';notice.setAttribute('role','status');btn.after(notice);}notice.innerHTML='Online rescheduling closes 4 hours before your appointment. Please <a href="tel:+12125108665">call (212) 510-8665</a> if you need to make a change.';notice.classList.toggle('hidden',!locked);if(locked){$('summarySchedule').classList.add('hidden');btn.setAttribute('aria-expanded','false');}}
+var fd257Demo=demoFrontDoorResponse_;
+demoFrontDoorResponse_=function(){var r=fd257Demo();var locked=new URLSearchParams(location.search).get('cutoff')==='locked';r.booking.appointmentStart=locked?'2026-09-13T10:00:00-04:00':'2026-09-15T10:00:00-04:00';if(locked)r.booking.appointmentDisplay='Sunday, September 13 at 10:00 AM';return r;};
+setInterval(function(){if(FD.demo)fd257RefreshLock();},15000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&FD.demo)fd257RefreshLock();});
 boot();
 </script>
 </body>
