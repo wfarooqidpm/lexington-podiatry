@@ -299,6 +299,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .compact-contract #section-contract .panel[data-panel="4"]>.intro,.compact-contract #finalEstimatePending{display:none!important}
 .signature-preview{margin-top:20px}#typedSignaturePreview{font-family:'Brush Script MT','Segoe Script',cursive;font-size:36px;padding:20px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
 #drawSignatureCanvas{display:block;width:100%;height:160px;background:white;border:1px solid var(--line);border-radius:10px;touch-action:none;margin:10px 0}
+
+.id-reminder{background:#e5f4fc!important;border:1px solid #70b7d9!important;border-left:5px solid #2581ab!important;color:#174c68!important;font-size:18px!important;line-height:1.5;font-weight:600;padding:20px!important;border-radius:12px}
+.medical-summary-ready #newPatientLayout{display:none!important}.medical-summary-ready .hero{display:none}.finished-heading h2{font-family:var(--serif);font-weight:400;font-size:36px;margin:8px 0}.finished-heading{margin-bottom:26px}.finished-insurance-grid,.finished-medical-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.finished-card{border:1px solid var(--line);border-radius:20px;padding:26px;margin-bottom:20px;background:var(--paper)}.finished-card h3{font-family:var(--serif);font-size:24px;line-height:1.3;font-weight:400;margin:8px 0}.finished-card p{margin:8px 0;white-space:pre-line}.finished-primary{background:#edf7ef;border-color:#b0d5bb}.finished-secondary{background:#f0f3fa;border-color:#bdc9df}.finished-pharmacy{background:#eff8f7;border-color:#b1d5cf}.finished-health{background:#f6faff;border-color:#bdd2e4}.finished-detail strong{font-size:13px;color:#385e78}.finished-active{color:#216644;font-weight:700}.finished-appointment{background:var(--walnut);color:var(--ivory);padding:36px}.finished-appointment .eyebrow{color:var(--champagne)}.finished-appointment h2{font-family:var(--serif);font-size:34px;line-height:1.25;font-weight:400}.finished-appointment h3{color:var(--champagne-soft)}
+@media(max-width:680px){.finished-insurance-grid,.finished-medical-grid{grid-template-columns:1fr}.finished-card{padding:21px}.finished-heading h2{font-size:29px}.finished-appointment h2{font-size:28px}}
 </style>
 </head>
 
@@ -2817,7 +2821,7 @@ fd230Save=function(section,submit){if(FD.demo&&section==='contract'&&submit&&$('
 /* v253 medical-card review with isolated filled and blank fixtures. */
 var fd253Demo=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd253Demo(),variant=new URLSearchParams(location.search).get('test');
- if(variant==='filled'){Object.assign(r.intake.data,{address1:'123 Example Avenue',city:'New York',state:'NY',zip:'10016',paymentChoice:'INSURANCE',insuranceCarrier:'Aetna',payerId:'60054',memberId:'DEMO123456',insurancePlan:'Demo primary plan',hasSecondaryInsurance:true,secondaryCarrier:'Demo supplemental insurance',secondaryMemberId:'DEMO98765',noKnownAllergies:false,allergies:'Penicillin — rash (fictional example)',noMedicalHistory:false,medicalHistory:['Hypertension'],medicalOther:'',noCurrentMedications:false,medications:'Amlodipine 5 mg daily (fictional example)',noSurgicalHistory:false,surgicalHistory:'Appendectomy, 2010 (fictional example)',familyHistory:'Mother: type 2 diabetes (fictional example)',pharmacy:'Example Community Pharmacy — DEMO',pharmacyAddress:'100 Example Street, New York, NY 10016',visitReasons:['Heel pain'],hpi:'Right heel discomfort when taking the first steps in the morning (fictional example).'});r.eligibility={success:true,status:'ACTIVE',planName:'Demo primary plan',benefits:{copay:30,coinsurance:10,deductibleRemaining:450},checkedAt:new Date().toISOString()};}
+ if(variant==='filled'||variant==='completed'){Object.assign(r.intake.data,{address1:'123 Example Avenue',city:'New York',state:'NY',zip:'10016',paymentChoice:'INSURANCE',insuranceCarrier:'Aetna',payerId:'60054',memberId:'DEMO123456',insurancePlan:'Demo primary plan',hasSecondaryInsurance:true,secondaryCarrier:'Demo supplemental insurance',secondaryMemberId:'DEMO98765',noKnownAllergies:false,allergies:'Penicillin — rash (fictional example)',noMedicalHistory:false,medicalHistory:['Hypertension'],medicalOther:'',noCurrentMedications:false,medications:'Amlodipine 5 mg daily (fictional example)',noSurgicalHistory:false,surgicalHistory:'Appendectomy, 2010 (fictional example)',familyHistory:'Mother: type 2 diabetes (fictional example)',pharmacy:'Example Community Pharmacy — DEMO',pharmacyAddress:'100 Example Street, New York, NY 10016',visitReasons:['Heel pain'],hpi:'Right heel discomfort when taking the first steps in the morning (fictional example).'});r.eligibility={success:true,status:'ACTIVE',planName:'Demo primary plan',benefits:{copay:30,coinsurance:10,deductibleRemaining:450},checkedAt:new Date().toISOString()};}
  return r;};
 var fd253Collect=collect;
 collect=function(){var d=fd253Collect();if(FD.demo&&$('familyHistory')){d.familyHistory=clean($('familyHistory').value);d.visitReasons=qa('#visitReasonChoices input:checked').map(function(x){return x.value;});}return d;};
@@ -2845,6 +2849,34 @@ searchPharmacy=function(){if(!FD.demo)return fd253Pharmacy();var city=clean($('p
 // The existing click listener holds the original search function; route demo requests locally too.
 var fd253ApiPharmacy=apiPharmacySearch;
 apiPharmacySearch=function(name,location){if(FD.demo){searchPharmacy();return Promise.resolve({success:true,results:[]});}return fd253ApiPharmacy(name,location);};
+
+/* Completed medical-card preview: four submitted sections, then a read-only summary. */
+var fd254Demo=demoFrontDoorResponse_;
+demoFrontDoorResponse_=function(){var r=fd254Demo();if(new URLSearchParams(location.search).get('test')==='completed'){r.intake.contractSigned=true;r.intake.completed=true;r.intake.data.sectionProgress={};['personal','insurance','contract','additional'].forEach(function(k){r.intake.data.sectionProgress[k]={submittedAt:'2026-09-13T12:00:00Z'};});}return r;};
+function fd254Ready(){var p=FD.data.sectionProgress||{};return FD230.signed&&['personal','insurance','additional'].every(function(k){return !!(p[k]&&p[k].submittedAt);});}
+function fd254Summary(){
+ if(!FD.demo||!$('completedMedicalCard'))return;
+ var ready=fd254Ready(),host=$('completedMedicalCard');document.body.classList.toggle('medical-summary-ready',ready);host.classList.toggle('hidden',!ready);if(!ready)return;
+ var d=collect(),esc=escapeHtml;
+ function card(title,body,kind){return '<section class="finished-card '+(kind||'')+'"><div class="eyebrow">'+esc(title)+'</div>'+body+'</section>';}
+ function line(t){return '<p>'+esc(t||'Not provided')+'</p>';}
+ var primary=card('Primary insurance','<h3>'+esc(d.insuranceCarrier||'Self-pay')+'</h3>'+line(d.insurancePlan)+(FD.eligibility&&FD.eligibility.status==='ACTIVE'?'<div class="finished-active">✓ Active coverage</div>':'')+line(d.memberId?'Member ID: '+d.memberId:''),'finished-primary');
+ var secondary=d.hasSecondaryInsurance?card('Secondary insurance','<h3>'+esc(d.secondaryCarrier||'Card on file')+'</h3>'+line(d.secondaryMemberId?'Member ID: '+d.secondaryMemberId:'Provided to the office'),'finished-secondary'):'';
+ var medical=fd230MedicalText(d).filter(function(x){return ['Allergies','Past medical history','Medications','Past surgical history','Family history'].indexOf(x[0])>=0;}).map(function(x){return '<div class="finished-detail"><strong>'+esc(x[0])+'</strong>'+line(x[1])+'</div>';}).join('');
+ host.innerHTML='<div class="finished-heading"><div class="eyebrow">Registration submitted</div><h2>'+esc([d.firstName,d.lastName].filter(Boolean).join(' '))+'’s medical card</h2><p>Your information is saved. We look forward to seeing you.</p></div><div class="finished-insurance-grid">'+primary+secondary+'</div>'+card('Preferred pharmacy','<h3>'+esc(d.pharmacy||'Not selected')+'</h3>'+line(d.pharmacyAddress),'finished-pharmacy')+card('Medical information','<div class="finished-medical-grid">'+medical+'</div><button type="button" class="btn secondary" id="finishedUpdate">Update medical information</button>','finished-health')+card('Your appointment','<h2>'+esc(FD.booking.appointmentDisplay||'Appointment details to be confirmed')+'</h2><h3>'+esc((d.visitReasons||[]).join(' · ')||'Foot consultation')+'</h3>'+line(d.hpi)+'<p>With Dr. Wiqar Farooqi · Lexington Podiatry</p>'+(!frontDoorIsVirtual_()?'<div class="id-reminder">Please bring a photo ID to your in-person appointment. We look forward to seeing you!</div>':''),'finished-appointment');
+ $('finishedUpdate').onclick=function(){document.body.classList.remove('medical-summary-ready');host.classList.add('hidden');FD230.medicalLocked=false;fd230RenderMedicalCard();fd230Open('additional');};
+}
+var fd254Init=fd250Init;
+fd250Init=function(){fd254Init();qa('p.callout').forEach(function(el){if(el.textContent.indexOf('Please bring a photo ID')===0)el.classList.add('id-reminder');});if(!FD.demo)return;
+ FD230.labels[3]='Medical information';$('section-additional').querySelector('summary').innerHTML='<span class="section-number">+</span>Medical information';$('sectionSubmit-additional').textContent='Submit medical information';
+ FD230.medicalLocked=false;fd230RenderMedicalCard();var host=document.createElement('section');host.id='completedMedicalCard';host.className='hidden';$('newPatientLayout').before(host);fd254Summary();
+};
+var fd254Insurance=fd250RenderInsurance;
+fd250RenderInsurance=function(){fd254Insurance();var box=q('.payment-choice').closest('.section');box.classList.toggle('hidden',fd250HasInsurance()&&!FD.insuranceUnlocked&&!isSelfPay()&&!needsStaffInsuranceHelp());};
+var fd254Render=fd230Render;
+fd230Render=function(){fd254Render();if(FD.demo&&$('sectionProgress230'))$('sectionProgress230').innerHTML=$('sectionProgress230').innerHTML.replace(/\+ Medical card/g,'+ Medical information');};
+var fd254Save=fd230Save;
+fd230Save=function(section,submit){var result=fd254Save(section,submit);if(FD.demo&&submit)FD230.queue.then(function(){FD230.medicalLocked=false;fd230RenderMedicalCard();fd254Summary();});return result;};
 
 boot();
 </script>
