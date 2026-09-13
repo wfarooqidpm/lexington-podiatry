@@ -357,7 +357,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
   <div class="panel" id="panel2Returning">
     <div class="verify-box">
       <div class="vb-title">Let's find your record</div>
-      <div class="vb-sub" id="returningVerifyInstructions">Enter the information from your established patient record. We’ll email a verification link to the address on file.</div>
+      <div class="vb-sub" id="returningVerifyInstructions">Enter your name, date of birth, and email as they appear in your patient record.</div>
       <div class="form-row">
         <div class="form-group"><label for="rpFirst">First name</label><input type="text" id="rpFirst" autocomplete="given-name" placeholder="Jane"></div>
         <div class="form-group"><label for="rpLast">Last name</label><input type="text" id="rpLast" autocomplete="family-name" placeholder="Smith"></div>
@@ -376,7 +376,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
       </div>
       <div id="verifyResult"></div><p id="bookingConnectionStatus" role="status" aria-live="polite" style="font-size:13px">Connecting to secure scheduling…</p>
       <div class="secure-badge" style="margin:24px 0 0;border-top:none;border-radius:8px;">🔒 Encrypted in transit</div>
-      <div class="form-nav"><button class="btn btn-ink" onclick="verifyReturning()" id="btnVerify">Email my verification link</button><button class="btn btn-ink" onclick="confirmReturningCode()" id="btnConfirmCode" style="display:none;">Verify code</button><button class="btn-back" onclick="backToVisitType()">← Back</button></div>
+      <div class="form-nav"><button class="btn btn-ink" onclick="verifyReturning()" id="btnVerify">Find my record</button><button class="btn btn-ink" onclick="confirmReturningCode()" id="btnConfirmCode" style="display:none;">Verify code</button><button class="btn-back" onclick="backToVisitType()">← Back</button></div>
     </div>
   </div>
 
@@ -1102,9 +1102,9 @@ function loadBookingConfig() {
     document.getElementById('returningEmailCodeFields').style.display = emailCode ? 'block' : 'none';
     document.getElementById('returningLegacyPhoneField').style.display = emailCode ? 'none' : 'block';
     document.getElementById('returningVerifyInstructions').textContent = emailCode
-      ? 'Enter the information from your established patient record. We’ll email a verification link to the address on file.'
+      ? 'Enter your name, date of birth, and email as they appear in your patient record.'
       : 'Enter your name and the last 4 digits of your phone number on file.';
-    document.getElementById('btnVerify').textContent = emailCode ? 'Email my verification link' : 'Find my record';
+    document.getElementById('btnVerify').textContent = emailCode ? 'Find my record' : 'Find my record';
 
     renderPracticeBanners(data.activeBanners || []);
     return data;
@@ -1202,7 +1202,7 @@ function reserveWebsiteAndStartFrontDoor() {
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {
-    if (!data.success || !data.token) {
+    if (!data.success || (state.patientType === 'returning' ? !data.bookingConfirmed : !data.token)) {
       throw new Error(data.error || 'The appointment could not be created.');
     }
 
@@ -1213,7 +1213,7 @@ function reserveWebsiteAndStartFrontDoor() {
       document.getElementById('confirmedSlot').textContent = state.selectedSlot.label;
       setStep(5);
       document.getElementById('panel5').classList.add('active');
-      routeReturningCard272(data.token);
+      document.getElementById('bookingCardRouteStatus').textContent='Your booking card will arrive by email at the address on file. You can open it there whenever you need it.';
     } else {
       window.location.href =
         '/frontdoor.html?t=' + encodeURIComponent(data.token);
@@ -1308,26 +1308,21 @@ function connect271(){
 function call271(request){return connect271().then(function(){return new Promise(function(resolve,reject){var id=String(++bridge271.next);bridge271.pending[id]={resolve:resolve,timer:setTimeout(function(){delete bridge271.pending[id];reject(new Error('The response is taking longer than expected. Your request may still be processing.'));},45000)};bridge271.peer.postMessage({type:'booking-call',channel:bridge271.channel,id:id,request:request},bridge271.origin);});});}
 function bookingFetch271(url,options){var req;if(options&&options.method==='POST'){req=JSON.parse(options.body);}else{req={};new URL(url).searchParams.forEach(function(v,k){req[k]=v;});}return call271(req).then(function(data){return {json:function(){return Promise.resolve(data);}};});}
 async function verifyReturning(){
-  if(magicBusy271)return;
-  var first=document.getElementById('rpFirst').value.trim(),last=document.getElementById('rpLast').value.trim(),dob=document.getElementById('rpDob').value,email=document.getElementById('rpVerifyEmail').value.trim();
-  if(!first||!last||!dob||!email){showVerifyResult('Please enter your name, date of birth, and email address.',false);return;}
-  magicBusy271=true;var btn=document.getElementById('btnVerify');btn.disabled=true;btn.textContent='Sending verification link…';
-  showVerifyResult('We’re preparing your verification email. Keep this page open.', 'info');
-  try {
-    if(!magicPending271){var key=random271(32);var bytes=new TextEncoder().encode('POLL|'+key);var digest=await crypto.subtle.digest('SHA-256',bytes);var hash=Array.from(new Uint8Array(digest),function(v){return v.toString(16).padStart(2,'0');}).join('');magicPending271={requestId:'VR-'+hash.slice(0,32),pollKey:key,created:Date.now()};try{sessionStorage.setItem('lexMagic271',JSON.stringify(magicPending271));}catch(ignore){}}
-    state.verificationPendingName=first+' '+last;state.verificationPendingEmail=email;
-    var result=await call271(Object.assign({action:'magic-start',firstName:first,lastName:last,dob:dob,email:email},magicPending271));
-    if(!result.success){clearMagic271();throw new Error(result.error||'Unable to send verification email.');}
-    showVerifyResult('Check your email. Tap “Verify my email,” then Continue. This page will automatically show appointment times after you confirm.', 'info');
-    pollMagic271();
-  } catch(err){showVerifyResult(err.message+' You can retry safely; an existing request will not send duplicate emails.',false);}
-  finally{magicBusy271=false;btn.disabled=false;btn.textContent=magicPending271?'Check verification status':'Email my verification link';}
+ if(magicBusy271)return;
+ var first=document.getElementById('rpFirst').value.trim(),last=document.getElementById('rpLast').value.trim(),dob=document.getElementById('rpDob').value,email=document.getElementById('rpVerifyEmail').value.trim();
+ if(!first||!last||!dob||!email){showVerifyResult('Please enter your name, date of birth, and email address.',false);return;}
+ magicBusy271=true;var btn=document.getElementById('btnVerify');btn.disabled=true;btn.textContent='Finding your record…';showVerifyResult('Checking your details…','info');
+ try{var result=await call271({action:'booking-match',firstName:first,lastName:last,dob:dob,email:email});
+ if(!result.success||!result.matched||!result.session)throw new Error(result.error||'We could not match those details. Please call the office.');
+ state.verificationSession=result.session;state.verifiedName=first+' '+last;state.verifiedEmail=email;state.verifiedPhone='';
+ clearMagic271();showVerifyResult('Welcome back! Choose your appointment.',true);openReturningBooking();
+ }catch(err){showVerifyResult(err.message,false);}finally{magicBusy271=false;btn.disabled=false;btn.textContent='Find my record';}
 }
 function clearMagic271(){clearTimeout(magicTimer271);magicPending271=null;try{sessionStorage.removeItem('lexMagic271');}catch(ignore){}}
 async function pollMagic271(){
   if(!magicPending271)return;
   var current=magicPending271;
-  if(Date.now()-current.created>10*60000){clearMagic271();showVerifyResult('The verification link expired. Request a new email to continue.',false);document.getElementById('btnVerify').textContent='Email my verification link';return;}
+  if(Date.now()-current.created>10*60000){clearMagic271();showVerifyResult('The verification link expired. Request a new email to continue.',false);document.getElementById('btnVerify').textContent='Find my record';return;}
   try{var data=await call271(Object.assign({action:'magic-poll'},current));if(magicPending271!==current)return;
     if(data.verified&&data.session){state.verificationSession=data.session;state.verifiedName=state.verificationPendingName||'';state.verifiedEmail=state.verificationPendingEmail||'';state.verifiedPhone='';clearMagic271();resetVerificationAttempts_();showVerifyResult('Email verified — welcome back!',true);openReturningBooking();return;}
     if(data.expired){clearMagic271();showVerifyResult('The verification link expired. Request a new email to continue.',false);return;}
@@ -1340,7 +1335,7 @@ function initMagic271(){
   if(m){history.replaceState(null,'',location.pathname);document.querySelector('main').innerHTML='<section class="verify-box" style="max-width:520px;margin:40px auto"><h1 style="font-size:28px">Verify your email</h1><p>Press Continue to approve your booking request. Your original booking page will automatically advance to appointment times.</p><button class="btn btn-ink" id="approveMagic271">Continue</button><p id="magicApprovalStatus" role="status"></p></section>';
     document.getElementById('approveMagic271').onclick=async function(){var btn=this,status=document.getElementById('magicApprovalStatus');btn.disabled=true;status.textContent='Confirming…';try{var data=await call271({action:'magic-approve',requestId:m[1],token:m[2]});if(!data.success||!data.approved)throw new Error(data.error||'Could not confirm.');status.textContent='Email verified. Return to your original booking page to choose a time.';btn.textContent='Verified ✓';}catch(err){status.textContent=err.message;btn.disabled=false;}};return;
   }
-  try{var saved=JSON.parse(sessionStorage.getItem('lexMagic271')||'null');if(saved&&/^VR-[a-f0-9]{32}$/.test(saved.requestId)&&/^[a-f0-9]{64}$/.test(saved.pollKey)&&Date.now()-saved.created<600000){magicPending271=saved;state.patientType='returning';showReturningVerification_('Check your verification email. This page will continue when you confirm.');pollMagic271();}}catch(ignore){}
+  clearMagic271();
 }
 
 
