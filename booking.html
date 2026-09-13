@@ -417,9 +417,9 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
     <div class="confirm-box">
       <div class="cb-icon">✓</div>
       <h2>Appointment booked</h2>
-      <p class="cb-detail">Thank you — your appointment is on the schedule. Continue to Front Door to complete your registration.</p>
+      <p class="cb-detail" id="bookingCompletionMessage">Thank you — your appointment is on the schedule.</p>
       <div class="cb-slot" id="confirmedSlot"></div>
-      <p class="cb-detail">Our team will confirm your appointment shortly.</p>
+      <p class="cb-detail" id="bookingCardRouteStatus" role="status"></p><a class="btn btn-ink" id="bookingCardRouteLink" hidden>View your booking card</a><button class="btn btn-ink" id="bookingCardRouteRetry" type="button" hidden>Check for my saved card</button>
       <p style="margin-top:14px;font-weight:600;font-size:16px;"><a href="tel:+12125108665" style="color:var(--brass);text-decoration:none;">(212) 510-8665</a></p>
     </div>
   </div>
@@ -1213,6 +1213,7 @@ function reserveWebsiteAndStartFrontDoor() {
       document.getElementById('confirmedSlot').textContent = state.selectedSlot.label;
       setStep(5);
       document.getElementById('panel5').classList.add('active');
+      routeReturningCard272(data.token);
     } else {
       window.location.href =
         '/frontdoor.html?t=' + encodeURIComponent(data.token);
@@ -1340,6 +1341,18 @@ function initMagic271(){
     document.getElementById('approveMagic271').onclick=async function(){var btn=this,status=document.getElementById('magicApprovalStatus');btn.disabled=true;status.textContent='Confirming…';try{var data=await call271({action:'magic-approve',requestId:m[1],token:m[2]});if(!data.success||!data.approved)throw new Error(data.error||'Could not confirm.');status.textContent='Email verified. Return to your original booking page to choose a time.';btn.textContent='Verified ✓';}catch(err){status.textContent=err.message;btn.disabled=false;}};return;
   }
   try{var saved=JSON.parse(sessionStorage.getItem('lexMagic271')||'null');if(saved&&/^VR-[a-f0-9]{32}$/.test(saved.requestId)&&/^[a-f0-9]{64}$/.test(saved.pollKey)&&Date.now()-saved.created<600000){magicPending271=saved;state.patientType='returning';showReturningVerification_('Check your verification email. This page will continue when you confirm.');pollMagic271();}}catch(ignore){}
+}
+
+
+async function routeReturningCard272(token) {
+  var status=document.getElementById('bookingCardRouteStatus'),link=document.getElementById('bookingCardRouteLink'),retry=document.getElementById('bookingCardRouteRetry');
+  retry.hidden=true;status.textContent='Checking for your saved Front Door information…';
+  try {
+    var result=await call271({action:'frontdoor-route',token:token});
+    if(!result.success)throw new Error(result.error||'Could not check saved information.');
+    if(result.medicalCard){var path='/frontdoor.html?t='+encodeURIComponent(token);link.href=path;link.hidden=false;status.textContent='Your information is already on file. Opening your booking card…';window.location.assign(path);}
+    else status.textContent='Your appointment is booked. We look forward to seeing you.';
+  } catch(err){status.textContent='Your appointment is booked. We could not check your saved information yet.';retry.hidden=false;retry.onclick=function(){routeReturningCard272(token);};}
 }
 
 initialiseInternationalPhone_();
