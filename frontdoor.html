@@ -949,13 +949,16 @@ function demoFromUrl(){var p=new URLSearchParams(window.location.search);return 
 
 // v235: allow Apps Script cold starts and retry only transient read failures.
 function demoFrontDoorResponse_(){
+  var activeDemo=new URLSearchParams(window.location.search).get('coverage')==='active';
+  var demoData={firstName:'Alex',lastName:'Morgan',dob:'1988-04-12',phone:'+1 (212) 555-0147',email:'alex.morgan@example.com',state:'NY',noKnownAllergies:true,noCurrentMedications:true,noMedicalHistory:true,noSurgicalHistory:true,medicationHistoryConsent:true,telemedicineConsent:true};
+  if(activeDemo)Object.assign(demoData,{paymentChoice:'INSURANCE',insuranceCarrier:'Aetna',payerId:'60054',memberId:'W123456789',insurancePlan:'Aetna Choice POS II',groupId:'012345'});
   return {
     success:true,
     capabilities:{selfPayCashPrice:true,followUpReview:true},
     booking:{source:'WEBSITE',patientType:'NEW',appointmentDisplay:'Tuesday, September 15 at 10:00 AM',visitReason:'',firstName:'Alex',lastName:'Morgan',dob:'1988-04-12',phone:'+1 (212) 555-0147',email:'alex.morgan@example.com',insuranceCarrier:''},
-    intake:{completed:false,currentStep:1,data:{firstName:'Alex',lastName:'Morgan',dob:'1988-04-12',phone:'+1 (212) 555-0147',email:'alex.morgan@example.com',state:'NY',noKnownAllergies:true,noCurrentMedications:true,noMedicalHistory:true,noSurgicalHistory:true,medicationHistoryConsent:true,telemedicineConsent:true}},
+    intake:{completed:false,currentStep:1,data:demoData},
     agreement:{version:'Demo',sections:[{title:'Demo patient agreement',paragraphs:['This preview uses a shortened sample agreement. Nothing entered here is saved or sent to the office.']}]},
-    eligibility:{status:'NOT REQUESTED'},
+    eligibility:activeDemo?{success:true,status:'ACTIVE',payerDisplay:'Aetna',planName:'Aetna Choice POS II',groupNumber:'012345',checkedAt:new Date().toISOString(),benefits:{copay:30,coinsurance:10,deductibleRemaining:450}}:{status:'NOT REQUESTED'},
     discovery:{status:'NOT REQUESTED'},
     cashPrice:{amount:120,label:'New patient visit'}
   };
