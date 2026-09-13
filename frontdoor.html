@@ -2814,6 +2814,38 @@ function fd252SignatureRender(){if(!$('typedSignaturePreview'))return;var typed=
 var fd252Save=fd230Save;
 fd230Save=function(section,submit){if(FD.demo&&section==='contract'&&submit&&$('adoptTypedSignature')){if(!$('adoptTypedSignature').checked&&$('drawSignatureCanvas').dataset.signed!=='yes'){$('sectionNote-contract').textContent='Please draw your signature or choose to adopt your typed name.';return;}FD.demoSignature=$('adoptTypedSignature').checked?{type:'typed',name:$('signatureName').value}:{type:'drawn',image:$('drawSignatureCanvas').toDataURL('image/png')};}return fd252Save(section,submit);};
 
+/* v253 medical-card review with isolated filled and blank fixtures. */
+var fd253Demo=demoFrontDoorResponse_;
+demoFrontDoorResponse_=function(){var r=fd253Demo(),variant=new URLSearchParams(location.search).get('test');
+ if(variant==='filled'){Object.assign(r.intake.data,{address1:'123 Example Avenue',city:'New York',state:'NY',zip:'10016',paymentChoice:'INSURANCE',insuranceCarrier:'Aetna',payerId:'60054',memberId:'DEMO123456',insurancePlan:'Demo primary plan',hasSecondaryInsurance:true,secondaryCarrier:'Demo supplemental insurance',secondaryMemberId:'DEMO98765',noKnownAllergies:false,allergies:'Penicillin — rash (fictional example)',noMedicalHistory:false,medicalHistory:['Hypertension'],medicalOther:'',noCurrentMedications:false,medications:'Amlodipine 5 mg daily (fictional example)',noSurgicalHistory:false,surgicalHistory:'Appendectomy, 2010 (fictional example)',familyHistory:'Mother: type 2 diabetes (fictional example)',pharmacy:'Example Community Pharmacy — DEMO',pharmacyAddress:'100 Example Street, New York, NY 10016',visitReasons:['Heel pain'],hpi:'Right heel discomfort when taking the first steps in the morning (fictional example).'});r.eligibility={success:true,status:'ACTIVE',planName:'Demo primary plan',benefits:{copay:30,coinsurance:10,deductibleRemaining:450},checkedAt:new Date().toISOString()};}
+ return r;};
+var fd253Collect=collect;
+collect=function(){var d=fd253Collect();if(FD.demo&&$('familyHistory')){d.familyHistory=clean($('familyHistory').value);d.visitReasons=qa('#visitReasonChoices input:checked').map(function(x){return x.value;});}return d;};
+var fd253Text=fd230MedicalText;
+fd230MedicalText=function(d){if(!FD.demo)return fd253Text(d);var prior=fd253Text(d),map={};prior.forEach(function(x){map[x[0]]=x[1];});return [['Allergies',map.Allergies],['Past medical history',map['Medical history']],['Medications',map.Medications],['Past surgical history',map['Surgical history']],['Family history',d.familyHistory||'Not provided'],['Preferred pharmacy',[d.pharmacy,d.pharmacyAddress].filter(Boolean).join(' · ')||'Not selected'],["Today’s visit",(d.visitReasons||[]).join(', ')||'Not selected'],['Visit details',d.hpi||'Not provided']].concat(prior.filter(function(x){return /insurance$/.test(x[0]);}));};
+var fd253Init=fd250Init;
+fd250Init=function(){fd253Init();if(!FD.demo)return;
+ $('demoNotice').classList.remove('hidden');$('demoNotice').textContent='Fictional preview — entries, signatures and pharmacy searches stay in this demo.';
+ var health=$('healthDetails');
+ function section(title,nodes){var el=document.createElement('div');el.className='section';var h=document.createElement('div');h.className='section-title';h.textContent=title;el.appendChild(h);nodes.forEach(function(n){el.appendChild(n);});return el;}
+ var pharmacyField=$('pharmacy').closest('.field');
+ var groups=[section('Allergies',[$('noKnownAllergies').closest('label'),$('allergyField')]),section('Past medical history',[$('noMedicalHistory').closest('label'),$('medicalHistoryFields')]),section('Medications',[$('noCurrentMedications').closest('label'),$('medicationsField')]),section('Past surgical history',[$('noSurgicalHistory').closest('label'),$('surgicalHistoryField')])];
+ var family=section('Family history',[]);family.innerHTML+='<div class="field"><label for="familyHistory">Relevant family history</label><textarea id="familyHistory" placeholder="Conditions in your family, or none known"></textarea></div>';groups.push(family);
+ groups.push(section('Preferred pharmacy',[pharmacyField]));health.replaceChildren.apply(health,groups);setValue('familyHistory',FD.data.familyHistory||'');
+ $('pharmacy').type='hidden';$('pharmacy').removeAttribute('placeholder');pharmacyField.querySelector('.note').textContent='Search by city and state, or ZIP, then select a pharmacy from the results.';
+ $('pharmacyLocationSearch').closest('.field').classList.add('hidden');
+ var locationFields=document.createElement('div');locationFields.className='grid3';locationFields.innerHTML='<div class="field"><label for="pharmacyCity">Town / City</label><input id="pharmacyCity" type="text" placeholder="Astoria"></div><div class="field"><label for="pharmacyState">State</label><select id="pharmacyState"></select></div><div class="field"><label for="pharmacyZip">Or ZIP code</label><input id="pharmacyZip" type="text" inputmode="numeric" maxlength="5" placeholder="11102"></div>';
+ $('pharmacySearchBtn').before(locationFields);$('pharmacyState').innerHTML=$('state').innerHTML;setValue('pharmacyState',FD.data.state||'NY');var oldSearch=$('pharmacySearchBtn'),newSearch=oldSearch.cloneNode(true);oldSearch.replaceWith(newSearch);newSearch.textContent='Search';newSearch.addEventListener('click',searchPharmacy);
+ $('bookingReason').closest('.field').classList.add('hidden');var visit=document.createElement('div');visit.id='visitReasonChoices';visit.className='check-grid';['Foot consultation','Heel pain','Foot pain','Ingrown toenail','Fungal toenail','Bunion','Hammertoe','Plantar wart','Callus / corn','Ankle pain','Orthotics','Other'].forEach(function(reason){var label=document.createElement('label');label.className='choice';var cb=document.createElement('input');cb.type='checkbox';cb.value=reason;cb.checked=(FD.data.visitReasons||[]).indexOf(reason)>=0;label.appendChild(cb);label.appendChild(document.createTextNode(reason));visit.appendChild(label);});$('bookingReason').closest('.field').before(visit);
+ $('hpi').previousElementSibling.textContent='Anything else you would like us to know?';
+ $('section-additional').open=true;if(new URLSearchParams(location.search).get('test')==='filled')FD230.medicalLocked=true;updateConditionalFields();fd230RenderMedicalCard();
+};
+var fd253Pharmacy=searchPharmacy;
+searchPharmacy=function(){if(!FD.demo)return fd253Pharmacy();var city=clean($('pharmacyCity').value),state=$('pharmacyState').value,zip=clean($('pharmacyZip').value),results=$('pharmacyResults');if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a town/city and state, or a five-digit ZIP code.';return;}var where=zip||city+', '+state;results.replaceChildren();['Example Community Pharmacy','Example Care Pharmacy'].forEach(function(name,i){var btn=document.createElement('button');btn.type='button';btn.className='pharmacy-result';btn.textContent=name+' — DEMO · '+(100+i*10)+' Example Street, '+where;btn.onclick=function(){setValue('pharmacy',name+' — DEMO');setValue('pharmacyAddress',(100+i*10)+' Example Street, '+where);setValue('pharmacyNpi','');setValue('pharmacyPhone','');renderPharmacySelection();results.replaceChildren();$('pharmacy').dispatchEvent(new Event('input',{bubbles:true}));};results.appendChild(btn);});};
+// The existing click listener holds the original search function; route demo requests locally too.
+var fd253ApiPharmacy=apiPharmacySearch;
+apiPharmacySearch=function(name,location){if(FD.demo){searchPharmacy();return Promise.resolve({success:true,results:[]});}return fd253ApiPharmacy(name,location);};
+
 boot();
 </script>
 </body>
