@@ -3059,8 +3059,6 @@ var fd269Render=fd230Render;
 fd230Render=function(){fd269Render();if(fd269Enabled())fd254Summary();};
 var fd269Eligibility=applyEligibilityResult;
 applyEligibilityResult=function(res){if(res&&res.success===false)FD.eligibility={status:'UNAVAILABLE'};fd269Eligibility(res);if(fd269Enabled())fd254Summary();};
-boot();
-
 function fd273ReturningCard(){return !!FD.booking&&/^(RETURNING|FOLLOW[ -]?UP)$/i.test(String(FD.booking.patientType||''));}
 var fd273SummaryBase=fd254Summary;
 fd254Summary=function(){fd273SummaryBase();if(!fd273ReturningCard()||!$('completedMedicalCard'))return;
@@ -3072,6 +3070,7 @@ fd254Summary=function(){fd273SummaryBase();if(!fd273ReturningCard()||!$('complet
 };
 var fd273DemoBase=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd273DemoBase();if(new URLSearchParams(location.search).get('test')==='abbreviated'){r.booking.patientType='FOLLOW UP';r.intake.contractSigned=false;r.intake.completed=false;r.intake.data.sectionProgress={};r.intake.data.insuranceCarrier='Aetna';r.intake.data.insurancePlan='Example plan';r.intake.data.memberId='DEMO12345';}return r;};
+boot();
 </script>
 </body>
 </html>
