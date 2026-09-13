@@ -993,6 +993,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <footer><div class="wrap"><span>Lexington Podiatry · WAF Podiatry P.C.</span><span>353 Lexington Ave, Rm 1502 · New York, NY 10016</span></div></footer>
 
+<script src="/frontdoor-connection.js?v=272"></script>
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
@@ -1065,7 +1066,7 @@ function apiGet(){
     });
     notice=setTimeout(function(){progress('Still connecting securely. Please keep this page open…');},8000);
     var request=Promise.resolve().then(function(){
-      return fetch(GATEWAY_URL+'?action=load&t='+encodeURIComponent(FD.token),{cache:'no-store',signal:controller?controller.signal:undefined});
+      return bookingFetch271(GATEWAY_URL+'?action=load&t='+encodeURIComponent(FD.token),{cache:'no-store',signal:controller?controller.signal:undefined});
     }).then(function(response){
       if(!response.ok){
         var error=new Error('The registration service could not be reached.');
