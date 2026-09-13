@@ -286,6 +286,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .insurance-methods{display:grid;gap:10px;margin-top:16px}.insurance-loaded-card{border:1px solid #b8d5c2;background:#eef8f2;border-radius:15px;padding:20px;margin-bottom:16px}.insurance-loaded-card.hidden{display:none}.insurance-loaded-head{display:flex;gap:11px;align-items:flex-start}.insurance-loaded-check{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#247653;color:#fff;font-weight:900;flex:none}.insurance-loaded-card h3{font-family:var(--serif);font-size:22px;font-weight:400;color:#245a37;margin:1px 0 2px}.insurance-loaded-meta{font-size:13px;color:#456050}.coverage-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}.coverage-benefit{background:#fff;border:1px solid #cfe0d4;border-radius:10px;padding:11px}.coverage-benefit strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#58735f}.coverage-benefit span{display:block;margin-top:3px;font-weight:700;color:#244b35}.deductible-alert{margin-top:12px;border:1px solid #e3c16f;background:#fff6dc;color:#76510c;border-radius:10px;padding:11px 13px;font-size:13px;font-weight:700}.selfpay-callout{background:#eef8f2;border-color:#b8d5c2}.selfpay-callout .price{color:#245a37}.staff-help-alert{border:1px solid #e3c16f!important;background:#fff6dc!important;color:#76510c}.insurance-manual-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
 @media(max-width:680px){.medical-card-grid{grid-template-columns:1fr}.registration-received{padding:25px 17px}}
 @media(max-width:680px){.coverage-benefits{grid-template-columns:1fr}.insurance-loaded-card{padding:17px}}
+
+#dob{min-width:0;max-width:100%;text-align:left;-webkit-appearance:none;appearance:none;display:block}
+#dob::-webkit-date-and-time-value{text-align:left;min-height:1.5em}
+#dob::-webkit-datetime-edit{padding:0;display:inline-flex}
+#secondaryCardView{background:#f1f5f8;border-color:#b9cbd7}
 </style>
 </head>
 
@@ -476,7 +481,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       </div>
       <div id="insuranceEntryMethods" class="insurance-methods hidden">
         <div class="section-title" style="margin:6px 0 2px">How would you like to provide it?</div>
-        <label class="choice"><input type="radio" name="insuranceEntryMethod" value="PHOTO"><span><strong>Take a photo</strong><span>Photograph the front and back. We’ll read the card and check coverage.</span></span></label>
+        <label class="choice"><input type="radio" name="insuranceEntryMethod" value="PHOTO"><span><strong>Take a photo or upload a screenshot</strong><span>Use a photo or screenshot of the front of your digital or physical insurance card. JPG, PNG, or PDF.</span></span></label>
         <label class="choice"><input type="radio" name="insuranceEntryMethod" value="MANUAL"><span><strong>Enter information manually</strong><span>Type the insurance information exactly as it appears on the card.</span></span></label>
         <label class="choice"><input type="radio" name="insuranceEntryMethod" value="STAFF_HELP"><span><strong>Ask staff for help</strong><span>Skip this for now and bring your insurance cards to the visit.</span></span></label>
       </div>
@@ -2717,6 +2722,44 @@ boot=function(){
  return fd250Boot();
 };
 
+/* v251: compact identity and optional secondary coverage. */
+var fd251SecondaryEditing=false;
+function fd251SecondaryRender(){
+ if(!$('secondaryMethods'))return;
+ var on=$('hasSecondary').checked,method=radioValue('secondaryMethod'),has=!!(clean($('secondaryCarrier').value)||clean($('secondaryMemberId').value)),uploaded=(FD.uploadsOnFile||[]).indexOf('secondary_insurance_front')>=0;
+ $('secondaryMethods').classList.toggle('hidden',!on||((has||uploaded)&&!fd251SecondaryEditing));
+ $('secondaryFields').classList.toggle('hidden',!on||!fd251SecondaryEditing&&has||method!=='MANUAL');
+ $('secondaryPhoto').classList.toggle('hidden',!on||method!=='PHOTO'||!fd251SecondaryEditing&&uploaded);
+ $('secondaryHelp').classList.toggle('hidden',!on||method!=='STAFF_HELP');
+ $('secondaryCardView').classList.toggle('hidden',!on||!(has||uploaded)||fd251SecondaryEditing);
+ $('secondaryCardText').textContent=[clean($('secondaryCarrier').value)||'Secondary insurance card received',clean($('secondaryMemberId').value)?'Member ID: '+clean($('secondaryMemberId').value):'',uploaded?'Card on file':''].filter(Boolean).join(' · ');
+}
+var fd251InsuranceRender=fd250RenderInsurance;
+fd250RenderInsurance=function(){fd251InsuranceRender();var choices=q('.payment-choice');choices.classList.toggle('hidden',fd250HasInsurance());choices.previousElementSibling.classList.toggle('hidden',fd250HasInsurance());fd251SecondaryRender();};
+var fd251Conditional=updateConditionalFields;
+updateConditionalFields=function(){fd251Conditional();fd251SecondaryRender();};
+var fd251MedicalText=fd230MedicalText;
+fd230MedicalText=function(d){var rows=fd251MedicalText(d);if(d.insuranceCarrier&&d.paymentChoice!=='SELF_PAY')rows.push(['Primary insurance',[d.insuranceCarrier,d.insurancePlan,d.memberId?'Member ID: '+d.memberId:''].filter(Boolean).join(' · ')]);if(d.hasSecondaryInsurance)rows.push(['Secondary insurance',[d.secondaryCarrier,d.secondaryMemberId?'Member ID: '+d.secondaryMemberId:''].filter(Boolean).join(' · ')||((FD.uploadsOnFile||[]).indexOf('secondary_insurance_front')>=0?'Card on file':'Not provided')]);return rows;};
+var fd251Init=fd250Init;
+fd250Init=function(){
+ fd251Init();
+ $('insuranceBack').closest('.field').classList.add('hidden');
+ var idSection=$('photoUpload').closest('.section');idSection.classList.add('hidden');setRadio('photoIdStatus','bring');
+ var reminder=document.createElement('p');reminder.className='callout';reminder.textContent='Please bring a photo ID to your in-person appointment. We look forward to seeing you!';reminder.classList.toggle('hidden',frontDoorIsVirtual_());idSection.after(reminder);
+ var secondary=$('secondaryFields');
+ var methods=document.createElement('div');methods.id='secondaryMethods';methods.className='insurance-methods';methods.innerHTML='<p class="note">Optional—share what you have. No coverage check is needed here.</p>'+[['PHOTO','Take a photo or upload a screenshot'],['MANUAL','Enter information manually'],['STAFF_HELP','Ask staff for help']].map(function(x){return '<label class="choice"><input type="radio" name="secondaryMethod" value="'+x[0]+'"><span><strong>'+x[1]+'</strong></span></label>';}).join('');secondary.before(methods);
+ var photo=document.createElement('div');photo.id='secondaryPhoto';photo.className='hidden';photo.innerHTML='<label for="secondaryCardFile">Front of secondary insurance card</label><input id="secondaryCardFile" type="file" accept="image/jpeg,image/png,application/pdf"><p class="note">A photo or screenshot of a digital card is welcome. JPG, PNG, or PDF, up to 4 MB.</p><button type="button" class="btn secondary" id="secondaryUploadBtn">Save secondary card</button><p id="secondaryUploadStatus" role="status"></p>';secondary.after(photo);
+ var help=document.createElement('p');help.id='secondaryHelp';help.className='note hidden';help.textContent='No problem—bring your secondary insurance card and we can help at your visit.';photo.after(help);
+ var card=document.createElement('div');card.id='secondaryCardView';card.className='insurance-loaded-card hidden';card.innerHTML='<strong>Secondary insurance</strong><p id="secondaryCardText"></p><button type="button" class="btn secondary" id="secondaryEdit">Update secondary insurance</button>';help.after(card);
+ var save=document.createElement('button');save.type='button';save.className='btn secondary';save.textContent='Save secondary information';secondary.appendChild(save);save.onclick=function(){var snapshot=collect();clearTimeout(FD230.timers.insurance);save.disabled=true;FD230.queue=FD230.queue.catch(function(){}).then(function(){return fd230Request('section-save','insurance',snapshot,false);}).then(function(res){FD.data=Object.assign({},FD.data,snapshot,{sectionProgress:res.sectionProgress||FD.data.sectionProgress});fd251SecondaryEditing=false;fd251SecondaryRender();toast('Secondary insurance saved.');}).catch(function(){toast('Could not save yet. Your entries are still here.');}).finally(function(){save.disabled=false;});};
+ $('secondaryEdit').onclick=function(){fd251SecondaryEditing=true;setRadio('secondaryMethod','MANUAL');fd251SecondaryRender();};
+ qa('input[name="secondaryMethod"]').forEach(function(el){el.onchange=function(){fd251SecondaryEditing=true;fd251SecondaryRender();};});
+ $('hasSecondary').addEventListener('change',function(){fd251SecondaryEditing=true;fd251SecondaryRender();});
+ if(!FD.demo){$('secondaryUploadBtn').disabled=true;$('secondaryCardFile').disabled=true;$('secondaryUploadStatus').textContent='Secondary card uploads are not available yet. You can enter the details manually or bring your card to the visit.';}
+ $('secondaryUploadBtn').onclick=function(){var file=$('secondaryCardFile').files[0],btn=this,note=$('secondaryUploadStatus');if(!file){note.textContent='Choose a photo or screenshot first.';return;}btn.disabled=true;note.textContent='Saving card…';fileToUpload(file,'secondary_insurance_front').then(function(upload){return fd230Request('section-upload','insurance',{},false,[upload]);}).then(function(res){FD.uploadsOnFile=res.uploadsOnFile||Array.from(new Set((FD.uploadsOnFile||[]).concat(['secondary_insurance_front'])));note.textContent='Secondary card saved.';fd251SecondaryEditing=false;fd251SecondaryRender();}).catch(function(e){note.textContent='The card could not be saved. Please try again or bring it to your visit.';}).finally(function(){btn.disabled=false;});};
+ if(clean($('secondaryCarrier').value)||clean($('secondaryMemberId').value)||(FD.uploadsOnFile||[]).indexOf('secondary_insurance_front')>=0)setCheck('hasSecondary',true);
+ setRadio('secondaryMethod','MANUAL');fd251SecondaryRender();fd250RenderInsurance();
+};
 boot();
 </script>
 </body>
