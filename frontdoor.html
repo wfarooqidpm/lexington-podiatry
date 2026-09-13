@@ -282,7 +282,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .registration-received.show{display:block}.closed-door{font-size:46px;line-height:1;margin-bottom:10px}.registration-received h2{font-family:var(--serif);font-size:31px;font-weight:400;margin:0 0 7px}.registration-received p{max-width:580px;margin:0 auto;color:#3d5f4c}
 .intake-layer.optional-card{border-color:#9fc4d2;background:#f5fafc}.intake-layer.optional-card>summary{color:#25596b}.intake-layer.optional-card .section-number{border-radius:999px;width:auto;padding:0 10px;border-color:#9fc4d2;color:#25596b}
 .medical-card-view{display:none}.medical-card-view.show{display:block;border:1px solid #9fc4d2;background:#eaf3f7;border-radius:15px;padding:22px}.medical-card-view h3{font-family:var(--serif);font-size:25px;font-weight:400;color:#25596b;margin:0}.medical-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}.medical-card-item{background:rgba(255,255,255,.7);border:1px solid rgba(79,140,162,.28);border-radius:11px;padding:13px}.medical-card-item strong{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#4f6d78;margin-bottom:4px}.medical-card-item span{font-size:14px;color:#253f48;white-space:pre-line}.medical-card-view .btn{background:#25596b;color:white}.optional-skip{font-size:13px;color:var(--ink-soft);margin-top:9px}.default-choice{border:1px solid #b9d6c3;background:#eef6f0;border-radius:11px;padding:12px 13px;margin-bottom:14px;font-weight:700}.default-choice input{accent-color:var(--good)}
+.prefill{display:none!important}#section-insurance .panel[data-panel="5"]{display:none!important}
+.insurance-methods{display:grid;gap:10px;margin-top:16px}.insurance-loaded-card{border:1px solid #b8d5c2;background:#eef8f2;border-radius:15px;padding:20px;margin-bottom:16px}.insurance-loaded-card.hidden{display:none}.insurance-loaded-head{display:flex;gap:11px;align-items:flex-start}.insurance-loaded-check{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#247653;color:#fff;font-weight:900;flex:none}.insurance-loaded-card h3{font-family:var(--serif);font-size:22px;font-weight:400;color:#245a37;margin:1px 0 2px}.insurance-loaded-meta{font-size:13px;color:#456050}.coverage-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}.coverage-benefit{background:#fff;border:1px solid #cfe0d4;border-radius:10px;padding:11px}.coverage-benefit strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#58735f}.coverage-benefit span{display:block;margin-top:3px;font-weight:700;color:#244b35}.deductible-alert{margin-top:12px;border:1px solid #e3c16f;background:#fff6dc;color:#76510c;border-radius:10px;padding:11px 13px;font-size:13px;font-weight:700}.selfpay-callout{background:#eef8f2;border-color:#b8d5c2}.selfpay-callout .price{color:#245a37}.staff-help-alert{border:1px solid #e3c16f!important;background:#fff6dc!important;color:#76510c}.insurance-manual-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
 @media(max-width:680px){.medical-card-grid{grid-template-columns:1fr}.registration-received{padding:25px 17px}}
+@media(max-width:680px){.coverage-benefits{grid-template-columns:1fr}.insurance-loaded-card{padding:17px}}
 </style>
 </head>
 
@@ -428,11 +431,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="section">
       <div class="section-title">Contact information</div>
       <div class="grid2">
-        <div class="field"><label for="firstName">First name <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="firstName" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
-        <div class="field"><label for="lastName">Last name <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="lastName" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
-        <div class="field"><label for="dob">Date of birth <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="dob" data-lpignore="true" data-1p-ignore="true" type="date" autocomplete="off"></div>
-        <div class="field"><label for="phone">Mobile / best phone <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="phone" data-lpignore="true" data-1p-ignore="true" type="tel" autocomplete="off"></div>
-        <div class="field"><label for="email">Email <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="email" data-lpignore="true" data-1p-ignore="true" type="email" autocomplete="off"></div>
+        <div class="field"><label for="firstName">First name <span class="req">*</span></label><input id="firstName" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
+        <div class="field"><label for="lastName">Last name <span class="req">*</span></label><input id="lastName" data-lpignore="true" data-1p-ignore="true" type="text" autocomplete="off"></div>
+        <div class="field"><label for="dob">Date of birth <span class="req">*</span></label><input id="dob" data-lpignore="true" data-1p-ignore="true" type="date" autocomplete="off"></div>
+        <div class="field"><label for="phone">Mobile / best phone <span class="req">*</span></label><input id="phone" data-lpignore="true" data-1p-ignore="true" type="tel" autocomplete="off"></div>
+        <div class="field"><label for="email">Email <span class="req">*</span></label><input id="email" data-lpignore="true" data-1p-ignore="true" type="email" autocomplete="off"></div>
       </div>
     </div>
 
@@ -468,26 +471,38 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div class="section">
       <div class="section-title">How would you like to handle this visit?</div>
       <div class="payment-choice">
-        <label class="choice"><input type="radio" name="paymentChoice" value="INSURANCE"><span><strong>Use my insurance</strong><span>We’ll check the plan information you provide and show an estimate when the payer returns enough detail.</span></span></label>
-        <label class="choice"><input type="radio" name="paymentChoice" value="STAFF_HELP"><span><strong>Unsure? Let our staff help</strong><span>Bring your insurance information to the office and we’ll help sort it out when you arrive.</span></span></label>
-        <label class="choice"><input type="radio" name="paymentChoice" value="SELF_PAY"><span><strong>Self-pay</strong><span>Skip insurance verification and use Lexington Podiatry’s cash price for this visit.</span></span></label>
+        <label class="choice"><input type="radio" name="paymentChoice" value="INSURANCE"><span><strong>Insurance</strong><span>Use your health insurance for this visit.</span></span></label>
+        <label class="choice"><input type="radio" name="paymentChoice" value="SELF_PAY"><span><strong>Self-pay</strong><span>$120 for the initial visit. Additional procedures are separate.</span></span></label>
       </div>
-      <div id="staffHelpBox" class="callout gold hidden" style="margin-top:14px">
-        <strong>We’ll help with your insurance at the office.</strong>
-        <div style="margin-top:6px">No insurance check will run now. If your coverage is not active for this visit, the visit price is $120.</div>
+      <div id="insuranceEntryMethods" class="insurance-methods hidden">
+        <div class="section-title" style="margin:6px 0 2px">How would you like to provide it?</div>
+        <label class="choice"><input type="radio" name="insuranceEntryMethod" value="PHOTO"><span><strong>Take a photo</strong><span>Photograph the front and back. We’ll read the card and check coverage.</span></span></label>
+        <label class="choice"><input type="radio" name="insuranceEntryMethod" value="MANUAL"><span><strong>Enter information manually</strong><span>Type the insurance information exactly as it appears on the card.</span></span></label>
+        <label class="choice"><input type="radio" name="insuranceEntryMethod" value="STAFF_HELP"><span><strong>Ask staff for help</strong><span>Skip this for now and bring your insurance cards to the visit.</span></span></label>
+      </div>
+      <div id="staffHelpBox" class="callout staff-help-alert hidden" style="margin-top:14px">
+        <strong>⚠ Bring your insurance cards to your visit.</strong>
+        <div style="margin-top:6px">Insurance verification is being skipped for now. Our staff will help when you arrive.</div>
       </div>
       <div id="selfPayPriceBox" class="selfpay-callout hidden">
-        <strong>Self-pay price</strong>
-        <div class="price" id="selfPayPriceAmount">$—</div>
-        <div class="note" id="selfPayPriceText">Cash price for the scheduled visit.</div>
+        <strong>✓ Self-pay</strong>
+        <div class="price" id="selfPayPriceAmount">$120</div>
+        <div class="note" id="selfPayPriceText">Initial visit · additional procedures are separate.</div>
       </div>
+    </div>
+
+    <div id="insuranceLoadedCard" class="insurance-loaded-card hidden" role="status">
+      <div class="insurance-loaded-head"><div class="insurance-loaded-check">✓</div><div><h3 id="insuranceLoadedTitle">Active coverage</h3><div id="insuranceLoadedMeta" class="insurance-loaded-meta"></div></div></div>
+      <div id="coverageBenefits" class="coverage-benefits"></div>
+      <div id="deductibleAlert" class="deductible-alert hidden">⚠ You have a remaining deductible. Watch for an invoice after billing is complete.</div>
+      <button class="btn secondary" type="button" id="editLoadedInsuranceBtn" style="margin-top:14px">Update insurance</button>
     </div>
 
     <div class="section" id="insuranceDetailsSection">
       <div class="section-title">Primary insurance</div>
       <div class="grid2">
         <div class="field">
-          <label for="insuranceCarrier">Insurance company <span class="req">*</span><span class="prefill">pre-filled</span></label>
+          <label for="insuranceCarrier">Insurance company <span class="req">*</span></label>
           <input id="insuranceCarrier" type="text" list="insuranceCarrierOptions" autocomplete="off">
           <datalist id="insuranceCarrierOptions">
             <option value="Aetna"></option>
@@ -516,7 +531,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           </datalist>
           <div class="payer-id-hint">If you know it, enter the payer ID exactly as printed, including leading zeroes.</div>
         </div>
-        <div class="field"><label for="memberId">Member ID <span class="req">*</span><span class="prefill">pre-filled</span></label><input id="memberId" type="text" autocomplete="off"></div>
+        <div class="field"><label for="memberId">Member ID <span class="req">*</span></label><input id="memberId" type="text" autocomplete="off"></div>
         <div class="field"><label for="insurancePlan">Plan name <span class="verified-label hidden" id="planVerified">verified</span></label><input id="insurancePlan" type="text"></div>
         <div class="field"><label for="groupId">Group number <span class="verified-label hidden" id="groupVerified">verified</span></label><input id="groupId" type="text" autocomplete="off"></div>
       </div>
@@ -574,11 +589,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       </div>
 
       <div id="insuranceCardChoicesWrap" class="hidden" style="margin-top:14px">
-        <div class="choice-list">
-          <label class="choice zocdoc-only"><input type="radio" name="insuranceCardStatus" value="zocdoc"><span><strong>I already uploaded my insurance card to Zocdoc</strong><span>Please do not upload it again. We’ll mark it for staff verification.</span></span></label>
-          <label class="choice"><input type="radio" name="insuranceCardStatus" value="upload"><span><strong>Upload my insurance card here</strong><span>JPG, PNG, or PDF. Maximum 4 MB per file.</span></span></label>
-          <label class="choice"><input type="radio" name="insuranceCardStatus" value="bring"><span><strong>I will bring my physical insurance card to the office</strong><span>This will not stop us from checking eligibility when we have enough information.</span></span></label>
-        </div>
         <div id="insuranceUploads" class="hidden" style="margin-top:18px">
           <div class="grid2">
             <div class="field"><label for="insuranceFront">Insurance card — front</label><input id="insuranceFront" type="file" accept="image/jpeg,image/png,application/pdf"></div>
@@ -698,7 +708,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
     <div class="section">
       <div class="section-title">Today’s visit</div>
-      <div class="field"><label for="bookingReason">Booking reason <span class="prefill">from booking</span></label><input id="bookingReason" type="text" readonly></div>
+      <div class="field"><label for="bookingReason">Booking reason</label><input id="bookingReason" type="text" readonly></div>
       <div class="field"><label for="hpi">How can we help?</label><textarea id="hpi" placeholder="Tell us where the problem is, how long it has been going on, and what you are feeling."></textarea></div>
     </div>
 
@@ -2385,7 +2395,7 @@ function analyzeInsuranceCard(){
     $('insuranceAnalyzeStatus').textContent=x.memberId?'Card details found. Checking coverage…':'We could not read every field. Please review the fields below.';
     return queueEligibilityFromCurrentData(collect());
   }).then(function(){
-    FD.busy=false;setBusy(false,'');$('insuranceAnalyzeStatus').textContent='Card read complete. Review the information below and continue.';
+    FD.busy=false;setBusy(false,'');$('insuranceAnalyzeStatus').textContent=insuranceIsActive()?'Card read complete. Active coverage is shown above.':'Card read complete. Review the information and continue.';
   }).catch(function(err){FD.busy=false;setBusy(false,'');$('insuranceAnalyzeStatus').textContent='Please review or enter the card details below.';toast(err.message||'The card could not be read.');});
 }
 
@@ -2643,9 +2653,66 @@ var fd240Render=fd230Render;
 fd230Render=function(){fd240Render();if(FD.insuranceUnlocked||FD240VerifiedKey&&FD240VerifiedKey!==fd230PolicyKey(collect()))fd240Benefits(null);renderInsuranceCardRequirement();};
 (function(){
  var style=document.createElement('style');style.textContent='.office-card-covered{display:none!important}#officeCardReceipt{display:grid;gap:8px;text-align:center;padding:24px;background:#eef8f2;border:1px solid #b8ddc8}#officeCardReceipt.hidden{display:none}';document.head.appendChild(style);
- var details=$('insuranceDetailsSection'),card=$('insuranceCardSection'),panel=details.parentNode,payment=panel.querySelector('.payment-choice').closest('.section');
- panel.insertBefore(details,payment);panel.insertBefore(card,payment);
 })();
+
+/* v250: insurance is either loaded and verified, entered now, photographed, or deferred to staff. */
+function fd250EntryMethod(){return radioValue('insuranceEntryMethod')}
+paymentChoice=function(){return fd250EntryMethod()==='STAFF_HELP'?'STAFF_HELP':(radioValue('paymentChoice')||'INSURANCE')};
+needsStaffInsuranceHelp=function(){return fd250EntryMethod()==='STAFF_HELP'};
+function fd250HasInsurance(){return !!(clean($('insuranceCarrier').value)&&clean($('memberId').value))}
+function fd250Money(v){return Number(v).toLocaleString('en-US',{style:'currency',currency:'USD'})}
+function fd250BenefitValue(b,names){for(var i=0;i<names.length;i++){var v=b[names[i]];if(v!==''&&v!=null)return v}return null}
+function fd250RenderCoverage(){
+ var res=FD.eligibility||{},active=String(res.status||'').toUpperCase()==='ACTIVE'&&!FD.insuranceUnlocked&&fd250HasInsurance(),card=$('insuranceLoadedCard'),benefits=$('coverageBenefits'),b=res.benefits||{};
+ card.classList.toggle('hidden',!active);if(!active)return;
+ var carrier=clean($('insuranceCarrier').value)||clean(res.payerDisplay)||'Insurance';
+ $('insuranceLoadedTitle').textContent='Active coverage: '+carrier;
+ var meta=[];if(res.planName||clean($('insurancePlan').value))meta.push(res.planName||clean($('insurancePlan').value));if(clean($('memberId').value))meta.push('Member '+clean($('memberId').value).replace(/.(?=.{4})/g,'•'));
+ $('insuranceLoadedMeta').textContent=meta.join(' · ');
+ var copay=fd250BenefitValue(b,['copay','specialistCopay','officeCopay']),coins=fd250BenefitValue(b,['coinsurance','coinsurancePercent','specialistCoinsurance']),remaining=fd250BenefitValue(b,['deductibleRemaining','deductible','remainingDeductible']),met=b.deductibleMet===true||(remaining!=null&&Number(remaining)<=0),items=[];
+ if(copay!=null)items.push(['Copay',fd250Money(copay)]);if(coins!=null)items.push(['Co-insurance',Number(coins)+'%']);if(remaining!=null||b.deductibleMet!=null)items.push(['Deductible',met?'✓ Met':fd250Money(remaining)+' remaining']);
+ benefits.innerHTML=items.map(function(x){return '<div class="coverage-benefit"><strong>'+escapeHtml(x[0])+'</strong><span>'+escapeHtml(x[1])+'</span></div>';}).join('');benefits.classList.toggle('hidden',!items.length);
+ $('deductibleAlert').classList.toggle('hidden',remaining==null||Number(remaining)<=0);
+}
+function fd250RenderInsurance(){
+ var self=radioValue('paymentChoice')==='SELF_PAY',active=insuranceIsActive()&&fd250HasInsurance(),has=fd250HasInsurance(),method=fd250EntryMethod();
+ $('insuranceEntryMethods').classList.toggle('hidden',self||active||has&&!FD.insuranceUnlocked);
+ $('staffHelpBox').classList.toggle('hidden',self||method!=='STAFF_HELP');
+ $('selfPayPriceBox').classList.toggle('hidden',!self);if(self){$('selfPayPriceAmount').textContent='$120';$('selfPayPriceText').textContent='Initial visit · additional procedures are separate.';}
+ var manual=!self&&!active&&(method==='MANUAL'||has&&method!=='PHOTO'&&method!=='STAFF_HELP');
+ var photo=!self&&!active&&method==='PHOTO';
+ $('insuranceDetailsSection').classList.toggle('hidden',!manual);
+ $('insuranceCardSection').classList.toggle('hidden',!photo);
+ $('insuranceCardChoicesWrap').classList.toggle('hidden',!photo);$('insuranceUploads').classList.toggle('hidden',!photo);
+ $('secondaryInsuranceSection').classList.toggle('hidden',self||method==='STAFF_HELP'||photo);
+ $('insuranceBillingPolicyCard').classList.toggle('hidden',self);
+ var office=$('officeBenefits');if(office)office.classList.add('hidden');fd250RenderCoverage();
+}
+var fd250PaymentUI=applyPaymentChoiceUI_;
+applyPaymentChoiceUI_=function(){fd250PaymentUI();fd250RenderInsurance()};
+var fd250Eligibility=applyEligibilityResult;
+applyEligibilityResult=function(res){fd250Eligibility(res);fd250RenderInsurance()};
+function fd250CheckManual(){
+ var data=collect();if(!data.insuranceCarrier||!data.memberId){toast('Please enter the insurance company and member ID first.');return;}
+ var btn=$('manualCoverageCheckBtn');btn.disabled=true;btn.textContent='Checking coverage…';queueEligibilityFromCurrentData(data).catch(function(e){toast(e.message||'Coverage could not be checked. You may continue to the contract.');}).finally(function(){btn.disabled=false;btn.textContent='Check coverage';});
+}
+function fd250Init(){
+ var actions=document.createElement('div');actions.className='insurance-manual-actions';actions.innerHTML='<button class="btn primary" type="button" id="manualCoverageCheckBtn">Check coverage</button><span class="note">Uses the information above to run the coverage check.</span>';$('insuranceDetailsSection').appendChild(actions);$('manualCoverageCheckBtn').addEventListener('click',fd250CheckManual);
+ $('editLoadedInsuranceBtn').addEventListener('click',function(){unlockInsuranceForChange();setRadio('insuranceEntryMethod','MANUAL');fd250RenderInsurance();fd230Open('insurance')});
+ qa('input[name="insuranceEntryMethod"]').forEach(function(el){el.addEventListener('change',function(){if(el.value==='PHOTO')setRadio('insuranceCardStatus','upload');FD.insuranceUnlocked=true;applyPaymentChoiceUI_();fd230Render();})});
+ qa('input[name="paymentChoice"]').forEach(function(el){el.addEventListener('change',fd250RenderInsurance)});
+ if(FD.data.insuranceAssistanceRequested||String(FD.data.paymentChoice||'').toUpperCase()==='STAFF_HELP'){setRadio('paymentChoice','INSURANCE');setRadio('insuranceEntryMethod','STAFF_HELP');}else if(!insuranceIsActive()&&fd250HasInsurance())setRadio('insuranceEntryMethod','MANUAL');
+ fd250RenderInsurance();
+}
+var fd250Render=fd230Render;
+fd230Render=function(){fd250Render();fd250RenderInsurance()};
+
+var fd250Boot=boot;
+boot=function(){
+ var originalBuild=fd230Build;
+ fd230Build=function(){originalBuild();fd250Init()};
+ return fd250Boot();
+};
 
 boot();
 </script>
