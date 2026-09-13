@@ -291,6 +291,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 #dob::-webkit-date-and-time-value{text-align:left;min-height:1.5em}
 #dob::-webkit-datetime-edit{padding:0;display:inline-flex}
 #secondaryCardView{background:#f1f5f8;border-color:#b9cbd7}
+
+.compact-contract #section-contract .policy-card{padding:16px 18px;margin-bottom:12px;border:1px solid var(--line);box-shadow:none}
+.compact-contract #section-contract .policy-card h3{font-size:22px;margin-bottom:10px}
+.compact-contract #section-contract .ack{padding:7px 0;border:0;font-size:14px;font-weight:500}
+.compact-contract #section-contract .policy-card details p{font-size:13px}
+.compact-contract #section-contract .panel[data-panel="4"]>.intro,.compact-contract #finalEstimatePending{display:none!important}
+.signature-preview{margin-top:20px}#typedSignaturePreview{font-family:'Brush Script MT','Segoe Script',cursive;font-size:36px;padding:20px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+#drawSignatureCanvas{display:block;width:100%;height:160px;background:white;border:1px solid var(--line);border-radius:10px;touch-action:none;margin:10px 0}
 </style>
 </head>
 
@@ -2760,6 +2768,52 @@ fd250Init=function(){
  if(clean($('secondaryCarrier').value)||clean($('secondaryMemberId').value)||(FD.uploadsOnFile||[]).indexOf('secondary_insurance_front')>=0)setCheck('hasSecondary',true);
  setRadio('secondaryMethod','MANUAL');fd251SecondaryRender();fd250RenderInsurance();
 };
+/* Compact contract preview; production requires matching gateway signature storage. */
+var fd252Init=fd250Init;
+fd250Init=function(){fd252Init();if(FD.demo)fd252Contract();};
+function fd252Contract(){
+ document.body.classList.add('compact-contract');
+ var panel=q('.panel[data-panel="4"]'),signPanel=q('.panel[data-panel="6"]');
+ var privacy=$('privacyAcknowledged').closest('.policy-card'),treatment=$('treatmentConsent').closest('.policy-card'),billing=$('billingAuthorizationAccepted').closest('.policy-card'),financial=$('financialPolicyAcknowledged').closest('.policy-card'),noShow=$('noShowPolicyAccepted').closest('.policy-card');
+ $('confirmationPolicyAccepted').closest('.policy-card').classList.add('hidden');$('zocdocPolicy').classList.add('hidden');
+ function details(card,title){var d=document.createElement('details'),sum=document.createElement('summary');sum.textContent=title;d.appendChild(sum);card.appendChild(d);return d;}
+ var privacyDetails=privacy.querySelector('details');privacyDetails.querySelector('summary').textContent='Read the full privacy information';var intro=privacy.querySelector(':scope > p');privacyDetails.insertBefore(intro,privacyDetails.children[1]);privacy.appendChild(privacyDetails);
+ var treatmentDetails=details(treatment,'Read the full treatment, medication-history and telemedicine consent');
+ Array.from(treatment.querySelectorAll(':scope > p')).forEach(function(p){treatmentDetails.appendChild(p);});
+ ['medicationHistoryConsent','telemedicineConsent'].forEach(function(id){var p=document.createElement('p');p.textContent=$(id).nextElementSibling.textContent;treatmentDetails.appendChild(p);});
+ var short={privacyAcknowledged:'I acknowledge the privacy notice.',treatmentConsent:'I consent to treatment by Dr. Wiqar Farooqi and authorized staff.',medicationHistoryConsent:'I authorize access to my medication history.',telemedicineConsent:'I consent to telemedicine when appropriate.',billingAuthorizationAccepted:'I authorize insurance billing and assignment of benefits.',financialPolicyAcknowledged:'I accept responsibility for charges owed by me.',noShowPolicyAccepted:'I accept the $50 no-show fee after confirming my appointment.'};
+ Object.keys(short).forEach(function(id){$(id).nextElementSibling.textContent=short[id];});
+ ['treatmentConsent','medicationHistoryConsent','telemedicineConsent'].forEach(function(id){treatment.insertBefore($(id).closest('label'),treatmentDetails);});
+ treatment.appendChild($('telemedicineDeclineWarning'));qa('#section-contract .consent-subchoice').forEach(function(el){el.remove();});
+ billing.querySelector('h3').textContent='Billing & financial responsibility';
+ var billDetails=details(billing,'Read the full billing and financial terms');billDetails.appendChild(billing.querySelector(':scope > p'));billDetails.appendChild($('financialPolicyText'));billing.insertBefore($('financialPolicyAcknowledged').closest('label'),billDetails);financial.remove();
+ var noShowDetails=details(noShow,'Read the full no-show policy');noShowDetails.appendChild(noShow.querySelector(':scope > p'));noShow.querySelector('.money').remove();
+ [privacy,treatment,billing,noShow].forEach(function(el){panel.appendChild(el);});
+ ['confirmationPolicyAccepted','noShowPolicyAccepted','privacyAcknowledged','treatmentConsent','medicationHistoryConsent','telemedicineConsent','billingAuthorizationAccepted','financialPolicyAcknowledged','agreementAccepted'].forEach(function(id){setCheck(id,true);});
+ $('agreementAccepted').closest('label').classList.add('hidden');
+ $('confirmSummary').closest('.section').classList.add('hidden');$('finalEstimatePending').classList.add('hidden');
+ signPanel.querySelector('.intro').textContent='Review your selections, then sign to submit your registration.';
+ $('signatureName').previousElementSibling.textContent='Full legal name';
+ setValue('signatureName',[clean($('firstName').value),clean($('lastName').value)].filter(Boolean).join(' '));
+ $('signatureName').dataset.autoName=$('signatureName').value;
+ ['firstName','lastName'].forEach(function(id){$(id).addEventListener('input',function(){if($('signatureName').value===$('signatureName').dataset.autoName){setValue('signatureName',[clean($('firstName').value),clean($('lastName').value)].filter(Boolean).join(' '));$('signatureName').dataset.autoName=$('signatureName').value;fd252SignatureRender();}});});
+ var host=document.createElement('div');host.className='signature-preview';host.innerHTML='<div class="section-title">Your signature</div><label class="check"><input id="adoptTypedSignature" type="checkbox"><span>I adopt my name below as my electronic signature.</span></label><div id="typedSignaturePreview"></div><div id="drawSignatureArea"><label for="drawSignatureCanvas">Draw your signature below</label><canvas id="drawSignatureCanvas" width="900" height="300" aria-label="Draw your signature using a finger, stylus or mouse"></canvas><button type="button" class="btn secondary" id="clearDrawSignature">Clear signature</button></div><p class="note">By selecting Sign & submit registration, I agree to the terms and selections above and sign electronically.</p>';
+ $('signatureName').closest('.signature-grid').after(host);
+ host.nextElementSibling.textContent='Demo preview only. This signature is not saved or sent to the office.';
+ $('adoptTypedSignature').checked=!window.matchMedia('(pointer:coarse)').matches;
+ $('adoptTypedSignature').onchange=fd252SignatureRender;$('signatureName').addEventListener('input',fd252SignatureRender);
+ var canvas=$('drawSignatureCanvas'),ctx=canvas.getContext('2d'),drawing=false;ctx.lineWidth=4;ctx.lineCap='round';ctx.strokeStyle='#2b2118';
+ function point(e){var r=canvas.getBoundingClientRect();return [(e.clientX-r.left)*canvas.width/r.width,(e.clientY-r.top)*canvas.height/r.height];}
+ canvas.onpointerdown=function(e){e.preventDefault();drawing=true;canvas.setPointerCapture(e.pointerId);var p=point(e);ctx.beginPath();ctx.moveTo(p[0],p[1]);};
+ canvas.onpointermove=function(e){if(!drawing)return;e.preventDefault();var p=point(e);ctx.lineTo(p[0],p[1]);ctx.stroke();canvas.dataset.signed='yes';};
+ canvas.onpointerup=canvas.onpointercancel=function(){drawing=false;};
+ $('clearDrawSignature').onclick=function(){ctx.clearRect(0,0,canvas.width,canvas.height);delete canvas.dataset.signed;};
+ fd252SignatureRender();
+}
+function fd252SignatureRender(){if(!$('typedSignaturePreview'))return;var typed=$('adoptTypedSignature').checked;$('typedSignaturePreview').textContent=$('signatureName').value;$('typedSignaturePreview').classList.toggle('hidden',!typed);$('drawSignatureArea').classList.toggle('hidden',typed);}
+var fd252Save=fd230Save;
+fd230Save=function(section,submit){if(FD.demo&&section==='contract'&&submit&&$('adoptTypedSignature')){if(!$('adoptTypedSignature').checked&&$('drawSignatureCanvas').dataset.signed!=='yes'){$('sectionNote-contract').textContent='Please draw your signature or choose to adopt your typed name.';return;}FD.demoSignature=$('adoptTypedSignature').checked?{type:'typed',name:$('signatureName').value}:{type:'drawn',image:$('drawSignatureCanvas').toDataURL('image/png')};}return fd252Save(section,submit);};
+
 boot();
 </script>
 </body>
