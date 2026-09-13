@@ -2543,7 +2543,7 @@ $('fuSubmitBtn').addEventListener('click',completeFollowUp_);
 (function(){var card=$('insuranceCardSection'),details=$('insuranceDetailsSection');if(card&&details&&details.parentNode)details.parentNode.insertBefore(card,details);})();
 
 /* Four-section registration; saves and downstream sync have separate lifetimes. */
-var FD230={keys:['personal','insurance','contract','additional'],labels:['Demographics','Insurance','Contract','Medical card'],queue:Promise.resolve(),timers:{},submitting:{},signed:false,medicalLocked:false,uploads:{},insuranceKey:'',serial:{},polling:false};
+var FD230={keys:['personal','insurance','contract','additional'],labels:['My information','Insurance','Contract','Medical card'],queue:Promise.resolve(),timers:{},submitting:{},signed:false,medicalLocked:false,uploads:{},insuranceKey:'',serial:{},polling:false};
 function fd239StateValue(value){
  var v=String(value||'').trim();if(!v)return 'NY';
  var options=Array.from($('state').options),match=options.find(function(o){return o.value.toUpperCase()===v.toUpperCase()||o.textContent.toUpperCase()===v.toUpperCase();});
@@ -2582,7 +2582,7 @@ function fd230Open(key){var box=$('section-'+key);if(!box)return;box.open=true;b
 function fd230Build(){
  document.body.classList.add('four-sections');
  var host=q('.layout > div'),panels={};qa('.panel[data-panel]').forEach(function(p){panels[p.dataset.panel]=p});
- var received=document.createElement('section');received.id='registrationReceived';received.className='registration-received';received.setAttribute('role','status');received.innerHTML='<div class="closed-door" aria-hidden="true">🚪</div><h2>Registration received</h2><p>Your demographics, insurance information, and signed contract have been submitted. You are ready to come into the office.</p>';host.appendChild(received);
+ var received=document.createElement('section');received.id='registrationReceived';received.className='registration-received';received.setAttribute('role','status');received.innerHTML='<div class="closed-door" aria-hidden="true">🚪</div><h2>Registration received</h2><p>Your personal information, insurance information, and signed contract have been submitted. You are ready to come into the office.</p>';host.appendChild(received);
  var placement={personal:['1'],insurance:['2','5'],contract:['4','6'],additional:['3']};
  FD230.keys.forEach(function(k,i){var box=document.createElement('details');box.id='section-'+k;box.className='intake-layer';box.open=i===0;
  if(k==='additional')box.classList.add('optional-card');
@@ -2603,7 +2603,7 @@ function fd230Build(){
  var card=document.createElement('div');card.id='medicalCardView';card.className='medical-card-view';card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><div class="eyebrow">Your information</div><h3>Medical card</h3></div><span aria-hidden="true" style="font-size:25px">🔒</span></div><div class="medical-card-grid" id="medicalCardGrid"></div><button type="button" class="btn" id="medicalCardUpdate">Update medical card</button>';additionalBody.appendChild(card);
  $('medicalCardUpdate').addEventListener('click',function(){FD230.medicalLocked=false;fd230RenderMedicalCard();});
  var aside=q('.layout > .sidebar'),rail=document.createElement('nav');rail.id='sectionProgress230';rail.setAttribute('aria-label','Registration progress');aside.prepend(rail);
- q('.hero p').textContent='Complete demographics, insurance, and your contract. Your medical card is optional and can be updated at any time.';
+ q('.hero p').textContent='Complete your information, insurance, and your contract. Your medical card is optional and can be updated at any time.';
  $('completePanel').classList.add('hidden');
  // A signature is an intentional action; restored typed text is never auto-signed.
  fd230Render();
