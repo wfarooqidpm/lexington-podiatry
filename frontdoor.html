@@ -2641,7 +2641,7 @@ function fd230Request(action,section,data,submit,uploads){
  if(FD.demo)return Promise.resolve({success:true,status:'DEMO',data:data||{},contractSigned:action==='sign-contract',sectionProgress:Object.assign({},FD.data.sectionProgress||{},submit?{[section]:{savedAt:new Date().toISOString(),submittedAt:new Date().toISOString()}}:{[section]:{savedAt:new Date().toISOString(),submittedAt:''}})});
  var controller=typeof AbortController!=='undefined'?new AbortController():null;
  var timer=setTimeout(function(){if(controller)controller.abort()},action==='sign-contract'?45000:25000);
- return fetch(GATEWAY_URL,{method:'POST',signal:controller?controller.signal:undefined,body:JSON.stringify({action:action,token:FD.token,step:section,submit:!!submit,clientVersion:'v0.23.0',data:data||{},uploads:uploads||[]})}).then(function(r){return r.json()}).then(function(r){if(!r.success)throw new Error(r.error||'Could not save yet. Please try again.');return r}).catch(function(e){if(e.name==='AbortError')throw new Error('The save is taking longer than expected. Please check again.');throw e}).finally(function(){clearTimeout(timer)});
+ return fetch(GATEWAY_URL,{method:'POST',signal:controller?controller.signal:undefined,body:JSON.stringify({action:action,token:FD.token,step:section,submit:!!submit,clientVersion:'v0.26.9',signatureImage:action==='sign-contract'&&FD.demoSignature&&FD.demoSignature.type==='drawn'?FD.demoSignature.image:'',data:data||{},uploads:uploads||[]})}).then(function(r){return r.json()}).then(function(r){if(!r.success)throw new Error(r.error||'Could not save yet. Please try again.');return r}).catch(function(e){if(e.name==='AbortError')throw new Error('The save is taking longer than expected. Please check again.');throw e}).finally(function(){clearTimeout(timer)});
 }
 function fd230CheckContract(attempt){
  if(FD230.polling||FD230.signed)return;FD230.polling=true;
@@ -2690,7 +2690,7 @@ showStep=function(step){fd230Open(({1:'personal',2:'insurance',3:'additional',4:
 boot=function(){
  FD.demo=demoFromUrl();FD.token=FD.demo?'DEMO':tokenFromUrl();if(!FD.demo&&!/^[a-f0-9]{64}$/i.test(FD.token)){setFatal('Please use the Front Door link sent by Lexington Podiatry.');return;}
  apiGet().then(function(res){if(!res.success)throw new Error(res.error||'Could not load registration.');
- FD.booking=res.booking||{};FD.data=res.intake&&res.intake.data||{};FD.agreement=res.agreement||null;FD.eligibility=res.eligibility||null;FD.discovery=res.discovery||null;FD.estimate=res.estimate||null;FD.cashPrice=res.cashPrice||null;FD.completed=!!(res.intake&&res.intake.completed);FD.followUpMode=false;FD230.signed=!!(res.intake&&res.intake.contractSigned);
+ FD.capabilities=res.capabilities||{};FD.booking=res.booking||{};FD.data=res.intake&&res.intake.data||{};FD.agreement=res.agreement||null;FD.eligibility=res.eligibility||null;FD.discovery=res.discovery||null;FD.estimate=res.estimate||null;FD.cashPrice=res.cashPrice||null;FD.completed=!!(res.intake&&res.intake.completed);FD.followUpMode=false;FD230.signed=!!(res.intake&&res.intake.contractSigned);
  FD.uploadsOnFile=res.intake&&res.intake.uploadsOnFile||[];hydrate();
  ['noKnownAllergies','noCurrentMedications','noMedicalHistory','noSurgicalHistory'].forEach(function(k){if(!Object.prototype.hasOwnProperty.call(FD.data,k))setCheck(k,true)});updateConditionalFields();FD230.insuranceKey=fd230PolicyKey(collect());fd230Build();
  ['noKnownAllergies','noCurrentMedications','noMedicalHistory','noSurgicalHistory'].forEach(function(k){$(k).addEventListener('change',updateConditionalFields)});
@@ -2835,14 +2835,14 @@ fd250Init=function(){
  $('secondaryEdit').onclick=function(){fd251SecondaryEditing=true;setRadio('secondaryMethod','MANUAL');fd251SecondaryRender();};
  qa('input[name="secondaryMethod"]').forEach(function(el){el.onchange=function(){fd251SecondaryEditing=true;fd251SecondaryRender();};});
  $('hasSecondary').addEventListener('change',function(){fd251SecondaryEditing=true;fd251SecondaryRender();});
- if(!FD.demo){$('secondaryUploadBtn').disabled=true;$('secondaryCardFile').disabled=true;$('secondaryUploadStatus').textContent='Secondary card uploads are not available yet. You can enter the details manually or bring your card to the visit.';}
+ if(!fd269Enabled()){$('secondaryUploadBtn').disabled=true;$('secondaryCardFile').disabled=true;$('secondaryUploadStatus').textContent='Secondary card uploads are not available yet. You can enter the details manually or bring your card to the visit.';}
  $('secondaryUploadBtn').onclick=function(){var file=$('secondaryCardFile').files[0],btn=this,note=$('secondaryUploadStatus');if(!file){note.textContent='Choose a photo or screenshot first.';return;}btn.disabled=true;note.textContent='Saving card…';fileToUpload(file,'secondary_insurance_front').then(function(upload){return fd230Request('section-upload','insurance',{},false,[upload]);}).then(function(res){FD.uploadsOnFile=res.uploadsOnFile||Array.from(new Set((FD.uploadsOnFile||[]).concat(['secondary_insurance_front'])));note.textContent='Secondary card saved.';fd251SecondaryEditing=false;fd251SecondaryRender();}).catch(function(e){note.textContent='The card could not be saved. Please try again or bring it to your visit.';}).finally(function(){btn.disabled=false;});};
  if(clean($('secondaryCarrier').value)||clean($('secondaryMemberId').value)||(FD.uploadsOnFile||[]).indexOf('secondary_insurance_front')>=0)setCheck('hasSecondary',true);
  setRadio('secondaryMethod','MANUAL');fd251SecondaryRender();fd250RenderInsurance();
 };
 /* Compact contract preview; production requires matching gateway signature storage. */
 var fd252Init=fd250Init;
-fd250Init=function(){fd252Init();if(FD.demo)fd252Contract();};
+fd250Init=function(){fd252Init();if(fd269Enabled())fd252Contract();};
 function fd252Contract(){
  document.body.classList.add('compact-contract');
  var panel=q('.panel[data-panel="4"]'),signPanel=q('.panel[data-panel="6"]');
@@ -2871,7 +2871,7 @@ function fd252Contract(){
  ['firstName','lastName'].forEach(function(id){$(id).addEventListener('input',function(){if($('signatureName').value===$('signatureName').dataset.autoName){setValue('signatureName',[clean($('firstName').value),clean($('lastName').value)].filter(Boolean).join(' '));$('signatureName').dataset.autoName=$('signatureName').value;fd252SignatureRender();}});});
  var host=document.createElement('div');host.className='signature-preview';host.innerHTML='<div class="section-title">Your signature</div><label class="check"><input id="adoptTypedSignature" type="checkbox"><span>I adopt my name below as my electronic signature.</span></label><div id="typedSignaturePreview"></div><div id="drawSignatureArea"><label for="drawSignatureCanvas">Draw your signature below</label><canvas id="drawSignatureCanvas" width="900" height="300" aria-label="Draw your signature using a finger, stylus or mouse"></canvas><button type="button" class="btn secondary" id="clearDrawSignature">Clear signature</button></div><p class="note">By selecting Sign & submit registration, I agree to the terms and selections above and sign electronically.</p>';
  $('signatureName').closest('.signature-grid').after(host);
- host.nextElementSibling.textContent='Demo preview only. This signature is not saved or sent to the office.';
+ host.nextElementSibling.textContent=FD.demo?'Demo preview only. This signature is not saved or sent to the office.':'Your signature and selected terms are saved securely when you submit.';
  $('adoptTypedSignature').checked=!window.matchMedia('(pointer:coarse)').matches;
  $('adoptTypedSignature').onchange=fd252SignatureRender;$('signatureName').addEventListener('input',fd252SignatureRender);
  var canvas=$('drawSignatureCanvas'),ctx=canvas.getContext('2d'),drawing=false;ctx.lineWidth=4;ctx.lineCap='round';ctx.strokeStyle='#2b2118';
@@ -2884,7 +2884,7 @@ function fd252Contract(){
 }
 function fd252SignatureRender(){if(!$('typedSignaturePreview'))return;var typed=$('adoptTypedSignature').checked;$('typedSignaturePreview').textContent=$('signatureName').value;$('typedSignaturePreview').classList.toggle('hidden',!typed);$('drawSignatureArea').classList.toggle('hidden',typed);}
 var fd252Save=fd230Save;
-fd230Save=function(section,submit){if(FD.demo&&section==='contract'&&submit&&$('adoptTypedSignature')){if(!$('adoptTypedSignature').checked&&$('drawSignatureCanvas').dataset.signed!=='yes'){$('sectionNote-contract').textContent='Please draw your signature or choose to adopt your typed name.';return;}FD.demoSignature=$('adoptTypedSignature').checked?{type:'typed',name:$('signatureName').value}:{type:'drawn',image:$('drawSignatureCanvas').toDataURL('image/png')};}return fd252Save(section,submit);};
+fd230Save=function(section,submit){if(fd269Enabled()&&section==='contract'&&submit&&$('adoptTypedSignature')){if(!$('adoptTypedSignature').checked&&$('drawSignatureCanvas').dataset.signed!=='yes'){$('sectionNote-contract').textContent='Please draw your signature or choose to adopt your typed name.';return;}FD.demoSignature=$('adoptTypedSignature').checked?{type:'typed',name:$('signatureName').value}:{type:'drawn',image:$('drawSignatureCanvas').toDataURL('image/png')};}return fd252Save(section,submit);};
 
 /* v253 medical-card review with isolated filled and blank fixtures. */
 var fd253Demo=demoFrontDoorResponse_;
@@ -2892,11 +2892,11 @@ demoFrontDoorResponse_=function(){var r=fd253Demo(),variant=new URLSearchParams(
  if(variant==='filled'||variant==='completed'){Object.assign(r.intake.data,{address1:'123 Example Avenue',city:'New York',state:'NY',zip:'10016',paymentChoice:'INSURANCE',insuranceCarrier:'Aetna',payerId:'60054',memberId:'DEMO123456',insurancePlan:'Demo primary plan',hasSecondaryInsurance:true,secondaryCarrier:'Demo supplemental insurance',secondaryMemberId:'DEMO98765',noKnownAllergies:false,allergies:'Penicillin — rash (fictional example)',noMedicalHistory:false,medicalHistory:['Hypertension'],medicalOther:'',noCurrentMedications:false,medications:'Amlodipine 5 mg daily (fictional example)',noSurgicalHistory:false,surgicalHistory:'Appendectomy, 2010 (fictional example)',familyHistory:'Mother: type 2 diabetes (fictional example)',pharmacy:'Example Community Pharmacy — DEMO',pharmacyAddress:'100 Example Street, New York, NY 10016',visitReasons:['Heel pain'],hpi:'Right heel discomfort when taking the first steps in the morning (fictional example).'});r.eligibility={success:true,status:'ACTIVE',planName:'Demo primary plan',benefits:{copay:30,coinsurance:10,deductibleRemaining:450},checkedAt:new Date().toISOString()};}
  return r;};
 var fd253Collect=collect;
-collect=function(){var d=fd253Collect();if(FD.demo&&$('familyHistory')){d.familyHistory=clean($('familyHistory').value);d.visitReasons=qa('#visitReasonChoices input:checked').map(function(x){return x.value;});}return d;};
+collect=function(){var d=fd253Collect();if(fd269Enabled()&&$('familyHistory')){d.familyHistory=clean($('familyHistory').value);d.visitReasons=qa('#visitReasonChoices input:checked').map(function(x){return x.value;});}return d;};
 var fd253Text=fd230MedicalText;
-fd230MedicalText=function(d){if(!FD.demo)return fd253Text(d);var prior=fd253Text(d),map={};prior.forEach(function(x){map[x[0]]=x[1];});return [['Allergies',map.Allergies],['Past medical history',map['Medical history']],['Medications',map.Medications],['Past surgical history',map['Surgical history']],['Family history',d.familyHistory||'Not provided'],['Preferred pharmacy',[d.pharmacy,d.pharmacyAddress].filter(Boolean).join(' · ')||'Not selected'],["Today’s visit",(d.visitReasons||[]).join(', ')||'Not selected'],['Visit details',d.hpi||'Not provided']].concat(prior.filter(function(x){return /insurance$/.test(x[0]);}));};
+fd230MedicalText=function(d){if(!fd269Enabled())return fd253Text(d);var prior=fd253Text(d),map={};prior.forEach(function(x){map[x[0]]=x[1];});return [['Allergies',map.Allergies],['Past medical history',map['Medical history']],['Medications',map.Medications],['Past surgical history',map['Surgical history']],['Family history',d.familyHistory||'Not provided'],['Preferred pharmacy',[d.pharmacy,d.pharmacyAddress].filter(Boolean).join(' · ')||'Not selected'],["Today’s visit",(d.visitReasons||[]).join(', ')||'Not selected'],['Visit details',d.hpi||'Not provided']].concat(prior.filter(function(x){return /insurance$/.test(x[0]);}));};
 var fd253Init=fd250Init;
-fd250Init=function(){fd253Init();if(!FD.demo)return;
+fd250Init=function(){fd253Init();if(!fd269Enabled())return;
  $('demoNotice').classList.remove('hidden');$('demoNotice').textContent='Fictional preview — entries, signatures and pharmacy searches stay in this demo.';
  var health=$('healthDetails');
  function section(title,nodes){var el=document.createElement('div');el.className='section';var h=document.createElement('div');h.className='section-title';h.textContent=title;el.appendChild(h);nodes.forEach(function(n){el.appendChild(n);});return el;}
@@ -2913,7 +2913,7 @@ fd250Init=function(){fd253Init();if(!FD.demo)return;
  $('section-additional').open=!!FD230.signed;if(new URLSearchParams(location.search).get('test')==='filled')FD230.medicalLocked=true;updateConditionalFields();fd230RenderMedicalCard();
 };
 var fd253Pharmacy=searchPharmacy;
-searchPharmacy=function(){if(!FD.demo)return fd253Pharmacy();var city=clean($('pharmacyCity').value),state=$('pharmacyState').value,zip=clean($('pharmacyZip').value),results=$('pharmacyResults');if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a town/city and state, or a five-digit ZIP code.';return;}var where=zip||city+', '+state;results.replaceChildren();['Example Community Pharmacy','Example Care Pharmacy'].forEach(function(name,i){var btn=document.createElement('button');btn.type='button';btn.className='pharmacy-result';btn.textContent=name+' — DEMO · '+(100+i*10)+' Example Street, '+where;btn.onclick=function(){setValue('pharmacy',name+' — DEMO');setValue('pharmacyAddress',(100+i*10)+' Example Street, '+where);setValue('pharmacyNpi','');setValue('pharmacyPhone','');renderPharmacySelection();results.replaceChildren();$('pharmacy').dispatchEvent(new Event('input',{bubbles:true}));};results.appendChild(btn);});};
+searchPharmacy=function(){if(!FD.demo&&fd269Enabled())return fd269Pharmacy(false);if(!FD.demo)return fd253Pharmacy();var city=clean($('pharmacyCity').value),state=$('pharmacyState').value,zip=clean($('pharmacyZip').value),results=$('pharmacyResults');if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a town/city and state, or a five-digit ZIP code.';return;}var where=zip||city+', '+state;results.replaceChildren();['Example Community Pharmacy','Example Care Pharmacy'].forEach(function(name,i){var btn=document.createElement('button');btn.type='button';btn.className='pharmacy-result';btn.textContent=name+' — DEMO · '+(100+i*10)+' Example Street, '+where;btn.onclick=function(){setValue('pharmacy',name+' — DEMO');setValue('pharmacyAddress',(100+i*10)+' Example Street, '+where);setValue('pharmacyNpi','');setValue('pharmacyPhone','');renderPharmacySelection();results.replaceChildren();$('pharmacy').dispatchEvent(new Event('input',{bubbles:true}));};results.appendChild(btn);});};
 // The existing click listener holds the original search function; route demo requests locally too.
 var fd253ApiPharmacy=apiPharmacySearch;
 apiPharmacySearch=function(name,location){if(FD.demo){searchPharmacy();return Promise.resolve({success:true,results:[]});}return fd253ApiPharmacy(name,location);};
@@ -2930,7 +2930,7 @@ function fd264InsuranceIcon(carrier){
  return key?'<img class="insurance-logo" src="'+logos[key]+'" alt="" aria-hidden="true">':'<span class="summary-symbol" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="3"/><circle cx="8" cy="10" r="2"/><path d="M5 16c0-4 6-4 6 0m3-7h5m-5 4h5"/></svg></span>';
 }
 function fd254Summary(){
- if(!FD.demo||!$('completedMedicalCard'))return;
+ if(!fd269Enabled()||!$('completedMedicalCard'))return;
  var ready=fd254Ready(),host=$('completedMedicalCard');document.body.classList.toggle('medical-summary-ready',ready);host.classList.toggle('hidden',!ready);$('demoNotice').textContent=ready?'✓ Submitted and booked · Tap to modify':'Fictional preview — entries stay in this demo.';if(!ready)return;
  var d=collect(),esc=escapeHtml;
  function field(id,label,value){return '<label class="snapshot-edit-label" for="edit-'+id+'">'+esc(label)+'</label><input id="edit-'+id+'" value="'+esc(value||'')+'">';}
@@ -2944,38 +2944,38 @@ function fd254Summary(){
  var medical=fd230MedicalText(d).filter(function(x){return ['Allergies','Past medical history','Medications','Past surgical history','Family history'].indexOf(x[0])>=0;}).map(function(x,i){return editor(x[0],x[1].replace(/ \(fictional example\)/g,''),'<label class="snapshot-edit-label" for="summary-health-'+i+'">'+esc(x[0])+'</label><textarea id="summary-health-'+i+'">'+esc(x[1])+'</textarea>','health-'+i);}).join('');
  var calendar='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 2v6M17 2v6M3 10h18M8 15h3M14 15h3M8 18h3"/></svg>';
  host.innerHTML='<header class="snapshot-heading"><h2 class="booking-card-title">Lexington Podiatry Booking - <strong class="booking-patient-name">'+esc([d.firstName,d.lastName].filter(Boolean).join(' '))+'</strong></h2></header><div class="booking-cards-frame"><section class="snapshot-appointment"><div><button type="button" id="appointmentCardToggle" class="appointment-card-toggle" aria-expanded="false" aria-controls="appointmentActions"><span class="calendar-sticker" aria-hidden="true">'+calendar+'</span><span><span class="snapshot-label">Your appointment</span><span class="appointment-title">'+esc(FD.booking.appointmentDisplay||'Details to be confirmed')+'</span><span class="appointment-provider">'+fd262VisitType(FD.booking.patientType)+' · Dr. Wiqar Farooqi · '+(frontDoorIsVirtual_()?'Virtual visit':'In person')+'</span></span><span class="appointment-chevron" aria-hidden="true">⌄</span></button><div id="appointmentActions" class="hidden"><button type="button" class="reschedule-button" id="summaryReschedule" aria-expanded="false">Reschedule</button></div></div><div class="snapshot-reason">'+editor('Visit reason',(d.visitReasons||[]).join(' · ')||'Foot consultation',field('visitReason','Reason',(d.visitReasons||[]).join(', '))+'<label class="snapshot-edit-label" for="edit-hpi">Visit details</label><textarea id="edit-hpi">'+esc(d.hpi||'')+'</textarea>','visit')+'</div><div id="summarySchedule" class="hidden"><p>Sample appointments — demo only</p><select id="summaryTime"><option>Wednesday, September 16 at 11:00 AM</option><option>Thursday, September 17 at 2:00 PM</option></select><button type="button" class="btn secondary" id="summaryConfirmTime">Confirm demo time</button></div></section>'+(!frontDoorIsVirtual_()&&!fd263HasPhotoId()?'<div class="snapshot-id">Please bring a photo ID to your appointment.</div>':'')+'<div class="snapshot-services">'+insurance+pharmacy+'</div><section class="snapshot-health"><div class="snapshot-label">Medical information</div><div class="snapshot-medical">'+medical+'</div></section></div>';
- setValue('edit-pharmState','NY');if($('summarySelfPay'))$('summarySelfPay').onclick=function(){setRadio('paymentChoice','SELF_PAY');FD.data=Object.assign({},FD.data,collect());fd254Summary();};
+ setValue('edit-pharmState','NY');if($('summarySelfPay'))$('summarySelfPay').onclick=function(){setRadio('paymentChoice','SELF_PAY');fd269SaveCard('insurance');};
  qa('#completedMedicalCard [data-cancel]').forEach(function(btn){btn.onclick=function(){fd254Summary();};});
  qa('#completedMedicalCard [data-save]').forEach(function(btn){btn.onclick=function(){var key=btn.dataset.save;
- if(key==='insurance'){var changed=['insuranceCarrier','insurancePlan','memberId'].some(function(id){return $(id).value!==$('edit-'+id).value;});['insuranceCarrier','insurancePlan','memberId','secondaryCarrier','secondaryMemberId'].forEach(function(id){setValue(id,$('edit-'+id).value);});setCheck('hasSecondary',$('edit-hasSecondary').checked);if(changed){FD.eligibility={status:'EDITING'};FD.insuranceUnlocked=true;}}
+ if(key==='insurance'){var changed=['insuranceCarrier','insurancePlan','memberId'].some(function(id){return $(id).value!==$('edit-'+id).value;});['insuranceCarrier','insurancePlan','memberId','secondaryCarrier','secondaryMemberId'].forEach(function(id){setValue(id,$('edit-'+id).value);});setCheck('hasSecondary',$('edit-hasSecondary').checked);if(changed){var mapped=payerForCarrier($('insuranceCarrier').value);setValue('payerId',mapped?mapped.id:'');FD.eligibility={status:'EDITING'};FD.insuranceUnlocked=true;}}
  else if(key==='visit'){setValue('hpi',$('edit-hpi').value);var reasons=$('edit-visitReason').value.split(',').map(clean).filter(Boolean);qa('#visitReasonChoices input').forEach(function(cb){cb.checked=reasons.indexOf(cb.value)>=0;});reasons.forEach(function(reason){if(!qa('#visitReasonChoices input').some(function(cb){return cb.value===reason;})){var cb=document.createElement('input');cb.type='checkbox';cb.value=reason;cb.checked=true;$('visitReasonChoices').appendChild(cb);}});}
  else {var i=Number(key.split('-')[1]),value=$('summary-health-'+i).value,ids=['allergies','medicalOther','medications','surgicalHistory','familyHistory'],checks=['noKnownAllergies','noMedicalHistory','noCurrentMedications','noSurgicalHistory'];setValue(ids[i],value);if(checks[i])setCheck(checks[i],false);if(i===1)qa('#historyChecks input').forEach(function(cb){cb.checked=false;});}
- FD.data=Object.assign({},FD.data,collect());fd254Summary();};});
+ fd269SaveCard(key==='insurance'?'insurance':'additional');};});
  $('appointmentCardToggle').onclick=function(){var actions=$('appointmentActions'),open=actions.classList.contains('hidden');actions.classList.toggle('hidden',!open);this.setAttribute('aria-expanded',String(open));if(!open){$('summarySchedule').classList.add('hidden');$('summaryReschedule').setAttribute('aria-expanded','false');}fd257RefreshLock();};
  fd257RefreshLock();
- $('summaryReschedule').onclick=function(){if(fd257Locked(FD.booking,Date.now())){fd257RefreshLock();return;}var box=$('summarySchedule'),open=box.classList.contains('hidden');box.classList.toggle('hidden',!open);this.setAttribute('aria-expanded',String(open));};
- $('summaryConfirmTime').onclick=function(){if(fd257Locked(FD.booking,Date.now())){fd257RefreshLock();return;}FD.booking.appointmentDisplay=$('summaryTime').value;FD.booking.appointmentStart=$('summaryTime').selectedIndex===0?'2026-09-16T11:00:00-04:00':'2026-09-17T14:00:00-04:00';fd254Summary();};
- $('summaryPharmSearch').onclick=function(){var city=clean($('edit-pharmCity').value),state=$('edit-pharmState').value,zip=clean($('edit-pharmZip').value),results=$('summaryPharmResults');results.replaceChildren();if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a city and state, or a five-digit ZIP.';return;}['Example Community Pharmacy','Example Care Pharmacy'].forEach(function(name,i){var btn=document.createElement('button');btn.type='button';btn.className='pharmacy-result';var address=(100+i*10)+' Example Street, '+(zip||city+', '+state);btn.textContent=name+' — DEMO · '+address;btn.onclick=function(){setValue('pharmacy',name+' — DEMO');setValue('pharmacyAddress',address);setValue('pharmacyNpi','');setValue('pharmacyPhone','');FD.data=Object.assign({},FD.data,collect());fd254Summary();};results.appendChild(btn);});};
+ $('summaryReschedule').onclick=function(){if(FD.booking.source==='ZOCDOC'||!FD.demo)return fd269Schedule();if(fd257Locked(FD.booking,Date.now())){fd257RefreshLock();return;}var box=$('summarySchedule'),open=box.classList.contains('hidden');box.classList.toggle('hidden',!open);this.setAttribute('aria-expanded',String(open));};
+ $('summaryConfirmTime').onclick=function(){if(!FD.demo)return fd269ConfirmSchedule();if(fd257Locked(FD.booking,Date.now())){fd257RefreshLock();return;}FD.booking.appointmentDisplay=$('summaryTime').value;FD.booking.appointmentStart=$('summaryTime').selectedIndex===0?'2026-09-16T11:00:00-04:00':'2026-09-17T14:00:00-04:00';fd254Summary();};
+ $('summaryPharmSearch').onclick=function(){if(!FD.demo)return fd269Pharmacy(true);var city=clean($('edit-pharmCity').value),state=$('edit-pharmState').value,zip=clean($('edit-pharmZip').value),results=$('summaryPharmResults');results.replaceChildren();if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a city and state, or a five-digit ZIP.';return;}['Example Community Pharmacy','Example Care Pharmacy'].forEach(function(name,i){var btn=document.createElement('button');btn.type='button';btn.className='pharmacy-result';var address=(100+i*10)+' Example Street, '+(zip||city+', '+state);btn.textContent=name+' — DEMO · '+address;btn.onclick=function(){setValue('pharmacy',name+' — DEMO');setValue('pharmacyAddress',address);setValue('pharmacyNpi','');setValue('pharmacyPhone','');FD.data=Object.assign({},FD.data,collect());fd254Summary();};results.appendChild(btn);});};
 }
 var fd254Init=fd250Init;
-fd250Init=function(){fd254Init();qa('p.callout').forEach(function(el){if(el.textContent.indexOf('Please bring a photo ID')===0)el.classList.add('id-reminder');});if(!FD.demo)return;
+fd250Init=function(){fd254Init();qa('p.callout').forEach(function(el){if(el.textContent.indexOf('Please bring a photo ID')===0)el.classList.add('id-reminder');});if(!fd269Enabled())return;
  FD230.labels[3]='Medical information';$('section-additional').querySelector('summary').innerHTML='<span class="section-number">+</span>Medical information';$('sectionSubmit-additional').textContent='Submit medical information';
  FD230.medicalLocked=false;fd230RenderMedicalCard();var host=document.createElement('section');host.id='completedMedicalCard';host.className='hidden';$('newPatientLayout').before(host);fd254Summary();
 };
 var fd254Insurance=fd250RenderInsurance;
 fd250RenderInsurance=function(){fd254Insurance();var box=q('.payment-choice').closest('.section');box.classList.toggle('hidden',fd250HasInsurance()&&!FD.insuranceUnlocked&&!isSelfPay()&&!needsStaffInsuranceHelp());};
 var fd254Render=fd230Render;
-fd230Render=function(){fd254Render();if(FD.demo&&$('sectionProgress230'))$('sectionProgress230').innerHTML=$('sectionProgress230').innerHTML.replace(/\+ Medical card/g,'+ Medical information');};
+fd230Render=function(){fd254Render();if(fd269Enabled()&&$('sectionProgress230'))$('sectionProgress230').innerHTML=$('sectionProgress230').innerHTML.replace(/\+ Medical card/g,'+ Medical information');};
 var fd254Save=fd230Save;
-fd230Save=function(section,submit){var result=fd254Save(section,submit);if(FD.demo&&submit)FD230.queue.then(function(){FD230.medicalLocked=false;fd230RenderMedicalCard();fd254Summary();});return result;};
+fd230Save=function(section,submit){var result=fd254Save(section,submit);if(fd269Enabled()&&submit)FD230.queue.then(function(){FD230.medicalLocked=false;fd230RenderMedicalCard();fd254Summary();});return result;};
 
 // Cutoff preview uses an absolute timestamp, never the formatted display string.
 function fd257Locked(booking,now){var start=Date.parse(booking.appointmentStart||'');return !Number.isFinite(start)||start-now<=4*60*60*1000;}
-function fd257RefreshLock(){var btn=$('summaryReschedule');if(!btn)return;var locked=fd257Locked(FD.booking,Date.now());btn.disabled=locked;var notice=$('rescheduleLockNotice');if(!notice){notice=document.createElement('p');notice.id='rescheduleLockNotice';notice.setAttribute('role','status');btn.after(notice);}notice.innerHTML='Online rescheduling closes 4 hours before your appointment. Please <a href="tel:+12125108665">call (212) 510-8665</a> if you need to make a change.';notice.classList.toggle('hidden',!locked);if(locked){$('summarySchedule').classList.add('hidden');btn.setAttribute('aria-expanded','false');}}
+function fd257RefreshLock(){var btn=$('summaryReschedule');if(!btn)return;btn.textContent=FD.booking.source==='ZOCDOC'?'Reschedule on Zocdoc':'Reschedule';var locked=fd257Locked(FD.booking,Date.now())||(!FD.demo&&['WEBSITE','ZOCDOC'].indexOf(FD.booking.source)<0);btn.disabled=locked;var notice=$('rescheduleLockNotice');if(!notice){notice=document.createElement('p');notice.id='rescheduleLockNotice';notice.setAttribute('role','status');btn.after(notice);}notice.innerHTML='Online rescheduling may be unavailable for this booking or within 4 hours of your appointment. Please <a href="tel:+12125108665">call (212) 510-8665</a> if you need to make a change.';notice.classList.toggle('hidden',!locked);if(locked){$('summarySchedule').classList.add('hidden');btn.setAttribute('aria-expanded','false');}}
 var fd257Demo=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd257Demo();var locked=new URLSearchParams(location.search).get('cutoff')==='locked';r.booking.appointmentStart=locked?'2026-09-13T10:00:00-04:00':'2026-09-15T10:00:00-04:00';if(locked)r.booking.appointmentDisplay='Sunday, September 13 at 10:00 AM';return r;};
-setInterval(function(){if(FD.demo)fd257RefreshLock();},15000);
-document.addEventListener('visibilitychange',function(){if(!document.hidden&&FD.demo)fd257RefreshLock();});
+setInterval(function(){if(fd269Enabled())fd257RefreshLock();},15000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&fd269Enabled())fd257RefreshLock();});
 var fd263Demo=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd263Demo();if(new URLSearchParams(location.search).get('id')==='uploaded')r.intake.uploadsOnFile=['photo_id'];return r;};
 /* Blank demo starts a fresh intake while retaining the normal form defaults. */
@@ -3020,6 +3020,44 @@ fd250RenderCoverage=function(){
 };
 var fd268Demo=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd268Demo(),state=new URLSearchParams(location.search).get('coverage');if(state==='unavailable'||state==='terminated'){r.eligibility={success:state==='terminated',status:state==='terminated'?'INACTIVE':'UNAVAILABLE',checkedAt:new Date().toISOString()};}return r;};
+
+function fd269Enabled(){return FD.demo||!!(FD.capabilities&&FD.capabilities.approvedIntake);}
+var fd269Collect=collect;
+collect=function(){var d=fd269Collect();if(fd269Enabled()&&$('adoptTypedSignature'))d.signatureType=$('adoptTypedSignature').checked?'typed':'drawn';return d;};
+function fd269SaveCard(section){
+ var d=collect(),buttons=qa('#completedMedicalCard [data-save],#summarySelfPay');buttons.forEach(function(b){b.disabled=true;});
+ var status=$('cardSaveStatus');if(!status){status=document.createElement('p');status.id='cardSaveStatus';status.setAttribute('role','status');$('completedMedicalCard').appendChild(status);}status.textContent='Saving…';
+ return fd230Request('section-save',section,d,true).then(function(r){FD.data=Object.assign({},FD.data,d,{sectionProgress:r.sectionProgress||FD.data.sectionProgress});fd254Summary();fd230Request('section-sync',section,{},false).catch(function(){});if(section==='insurance'&&d.paymentChoice!=='SELF_PAY'){FD230.insuranceKey=fd230PolicyKey(d);queueEligibilityFromCurrentData(d).then(fd254Summary).catch(function(){FD.eligibility={status:'UNAVAILABLE'};fd254Summary();});}}).catch(function(e){status.textContent=e.message+' Please try saving again.';buttons.forEach(function(b){b.disabled=false;});});
+}
+function fd269Pharmacy(summary){
+ var city=clean($(summary?'edit-pharmCity':'pharmacyCity').value),state=$(summary?'edit-pharmState':'pharmacyState').value,zip=clean($(summary?'edit-pharmZip':'pharmacyZip').value),results=$(summary?'summaryPharmResults':'pharmacyResults');
+ if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a town/city and state, or a five-digit ZIP code.';return;}
+ results.textContent='Searching pharmacies…';var p=new URLSearchParams({action:'pharmacy-search',t:FD.token,city:city,state:state,zip:zip});
+ return fetch(GATEWAY_URL+'?'+p).then(function(r){return r.json();}).then(function(r){if(!r.success)throw new Error(r.error||'Search unavailable.');results.replaceChildren();if(!r.results||!r.results.length){results.textContent='No pharmacies found. Try a nearby city or ZIP.';return;}
+ r.results.forEach(function(ph){var b=document.createElement('button');b.type='button';b.className='pharmacy-result';b.textContent=ph.name+' · '+ph.address;b.onclick=function(){setValue('pharmacy',ph.name);setValue('pharmacyAddress',ph.address);setValue('pharmacyNpi',ph.npi);setValue('pharmacyPhone',ph.phone);renderPharmacySelection();if(summary)fd269SaveCard('additional');else{results.replaceChildren();$('pharmacy').dispatchEvent(new Event('input',{bubbles:true}));}};results.appendChild(b);});
+ }).catch(function(e){results.textContent=e.message+' Please try again or ask the office for help.';});
+}
+function fd269Schedule(){
+ if(FD.booking.source==='ZOCDOC'){if(!fd257Locked(FD.booking,Date.now()))window.open('https://www.zocdoc.com/','_blank','noopener,noreferrer');return;}
+ if(fd257Locked(FD.booking,Date.now())){fd257RefreshLock();return;}
+ var box=$('summarySchedule');box.classList.remove('hidden');box.replaceChildren();var note=document.createElement('p');note.textContent='Finding available appointments…';box.appendChild(note);
+ fd230Request('reschedule-slots','additional',{},false).then(function(r){note.textContent='Choose a new appointment';var select=document.createElement('select');select.id='liveScheduleTime';(r.slots||[]).forEach(function(slot){var o=document.createElement('option');o.value=slot.iso;o.textContent=slot.dateLabel+' · '+slot.timeLabel;select.appendChild(o);});if(!select.options.length){note.textContent='No available appointments. Please call the office.';return;}box.appendChild(select);var button=document.createElement('button');button.type='button';button.className='btn';button.textContent='Confirm new appointment';button.onclick=fd269ConfirmSchedule;box.appendChild(button);}).catch(function(e){note.textContent=e.message;});
+}
+function fd269ConfirmSchedule(){
+ var select=$('liveScheduleTime');if(!select)return;var button=$('summarySchedule').querySelector('button');button.disabled=true;button.textContent='Rescheduling…';
+ fd230Request('reschedule-confirm','additional',{start:select.value},true).then(function(r){FD.booking.appointmentStart=r.appointmentStart;FD.booking.appointmentEnd=r.appointmentEnd;FD.booking.appointmentDisplay=r.appointmentDisplay;fd254Summary();}).catch(function(e){button.disabled=false;button.textContent='Confirm new appointment';var note=$('summarySchedule').querySelector('p');note.textContent=e.message;});
+}
+var fd269Init=fd250Init;
+fd250Init=function(){fd269Init();if(!fd269Enabled())return;
+ if(!FD.demo&&FD.agreement&&FD.agreement.sections){var texts=FD.agreement.sections,details=qa('#section-contract .policy-card details');details.forEach(function(el,i){if(!texts[i])return;var sum=el.querySelector('summary');el.replaceChildren(sum);texts[i].paragraphs.forEach(function(t){var p=document.createElement('p');p.textContent=t;el.appendChild(p);});});}
+ if(!FD.demo){$('demoNotice').classList.remove('hidden');if(!fd254Ready())$('demoNotice').textContent='Your information is saved securely as you complete each section.';}
+ if(!FD230.signed)['insurance','contract','additional'].forEach(function(k){$('section-'+k).open=false;});
+};
+
+var fd269Render=fd230Render;
+fd230Render=function(){fd269Render();if(fd269Enabled())fd254Summary();};
+var fd269Eligibility=applyEligibilityResult;
+applyEligibilityResult=function(res){if(res&&res.success===false)FD.eligibility={status:'UNAVAILABLE'};fd269Eligibility(res);if(fd269Enabled())fd254Summary();};
 boot();
 </script>
 </body>
