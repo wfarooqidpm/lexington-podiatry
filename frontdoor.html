@@ -2932,14 +2932,14 @@ function fd264InsuranceIcon(carrier){
 }
 function fd254Summary(){
  if(!fd269Enabled()||!$('completedMedicalCard'))return;
- var ready=fd254Ready(),host=$('completedMedicalCard');document.body.classList.toggle('medical-summary-ready',ready);host.classList.toggle('hidden',!ready);$('demoNotice').textContent=ready?'✓ Submitted and booked · Tap to modify':'Fictional preview — entries stay in this demo.';if(!ready)return;
+ var ready=fd254Ready()||fd273ReturningCard(),host=$('completedMedicalCard');document.body.classList.toggle('medical-summary-ready',ready);host.classList.toggle('hidden',!ready);$('demoNotice').textContent=ready?(fd254Ready()?'✓ Submitted and booked · Tap to modify':'✓ Appointment booked · Tap to modify'):'Fictional preview — entries stay in this demo.';if(!ready)return;
  var d=collect(),esc=escapeHtml;
  function field(id,label,value){return '<label class="snapshot-edit-label" for="edit-'+id+'">'+esc(label)+'</label><input id="edit-'+id+'" value="'+esc(value||'')+'">';}
  function actions(id){return '<div class="snapshot-actions"><button class="btn secondary" type="button" data-save="'+id+'">Save</button><button class="btn secondary" type="button" data-cancel>Cancel</button></div>';}
  function editor(label,preview,body,id){return '<details class="snapshot-detail snapshot-editor"><summary><span class="snapshot-label">'+esc(label)+'</span><span class="snapshot-value">'+esc(preview||'Not provided')+'</span></summary><div class="snapshot-edit-body">'+body+actions(id)+'</div></details>';}
  var coverage=fd268CoverageState(FD.eligibility,d),active=coverage==='active';
 
- var insSummary='<div class="summary-icon-row"><div><span class="snapshot-label">Primary insurance</span><h3>'+esc(d.insuranceCarrier||'Self-pay')+'</h3>'+'<span class="coverage-status">'+esc(fd268CoverageLabel(coverage,d.insuranceCarrier))+'</span>'+'<p>'+esc(d.insurancePlan||'')+'</p></div>'+fd264InsuranceIcon(d.insuranceCarrier)+'</div>'+(d.hasSecondaryInsurance?'<div class="snapshot-secondary summary-icon-row"><div><span class="snapshot-label">Secondary insurance</span>'+esc(d.secondaryCarrier||'Card on file')+'</div>'+fd264InsuranceIcon(d.secondaryCarrier)+'</div>':'');
+ var insSummary='<div class="summary-icon-row"><div><span class="snapshot-label">Primary insurance</span><h3>'+esc(d.insuranceCarrier||(isSelfPay()?'Self-pay':'Insurance not on file'))+'</h3>'+'<span class="coverage-status">'+esc(fd268CoverageLabel(coverage,d.insuranceCarrier))+'</span>'+'<p>'+esc(d.insurancePlan||'')+'</p></div>'+fd264InsuranceIcon(d.insuranceCarrier)+'</div>'+(d.hasSecondaryInsurance?'<div class="snapshot-secondary summary-icon-row"><div><span class="snapshot-label">Secondary insurance</span>'+esc(d.secondaryCarrier||'Card on file')+'</div>'+fd264InsuranceIcon(d.secondaryCarrier)+'</div>':'');
  var insurance='<details class="snapshot-tile snapshot-editor coverage-'+coverage+'"><summary>'+insSummary+'</summary><div class="snapshot-edit-body">'+field('insuranceCarrier','Primary insurance',d.insuranceCarrier)+field('insurancePlan','Plan',d.insurancePlan)+field('memberId','Member ID',d.memberId)+'<label class="check"><input type="checkbox" id="edit-hasSecondary" '+(d.hasSecondaryInsurance?'checked':'')+'>Secondary insurance</label>'+field('secondaryCarrier','Secondary insurance',d.secondaryCarrier)+field('secondaryMemberId','Secondary member ID',d.secondaryMemberId)+actions('insurance')+(coverage==='inactive'?'<button type="button" class="btn secondary" id="summarySelfPay">Choose self-pay</button>':'')+'</div></details>';
  var pharmacy='<details class="snapshot-tile snapshot-editor"><summary><div class="summary-icon-row"><div><span class="snapshot-label">Pharmacy</span><h3>'+esc(d.pharmacy||'Not selected')+'</h3><p>'+esc(d.pharmacyAddress||'')+'</p></div><span class="summary-symbol pharmacy-symbol" aria-hidden="true">℞</span></div></summary><div class="snapshot-edit-body">'+field('pharmCity','Town / City','')+'<label for="edit-pharmState" class="snapshot-edit-label">State</label><select id="edit-pharmState">'+$('state').innerHTML+'</select>'+field('pharmZip','Or ZIP','')+'<button type="button" class="btn secondary" id="summaryPharmSearch">Search</button><div id="summaryPharmResults" role="status"></div><button type="button" class="btn secondary" data-cancel>Cancel</button></div></details>';
  var medical=fd230MedicalText(d).filter(function(x){return ['Allergies','Past medical history','Medications','Past surgical history','Family history'].indexOf(x[0])>=0;}).map(function(x,i){return editor(x[0],x[1].replace(/ \(fictional example\)/g,''),'<label class="snapshot-edit-label" for="summary-health-'+i+'">'+esc(x[0])+'</label><textarea id="summary-health-'+i+'">'+esc(x[1])+'</textarea>','health-'+i);}).join('');
@@ -3060,6 +3060,18 @@ fd230Render=function(){fd269Render();if(fd269Enabled())fd254Summary();};
 var fd269Eligibility=applyEligibilityResult;
 applyEligibilityResult=function(res){if(res&&res.success===false)FD.eligibility={status:'UNAVAILABLE'};fd269Eligibility(res);if(fd269Enabled())fd254Summary();};
 boot();
+
+function fd273ReturningCard(){return !!FD.booking&&/^(RETURNING|FOLLOW[ -]?UP)$/i.test(String(FD.booking.patientType||''));}
+var fd273SummaryBase=fd254Summary;
+fd254Summary=function(){fd273SummaryBase();if(!fd273ReturningCard()||!$('completedMedicalCard'))return;
+ var incomplete=!fd254Ready(),host=$('completedMedicalCard');
+ host.classList.toggle('abbreviated-card',incomplete);
+ if(incomplete){var health=host.querySelector('.snapshot-health');if(health)health.classList.add('hidden');
+ var pharm=host.querySelector('.pharmacy-symbol');if(pharm)pharm.closest('details').classList.add('hidden');
+ $('demoNotice').textContent='✓ Appointment booked · Tap to modify';}
+};
+var fd273DemoBase=demoFrontDoorResponse_;
+demoFrontDoorResponse_=function(){var r=fd273DemoBase();if(new URLSearchParams(location.search).get('test')==='abbreviated'){r.booking.patientType='FOLLOW UP';r.intake.contractSigned=false;r.intake.completed=false;r.intake.data.sectionProgress={};r.intake.data.insuranceCarrier='Aetna';r.intake.data.insurancePlan='Example plan';r.intake.data.memberId='DEMO12345';}return r;};
 </script>
 </body>
 </html>
