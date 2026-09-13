@@ -363,6 +363,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 #completedMedicalCard .snapshot-tile:nth-child(2) .snapshot-edit-body{background:var(--paper);color:var(--ink);padding:12px;border-radius:8px;margin-top:12px}
 .insurance-logo{width:86px;height:48px;object-fit:contain;flex:0 0 86px}
 @media(max-width:480px){.insurance-logo{width:68px;height:42px;flex-basis:68px}}
+
+#completedMedicalCard .coverage-neutral,.insurance-loaded-card.coverage-neutral,#secondaryCardView{background:#f1f0ed;border-color:#d5d1c8;color:#504b43}
+#completedMedicalCard .coverage-inactive,.insurance-loaded-card.coverage-inactive{background:#fbeceb;border-color:#dca39e;color:#8d322c}
+#completedMedicalCard .coverage-active{background:#eef7f0;border-color:#bdd1c3;color:#245a37}
+#completedMedicalCard .coverage-selfpay{background:#f1f0ed;border-color:#d5d1c8;color:#504b43}
+.coverage-neutral h3,.coverage-neutral .insurance-loaded-meta,.coverage-inactive h3,.coverage-inactive .insurance-loaded-meta{color:inherit}
+.coverage-neutral .insurance-loaded-check{background:#777169}.coverage-inactive .insurance-loaded-check{background:#a83c35}
+.coverage-status{font-size:12px;font-weight:600}
 </style>
 </head>
 
@@ -2928,15 +2936,15 @@ function fd254Summary(){
  function field(id,label,value){return '<label class="snapshot-edit-label" for="edit-'+id+'">'+esc(label)+'</label><input id="edit-'+id+'" value="'+esc(value||'')+'">';}
  function actions(id){return '<div class="snapshot-actions"><button class="btn secondary" type="button" data-save="'+id+'">Save</button><button class="btn secondary" type="button" data-cancel>Cancel</button></div>';}
  function editor(label,preview,body,id){return '<details class="snapshot-detail snapshot-editor"><summary><span class="snapshot-label">'+esc(label)+'</span><span class="snapshot-value">'+esc(preview||'Not provided')+'</span></summary><div class="snapshot-edit-body">'+body+actions(id)+'</div></details>';}
- var active=FD.eligibility&&FD.eligibility.status==='ACTIVE';
+ var coverage=fd268CoverageState(FD.eligibility,d),active=coverage==='active';
 
- var insSummary='<div class="summary-icon-row"><div><span class="snapshot-label">Primary insurance</span><h3>'+esc(d.insuranceCarrier||'Self-pay')+'</h3>'+(active?'<span class="snapshot-active">✓ Active primary coverage</span>':'<span>Primary coverage needs review</span>')+'<p>'+esc(d.insurancePlan||'')+'</p></div>'+fd264InsuranceIcon(d.insuranceCarrier)+'</div>'+(d.hasSecondaryInsurance?'<div class="snapshot-secondary summary-icon-row"><div><span class="snapshot-label">Secondary insurance</span>'+esc(d.secondaryCarrier||'Card on file')+'</div>'+fd264InsuranceIcon(d.secondaryCarrier)+'</div>':'');
- var insurance='<details class="snapshot-tile snapshot-editor"><summary>'+insSummary+'</summary><div class="snapshot-edit-body">'+field('insuranceCarrier','Primary insurance',d.insuranceCarrier)+field('insurancePlan','Plan',d.insurancePlan)+field('memberId','Member ID',d.memberId)+'<label class="check"><input type="checkbox" id="edit-hasSecondary" '+(d.hasSecondaryInsurance?'checked':'')+'>Secondary insurance</label>'+field('secondaryCarrier','Secondary insurance',d.secondaryCarrier)+field('secondaryMemberId','Secondary member ID',d.secondaryMemberId)+actions('insurance')+'</div></details>';
+ var insSummary='<div class="summary-icon-row"><div><span class="snapshot-label">Primary insurance</span><h3>'+esc(d.insuranceCarrier||'Self-pay')+'</h3>'+'<span class="coverage-status">'+esc(fd268CoverageLabel(coverage,d.insuranceCarrier))+'</span>'+'<p>'+esc(d.insurancePlan||'')+'</p></div>'+fd264InsuranceIcon(d.insuranceCarrier)+'</div>'+(d.hasSecondaryInsurance?'<div class="snapshot-secondary summary-icon-row"><div><span class="snapshot-label">Secondary insurance</span>'+esc(d.secondaryCarrier||'Card on file')+'</div>'+fd264InsuranceIcon(d.secondaryCarrier)+'</div>':'');
+ var insurance='<details class="snapshot-tile snapshot-editor coverage-'+coverage+'"><summary>'+insSummary+'</summary><div class="snapshot-edit-body">'+field('insuranceCarrier','Primary insurance',d.insuranceCarrier)+field('insurancePlan','Plan',d.insurancePlan)+field('memberId','Member ID',d.memberId)+'<label class="check"><input type="checkbox" id="edit-hasSecondary" '+(d.hasSecondaryInsurance?'checked':'')+'>Secondary insurance</label>'+field('secondaryCarrier','Secondary insurance',d.secondaryCarrier)+field('secondaryMemberId','Secondary member ID',d.secondaryMemberId)+actions('insurance')+(coverage==='inactive'?'<button type="button" class="btn secondary" id="summarySelfPay">Choose self-pay</button>':'')+'</div></details>';
  var pharmacy='<details class="snapshot-tile snapshot-editor"><summary><div class="summary-icon-row"><div><span class="snapshot-label">Pharmacy</span><h3>'+esc(d.pharmacy||'Not selected')+'</h3><p>'+esc(d.pharmacyAddress||'')+'</p></div><span class="summary-symbol pharmacy-symbol" aria-hidden="true">℞</span></div></summary><div class="snapshot-edit-body">'+field('pharmCity','Town / City','')+'<label for="edit-pharmState" class="snapshot-edit-label">State</label><select id="edit-pharmState">'+$('state').innerHTML+'</select>'+field('pharmZip','Or ZIP','')+'<button type="button" class="btn secondary" id="summaryPharmSearch">Search</button><div id="summaryPharmResults" role="status"></div><button type="button" class="btn secondary" data-cancel>Cancel</button></div></details>';
  var medical=fd230MedicalText(d).filter(function(x){return ['Allergies','Past medical history','Medications','Past surgical history','Family history'].indexOf(x[0])>=0;}).map(function(x,i){return editor(x[0],x[1].replace(/ \(fictional example\)/g,''),'<label class="snapshot-edit-label" for="summary-health-'+i+'">'+esc(x[0])+'</label><textarea id="summary-health-'+i+'">'+esc(x[1])+'</textarea>','health-'+i);}).join('');
  var calendar='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 2v6M17 2v6M3 10h18M8 15h3M14 15h3M8 18h3"/></svg>';
  host.innerHTML='<header class="snapshot-heading"><h2 class="booking-card-title">Lexington Podiatry Booking - <strong class="booking-patient-name">'+esc([d.firstName,d.lastName].filter(Boolean).join(' '))+'</strong></h2></header><div class="booking-cards-frame"><section class="snapshot-appointment"><div><button type="button" id="appointmentCardToggle" class="appointment-card-toggle" aria-expanded="false" aria-controls="appointmentActions"><span class="calendar-sticker" aria-hidden="true">'+calendar+'</span><span><span class="snapshot-label">Your appointment</span><span class="appointment-title">'+esc(FD.booking.appointmentDisplay||'Details to be confirmed')+'</span><span class="appointment-provider">'+fd262VisitType(FD.booking.patientType)+' · Dr. Wiqar Farooqi · '+(frontDoorIsVirtual_()?'Virtual visit':'In person')+'</span></span><span class="appointment-chevron" aria-hidden="true">⌄</span></button><div id="appointmentActions" class="hidden"><button type="button" class="reschedule-button" id="summaryReschedule" aria-expanded="false">Reschedule</button></div></div><div class="snapshot-reason">'+editor('Visit reason',(d.visitReasons||[]).join(' · ')||'Foot consultation',field('visitReason','Reason',(d.visitReasons||[]).join(', '))+'<label class="snapshot-edit-label" for="edit-hpi">Visit details</label><textarea id="edit-hpi">'+esc(d.hpi||'')+'</textarea>','visit')+'</div><div id="summarySchedule" class="hidden"><p>Sample appointments — demo only</p><select id="summaryTime"><option>Wednesday, September 16 at 11:00 AM</option><option>Thursday, September 17 at 2:00 PM</option></select><button type="button" class="btn secondary" id="summaryConfirmTime">Confirm demo time</button></div></section>'+(!frontDoorIsVirtual_()&&!fd263HasPhotoId()?'<div class="snapshot-id">Please bring a photo ID to your appointment.</div>':'')+'<div class="snapshot-services">'+insurance+pharmacy+'</div><section class="snapshot-health"><div class="snapshot-label">Medical information</div><div class="snapshot-medical">'+medical+'</div></section></div>';
- setValue('edit-pharmState','NY');
+ setValue('edit-pharmState','NY');if($('summarySelfPay'))$('summarySelfPay').onclick=function(){setRadio('paymentChoice','SELF_PAY');FD.data=Object.assign({},FD.data,collect());fd254Summary();};
  qa('#completedMedicalCard [data-cancel]').forEach(function(btn){btn.onclick=function(){fd254Summary();};});
  qa('#completedMedicalCard [data-save]').forEach(function(btn){btn.onclick=function(){var key=btn.dataset.save;
  if(key==='insurance'){var changed=['insuranceCarrier','insurancePlan','memberId'].some(function(id){return $(id).value!==$('edit-'+id).value;});['insuranceCarrier','insurancePlan','memberId','secondaryCarrier','secondaryMemberId'].forEach(function(id){setValue(id,$('edit-'+id).value);});setCheck('hasSecondary',$('edit-hasSecondary').checked);if(changed){FD.eligibility={status:'EDITING'};FD.insuranceUnlocked=true;}}
@@ -2982,6 +2990,36 @@ demoFrontDoorResponse_=function(){
 };
 var fd266Init=fd250Init;
 fd250Init=function(){fd266Init();if(FD.demo&&new URLSearchParams(location.search).get('test')==='blank'){FD230.medicalLocked=false;['insurance','contract','additional'].forEach(function(k){$('section-'+k).open=false;});fd230Open('personal');}};
+
+function fd268CoverageState(res,d){
+ res=res||{};d=d||{};
+ if(d.paymentChoice==='SELF_PAY')return 'selfpay';
+ if(!d.insuranceCarrier||!d.memberId)return 'neutral';
+ if(FD.insuranceUnlocked&&!/^(INACTIVE|TERMINATED)$/.test(String(res.status||'').toUpperCase()))return 'neutral';
+ var status=String(res.status||'').toUpperCase(),checked=Date.parse(res.checkedAt||'');
+ if(res.success===false||res.error||!Number.isFinite(checked)||Date.now()-checked>86400000||checked>Date.now()+60000)return 'neutral';
+ if(status==='ACTIVE')return 'active';
+ if(status==='INACTIVE'||status==='TERMINATED')return 'inactive';
+ return 'neutral';
+}
+function fd268CoverageLabel(state,carrier){
+ if(state==='active')return '✓ Active coverage';
+ if(state==='inactive')return 'Coverage reported inactive or terminated — update insurance or choose self-pay';
+ if(state==='selfpay')return 'Self-pay selected';
+ return /medicare/i.test(carrier||'')?'Medicare on file · live verification unavailable':'Insurance on file · coverage not verified';
+}
+var fd268Coverage=fd250RenderCoverage;
+fd250RenderCoverage=function(){
+ fd268Coverage();var d=collect(),state=fd268CoverageState(FD.eligibility,d),card=$('insuranceLoadedCard');
+ card.classList.remove('coverage-active','coverage-neutral','coverage-inactive','coverage-selfpay');card.classList.add('coverage-'+state);
+ var show=fd250HasInsurance()&&(!FD.insuranceUnlocked||state==='inactive')&&!isSelfPay();card.classList.toggle('hidden',!show);if(!show)return;
+ card.querySelector('.insurance-loaded-check').textContent=state==='active'?'✓':state==='inactive'?'!':'i';
+ $('insuranceLoadedTitle').textContent=state==='active'?'Active coverage: '+d.insuranceCarrier:d.insuranceCarrier;
+ if(state!=='active'){$('coverageBenefits').classList.add('hidden');$('deductibleAlert').classList.add('hidden');$('insuranceLoadedMeta').textContent=fd268CoverageLabel(state,d.insuranceCarrier);}
+ var cash=$('inactiveSelfPay');if(!cash){cash=document.createElement('button');cash.id='inactiveSelfPay';cash.type='button';cash.className='btn secondary';cash.textContent='Choose self-pay';cash.onclick=function(){setRadio('paymentChoice','SELF_PAY');applyPaymentChoiceUI_();};card.appendChild(cash);}cash.classList.toggle('hidden',state!=='inactive');
+};
+var fd268Demo=demoFrontDoorResponse_;
+demoFrontDoorResponse_=function(){var r=fd268Demo(),state=new URLSearchParams(location.search).get('coverage');if(state==='unavailable'||state==='terminated'){r.eligibility={success:state==='terminated',status:state==='terminated'?'INACTIVE':'UNAVAILABLE',checkedAt:new Date().toISOString()};}return r;};
 boot();
 </script>
 </body>
