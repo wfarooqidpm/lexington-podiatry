@@ -2609,7 +2609,7 @@ function fd230Build(){
  var note=document.createElement('span');note.id='sectionNote-'+k;note.className='save-state';note.setAttribute('role','status');actions.appendChild(note);content.appendChild(actions);host.appendChild(box);
  box.addEventListener('input',function(e){if(e.target.type==='file')return;
  if(k==='personal'||k==='insurance'){if(FD230.insuranceKey!==fd230PolicyKey(collect())){FD.insuranceUnlocked=true;FD.eligibility=null;}}
- if(FD.data.officeSections)FD.data.officeSections[k]=false;if(k==='personal'&&FD.data.addressReview){FD.data.addressConfirmed=false;if($('addressConfirm276'))$('addressConfirm276').checked=false;}
+ if(FD.data.officeSections)FD.data.officeSections[k]=false;if(k==='personal'&&FD.data.addressReview){if(e.target.id==='addressConfirm276'){FD.data.addressConfirmed=e.target.checked;}else if(['address1','address2','city','state','zip'].indexOf(e.target.id)>=0){FD.data.addressConfirmed=false;if($('addressConfirm276'))$('addressConfirm276').checked=false;}}
  if(FD.data.sectionProgress&&FD.data.sectionProgress[k])FD.data.sectionProgress[k].submittedAt='';fd230Render();clearTimeout(FD230.timers[k]);FD230.timers[k]=setTimeout(function(){fd230Save(k,false)},900);});
  box.addEventListener('change',function(e){if(e.target.type==='file')fd230UploadFiles();});
  });
@@ -2909,7 +2909,7 @@ var fd253Text=fd230MedicalText;
 fd230MedicalText=function(d){if(!fd269Enabled())return fd253Text(d);var prior=fd253Text(d),map={};prior.forEach(function(x){map[x[0]]=x[1];});return [['Allergies',map.Allergies],['Past medical history',map['Medical history']],['Medications',map.Medications],['Past surgical history',map['Surgical history']],['Family history',d.familyHistory||'Not provided'],['Preferred pharmacy',[d.pharmacy,d.pharmacyAddress].filter(Boolean).join(' · ')||'Not selected'],["Today’s visit",(d.visitReasons||[]).join(', ')||'Not selected'],['Visit details',d.hpi||'Not provided']].concat(prior.filter(function(x){return /insurance$/.test(x[0]);}));};
 var fd253Init=fd250Init;
 fd250Init=function(){fd253Init();if(!fd269Enabled())return;
- $('demoNotice').classList.remove('hidden');$('demoNotice').textContent='Fictional preview — entries, signatures and pharmacy searches stay in this demo.';
+ $('demoNotice').classList.toggle('hidden',!FD.demo);$('demoNotice').textContent=FD.demo?'Fictional preview — entries, signatures and pharmacy searches stay in this demo.':'';
  var health=$('healthDetails');
  function section(title,nodes){var el=document.createElement('div');el.className='section';var h=document.createElement('div');h.className='section-title';h.textContent=title;el.appendChild(h);nodes.forEach(function(n){el.appendChild(n);});return el;}
  var pharmacyField=$('pharmacy').closest('.field');
@@ -2943,7 +2943,7 @@ function fd264InsuranceIcon(carrier){
 }
 function fd254Summary(){
  if(!fd269Enabled()||!$('completedMedicalCard'))return;
- var ready=fd254Ready()||fd273ReturningCard(),host=$('completedMedicalCard');document.body.classList.toggle('medical-summary-ready',ready);host.classList.toggle('hidden',!ready);$('demoNotice').textContent=ready?(fd254Ready()?'✓ Submitted and booked · Tap to modify':'✓ Appointment booked · Tap to modify'):'Fictional preview — entries stay in this demo.';if(!ready)return;
+ var ready=fd254Ready()||fd273ReturningCard(),host=$('completedMedicalCard');document.body.classList.toggle('medical-summary-ready',ready);host.classList.toggle('hidden',!ready);$('demoNotice').classList.toggle('hidden',!ready&&!FD.demo);$('demoNotice').textContent=ready?(fd254Ready()?'✓ Submitted and booked · Tap to modify':'✓ Appointment booked · Tap to modify'):(FD.demo?'Fictional preview — entries stay in this demo.':'');if(!ready)return;
  var d=collect(),esc=escapeHtml;
  function field(id,label,value){return '<label class="snapshot-edit-label" for="edit-'+id+'">'+esc(label)+'</label><input id="edit-'+id+'" value="'+esc(value||'')+'">';}
  function actions(id){return '<div class="snapshot-actions"><button class="btn secondary" type="button" data-save="'+id+'">Save</button><button class="btn secondary" type="button" data-cancel>Cancel</button></div>';}
