@@ -2573,6 +2573,7 @@ function fd230Progress(){
    return 'yellow';
   }
   if(p[k]&&p[k].submittedAt)return 'green';
+  if(k==='personal'&&d.addressReview&&!d.addressConfirmed)return 'yellow';
   if(k==='personal'&&d.officeSections&&d.officeSections.personal)return 'green';
   if(FD.completed&&d.flowVersion!=='FOUR_SECTIONS')return 'green';
   if(p[k]&&p[k].savedAt)return 'yellow';
@@ -2582,9 +2583,10 @@ function fd230Progress(){
  });
 }
 function fd230Render(){
+ fd276AddressPrompt();
  if(!$('sectionProgress230'))return;
  var states=fd230Progress();
- $('sectionProgress230').innerHTML=FD230.keys.map(function(k,i){var state=states[i],status=state==='green'?(k==='insurance'&&paymentChoice()!=='SELF_PAY'?(FD.eligibility&&FD.eligibility.status==='ACTIVE'?'Verified':'Saved · verification pending'):k==='personal'&&!(FD.data.sectionProgress&&FD.data.sectionProgress.personal&&FD.data.sectionProgress.personal.submittedAt)?'On file':'Submitted'):state==='yellow'?(k==='insurance'?'Entered · not verified':'Saved · not submitted'):state==='black'?'Verification failed':'Not entered';
+ $('sectionProgress230').innerHTML=FD230.keys.map(function(k,i){var state=states[i],status=state==='green'?(k==='insurance'&&paymentChoice()!=='SELF_PAY'?(FD.eligibility&&FD.eligibility.status==='ACTIVE'?'Verified':'Saved · verification pending'):k==='personal'&&!(FD.data.sectionProgress&&FD.data.sectionProgress.personal&&FD.data.sectionProgress.personal.submittedAt)?'On file':'Submitted'):state==='yellow'?(k==='personal'&&FD.data.addressReview&&!FD.data.addressConfirmed?'Verify address':k==='insurance'?'Entered · not verified':'Saved · not submitted'):state==='black'?'Verification failed':'Not entered';
  return '<button type="button" class="section-track-item '+state+'" onclick="fd230Open(\''+k+'\')" aria-label="'+FD230.labels[i]+': '+status+'"><span class="section-track-dot">'+(state==='green'?'✓':k==='additional'?'+':i+1)+'</span><span><strong>'+(k==='additional'?'+ Medical card':FD230.labels[i])+'</strong><small>'+(k==='additional'?(state==='green'?'Saved':'Optional'):status)+'</small></span></button>';
  }).join('');
  if(FD230.signed){$('sectionSignBtn').disabled=true;$('sectionSignBtn').textContent='Contract signed';$('sectionNote-contract').textContent='Your signed contract is saved.';fd230ShowRegistrationReceived();}
@@ -2607,7 +2609,7 @@ function fd230Build(){
  var note=document.createElement('span');note.id='sectionNote-'+k;note.className='save-state';note.setAttribute('role','status');actions.appendChild(note);content.appendChild(actions);host.appendChild(box);
  box.addEventListener('input',function(e){if(e.target.type==='file')return;
  if(k==='personal'||k==='insurance'){if(FD230.insuranceKey!==fd230PolicyKey(collect())){FD.insuranceUnlocked=true;FD.eligibility=null;}}
- if(FD.data.officeSections)FD.data.officeSections[k]=false;
+ if(FD.data.officeSections)FD.data.officeSections[k]=false;if(k==='personal'&&FD.data.addressReview){FD.data.addressConfirmed=false;if($('addressConfirm276'))$('addressConfirm276').checked=false;}
  if(FD.data.sectionProgress&&FD.data.sectionProgress[k])FD.data.sectionProgress[k].submittedAt='';fd230Render();clearTimeout(FD230.timers[k]);FD230.timers[k]=setTimeout(function(){fd230Save(k,false)},900);});
  box.addEventListener('change',function(e){if(e.target.type==='file')fd230UploadFiles();});
  });
@@ -2656,12 +2658,18 @@ function fd230CheckContract(attempt){
  }).catch(function(){$('sectionNote-contract').textContent='Could not confirm the signed document yet. Click Sign contract to check again.';}).finally(function(){FD230.polling=false;});
 }
 
+function fd276AddressPrompt(){
+ var host=$('section-personal');if(!host)return;var box=$('addressReview276');
+ if(!box){box=document.createElement('div');box.id='addressReview276';box.className='notice';box.setAttribute('role','status');box.innerHTML='<strong>Please verify your address</strong><p>Your insurance supplied the address below. Check it and make any corrections before submitting.</p><label><input type="checkbox" id="addressConfirm276"> I have checked this address and it is my current address.</label>';host.querySelector('.section-body').prepend(box);$('addressConfirm276').addEventListener('change',function(){FD.data.addressConfirmed=this.checked;});}
+ box.style.display=FD.data.addressReview?'block':'none';$('addressConfirm276').checked=!!FD.data.addressConfirmed;
+}
 function fd230Save(section,submit){
  if(FD230.signed&&section==='contract')return;
  if(submit&&FD230.submitting[section])return;
  clearTimeout(FD230.timers[section]);
- var snapshot=collect(),signing=section==='contract'&&submit,sequence=(FD230.serial[section]||0)+1;FD230.serial[section]=sequence;
+ var snapshot=collect();snapshot.addressConfirmed=!!($('addressConfirm276')&&$('addressConfirm276').checked);var signing=section==='contract'&&submit,sequence=(FD230.serial[section]||0)+1;FD230.serial[section]=sequence;
  var button=$(signing?'sectionSignBtn':'sectionSubmit-'+section),note=$('sectionNote-'+section);
+ if(submit&&(section==='personal'||signing)&&FD.data.addressReview&&!snapshot.addressConfirmed){note.textContent='Please verify your address in My information before continuing.';fd230Open('personal');$('addressConfirm276').focus();return;}
  if(submit&&section==='personal'){var missing=['firstName','lastName','dob','phone','email','address1','city','state','zip'].filter(function(k){return !String(snapshot[k]||'').trim();});if(missing.length){note.textContent='Please complete the highlighted personal details, then Save & continue.';missing.forEach(function(k){$(k).setAttribute('aria-invalid','true')});$(missing[0]).focus();return;}['firstName','lastName','dob','phone','email','address1','city','state','zip'].forEach(function(k){$(k).removeAttribute('aria-invalid')});}
  if(signing){try{if(!FD.agreement||!Array.isArray(FD.agreement.sections)||!FD.agreement.sections.length)throw new Error('Please reload so the contract text is available before signing.');['confirmationPolicyAccepted','noShowPolicyAccepted','privacyAcknowledged','treatmentConsent','financialPolicyAcknowledged','agreementAccepted'].forEach(function(k){if(!snapshot[k])throw new Error('Please review the contract acknowledgements before signing.');});if(!snapshot.signatureName)throw new Error('Please type your name to sign.');if(frontDoorIsVirtual_()&&!snapshot.telemedicineConsent)throw new Error('Please accept telemedicine consent for your video visit.');}catch(e){note.textContent=e.message;return;}}
  if(submit){FD230.submitting[section]=true;button.disabled=true;}note.textContent=signing?'Saving your signed contract…':'Saving…';
