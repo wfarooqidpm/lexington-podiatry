@@ -3081,7 +3081,6 @@ fd254Summary=function(){fd273SummaryBase();if(!fd273ReturningCard()||!$('complet
 };
 var fd273DemoBase=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd273DemoBase();if(new URLSearchParams(location.search).get('test')==='abbreviated'){r.booking.patientType='FOLLOW UP';r.intake.contractSigned=false;r.intake.completed=false;r.intake.data.sectionProgress={};r.intake.data.insuranceCarrier='Aetna';r.intake.data.insurancePlan='Example plan';r.intake.data.memberId='DEMO12345';}return r;};
-boot();
 
 /* Keep an insurer-only selection visible and guide completion. */
 function fd288PartialInsurance(){
@@ -3095,6 +3094,8 @@ var fd288InitBase=fd250Init;fd250Init=function(){fd288InitBase();if(clean($('ins
 var fd288CoverageBase=fd250RenderCoverage;fd250RenderCoverage=function(){fd288CoverageBase();fd288PartialInsurance();};
 ['insuranceCarrier','memberId'].forEach(function(id){$(id).addEventListener('input',fd288PartialInsurance);$(id).addEventListener('change',fd288PartialInsurance);});
 var fd288DemoBase=demoFrontDoorResponse_;demoFrontDoorResponse_=function(){var r=fd288DemoBase();if(new URLSearchParams(location.search).get('test')==='partial-medicare'){r.booking.insuranceCarrier='Medicare';r.booking.payerId='CMS';r.booking.memberId='';r.intake.completed=false;r.intake.contractSigned=false;r.intake.data.paymentChoice='INSURANCE';r.intake.data.insuranceCarrier='Medicare';r.intake.data.memberId='';r.intake.data.payerId='CMS';r.intake.data.sectionProgress={};r.eligibility={status:'NOT REQUESTED'};}return r;};
+
+boot();
 </script>
 </body>
 </html>
