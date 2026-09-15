@@ -616,7 +616,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           </datalist>
           <div class="payer-id-hint">If you know it, enter the payer ID exactly as printed, including leading zeroes.</div>
         </div>
-        <div class="field"><label for="memberId">Member ID <span class="req">*</span></label><input id="memberId" type="text" autocomplete="off"></div>
+        <div id="partialInsuranceNotice288" class="notice hidden" role="status" style="grid-column:1/-1;background:#fff7e3;border:1px solid #e7c66f;padding:14px;border-radius:8px"></div>
+<div class="field"><label for="memberId">Member ID <span class="req">*</span></label><input id="memberId" type="text" autocomplete="off" aria-describedby="partialInsuranceNotice288"></div>
         <div class="field"><label for="insurancePlan">Plan name <span class="verified-label hidden" id="planVerified">verified</span></label><input id="insurancePlan" type="text"></div>
         <div class="field"><label for="groupId">Group number <span class="verified-label hidden" id="groupVerified">verified</span></label><input id="groupId" type="text" autocomplete="off"></div>
       </div>
@@ -3081,6 +3082,20 @@ fd254Summary=function(){fd273SummaryBase();if(!fd273ReturningCard()||!$('complet
 var fd273DemoBase=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd273DemoBase();if(new URLSearchParams(location.search).get('test')==='abbreviated'){r.booking.patientType='FOLLOW UP';r.intake.contractSigned=false;r.intake.completed=false;r.intake.data.sectionProgress={};r.intake.data.insuranceCarrier='Aetna';r.intake.data.insurancePlan='Example plan';r.intake.data.memberId='DEMO12345';}return r;};
 boot();
+
+/* Keep an insurer-only selection visible and guide completion. */
+function fd288PartialInsurance(){
+ var box=$('partialInsuranceNotice288');if(!box)return;
+ var carrier=clean($('insuranceCarrier').value),partial=!!carrier&&!clean($('memberId').value)&&!isSelfPay();
+ box.classList.toggle('hidden',!partial);
+ if(partial){box.textContent=carrier+' is already selected. Please enter '+(/medicare/i.test(carrier)?'your Medicare Number from your card':'your member ID from your insurance card')+' below to complete your insurance information.';}
+ $('memberId').placeholder=/medicare/i.test(carrier)?'Medicare Number':'Member ID';
+}
+var fd288InitBase=fd250Init;fd250Init=function(){fd288InitBase();if(clean($('insuranceCarrier').value)&&!clean($('memberId').value)&&!isSelfPay()){setRadio('insuranceEntryMethod','MANUAL');fd250RenderInsurance();}fd288PartialInsurance();};
+var fd288CoverageBase=fd250RenderCoverage;fd250RenderCoverage=function(){fd288CoverageBase();fd288PartialInsurance();};
+['insuranceCarrier','memberId'].forEach(function(id){$(id).addEventListener('input',fd288PartialInsurance);$(id).addEventListener('change',fd288PartialInsurance);});
+var fd288DemoBase=demoFrontDoorResponse_;demoFrontDoorResponse_=function(){var r=fd288DemoBase();if(new URLSearchParams(location.search).get('test')==='partial-medicare'){r.booking.insuranceCarrier='Medicare';r.booking.payerId='CMS';r.booking.memberId='';r.intake.completed=false;r.intake.contractSigned=false;r.intake.data.paymentChoice='INSURANCE';r.intake.data.insuranceCarrier='Medicare';r.intake.data.memberId='';r.intake.data.payerId='CMS';r.intake.data.sectionProgress={};r.eligibility={status:'NOT REQUESTED'};}return r;};
 </script>
 </body>
 </html>
+
