@@ -3044,7 +3044,9 @@ function fd269SaveCard(section){
 function fd269Pharmacy(summary){
  var city=clean($(summary?'edit-pharmCity':'pharmacyCity').value),state=$(summary?'edit-pharmState':'pharmacyState').value,zip=clean($(summary?'edit-pharmZip':'pharmacyZip').value),results=$(summary?'summaryPharmResults':'pharmacyResults');
  if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a town/city and state, or a five-digit ZIP code.';return;}
- results.textContent='Searching pharmacies…';var p=new URLSearchParams({action:'pharmacy-search',t:FD.token,city:city,state:state,zip:zip});
+ // Preserve the typed pharmacy name alongside location; ZIP must not broaden a named search.
+ var name=summary?'':clean($('pharmacyNameSearch').value);
+ results.textContent='Searching pharmacies…';var p=new URLSearchParams({action:'pharmacy-search',t:FD.token,name:name,city:city,state:state,zip:zip});
  return fetch(GATEWAY_URL+'?'+p).then(function(r){return r.json();}).then(function(r){if(!r.success)throw new Error(r.error||'Search unavailable.');results.replaceChildren();if(!r.results||!r.results.length){results.textContent='No pharmacies found. Try a nearby city or ZIP.';return;}
  r.results.forEach(function(ph){var b=document.createElement('button');b.type='button';b.className='pharmacy-result';b.textContent=ph.name+' · '+ph.address;b.onclick=function(){setValue('pharmacy',ph.name);setValue('pharmacyAddress',ph.address);setValue('pharmacyNpi',ph.npi);setValue('pharmacyPhone',ph.phone);renderPharmacySelection();if(summary)fd269SaveCard('additional');else{results.replaceChildren();$('pharmacy').dispatchEvent(new Event('input',{bubbles:true}));}};results.appendChild(b);});
  }).catch(function(e){results.textContent=e.message+' Please try again or ask the office for help.';});
