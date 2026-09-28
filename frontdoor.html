@@ -2646,9 +2646,20 @@ function fd230RenderMedicalCard(){
 }
 function fd230Request(action,section,data,submit,uploads){
  if(FD.demo)return Promise.resolve({success:true,status:'DEMO',data:data||{},contractSigned:action==='sign-contract',sectionProgress:Object.assign({},FD.data.sectionProgress||{},submit?{[section]:{savedAt:new Date().toISOString(),submittedAt:new Date().toISOString()}}:{[section]:{savedAt:new Date().toISOString(),submittedAt:''}})});
- var controller=typeof AbortController!=='undefined'?new AbortController():null;
- var timer=setTimeout(function(){if(controller)controller.abort()},action==='sign-contract'?45000:25000);
- return fetch(GATEWAY_URL,{method:'POST',signal:controller?controller.signal:undefined,body:JSON.stringify({action:action,token:FD.token,step:section,submit:!!submit,clientVersion:'v0.26.9',signatureImage:action==='sign-contract'&&FD.demoSignature&&FD.demoSignature.type==='drawn'?FD.demoSignature.image:'',data:data||{},uploads:uploads||[]})}).then(function(r){return r.json()}).then(function(r){if(!r.success)throw new Error(r.error||'Could not save yet. Please try again.');return r}).catch(function(e){if(e.name==='AbortError')throw new Error('The save is taking longer than expected. Please check again.');throw e}).finally(function(){clearTimeout(timer)});
+ // Retry only an explicit lock refusal: the gateway has not written anything.
+ // Never replay timeouts, network failures, uploads, or downstream side effects.
+ var payload=JSON.stringify({action:action,token:FD.token,step:section,submit:!!submit,clientVersion:'v0.29.2',signatureImage:action==='sign-contract'&&FD.demoSignature&&FD.demoSignature.type==='drawn'?FD.demoSignature.image:'',data:data||{},uploads:uploads||[]});
+ function attempt(number){
+  var controller=typeof AbortController!=='undefined'?new AbortController():null;
+  var timer=setTimeout(function(){if(controller)controller.abort()},action==='sign-contract'?45000:25000);
+  return fetch(GATEWAY_URL,{method:'POST',signal:controller?controller.signal:undefined,body:payload}).then(function(r){return r.json()}).then(function(r){
+   if(!r.success){var error=new Error(r.error||'Could not save yet. Please try again.');error.saveBusy=/^Saving is busy[.;]/.test(r.error||'');throw error;}return r;
+  }).finally(function(){clearTimeout(timer)}).catch(function(e){
+   if(e.saveBusy&&(action==='section-save'||action==='sign-contract')&&number<2)return new Promise(function(resolve){setTimeout(resolve,750*(number+1))}).then(function(){return attempt(number+1)});
+   if(e.name==='AbortError')throw new Error('The save is taking longer than expected. Please check again.');throw e;
+  });
+ }
+ return attempt(0);
 }
 function fd230CheckContract(attempt){
  if(FD230.polling||FD230.signed)return;FD230.polling=true;
@@ -2672,7 +2683,8 @@ function fd230Save(section,submit){
  var button=$(signing?'sectionSignBtn':'sectionSubmit-'+section),note=$('sectionNote-'+section);
  if(submit&&section==='personal'){var missing=['firstName','lastName','dob','phone','email','address1','city','state','zip'].filter(function(k){return !String(snapshot[k]||'').trim();});if(missing.length){note.textContent='Please complete the highlighted personal details, then Save & continue.';missing.forEach(function(k){$(k).setAttribute('aria-invalid','true')});$(missing[0]).focus();return;}['firstName','lastName','dob','phone','email','address1','city','state','zip'].forEach(function(k){$(k).removeAttribute('aria-invalid')});}
  if(signing){try{if(!FD.agreement||!Array.isArray(FD.agreement.sections)||!FD.agreement.sections.length)throw new Error('Please reload so the contract text is available before signing.');['confirmationPolicyAccepted','noShowPolicyAccepted','privacyAcknowledged','treatmentConsent','financialPolicyAcknowledged','agreementAccepted'].forEach(function(k){if(!snapshot[k])throw new Error('Please review the contract acknowledgements before signing.');});if(!snapshot.signatureName)throw new Error('Please type your name to sign.');if(frontDoorIsVirtual_()&&!snapshot.telemedicineConsent)throw new Error('Please accept telemedicine consent for your video visit.');}catch(e){note.textContent=e.message;return;}}
- if(submit){FD230.submitting[section]=true;button.disabled=true;}note.textContent=signing?'Saving your signed contract…':'Saving…';
+ var buttonLabel=button&&button.textContent;
+ if(submit){FD230.submitting[section]=true;button.disabled=true;button.textContent=signing?'Signing…':'Saving…';button.setAttribute('aria-busy','true');}note.textContent=signing?'Saving your signed contract…':'Saving…';
  var timer=setTimeout(function(){note.textContent='This is taking longer than expected. Your entries remain here; you can work in another section.'},12000);
  FD230.queue=FD230.queue.catch(function(){}).then(function(){if(!submit&&sequence!==FD230.serial[section])return null;return fd230Request(signing?'sign-contract':'section-save',section,snapshot,submit)}).then(function(res){
   if(!res)return;
@@ -2687,7 +2699,7 @@ function fd230Save(section,submit){
    else if(section==='additional'){FD230.medicalLocked=true;fd230RenderMedicalCard();}
    else{var next=FD230.keys[FD230.keys.indexOf(section)+1];if(next)fd230Open(next);}
   }
- }).catch(function(e){note.textContent=e.message+' Your entries are still on this page.';if(signing)fd230CheckContract(0);}).finally(function(){clearTimeout(timer);if(submit){FD230.submitting[section]=false;button.disabled=section==='contract'&&FD230.signed;}});
+ }).catch(function(e){note.textContent=e.message+' Your entries are still on this page.';if(signing)fd230CheckContract(0);}).finally(function(){clearTimeout(timer);if(submit){FD230.submitting[section]=false;button.disabled=section==='contract'&&FD230.signed;button.textContent=section==='contract'&&FD230.signed?'Contract signed':buttonLabel;button.removeAttribute('aria-busy');}});
 }
 function fd230UploadFiles(){
  ['insuranceFront','insuranceBack','photoIdFile'].forEach(function(id){var el=$(id),file=el&&el.files[0];if(!file)return;var key=[file.name,file.size,file.lastModified].join('|');if(FD230.uploads[id]===key)return;
@@ -3105,5 +3117,6 @@ boot();
 </script>
 </body>
 </html>
+
 
 
