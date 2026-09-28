@@ -3037,10 +3037,14 @@ function fd269Enabled(){return FD.demo||!!(FD.capabilities&&FD.capabilities.appr
 var fd269Collect=collect;
 collect=function(){var d=fd269Collect();if(fd269Enabled()&&$('adoptTypedSignature'))d.signatureType=$('adoptTypedSignature').checked?'typed':'drawn';return d;};
 function fd269SaveCard(section){
+ // Completed-card edits share the draft queue, so an older autosave cannot finish last.
+ clearTimeout(FD230.timers[section]);FD230.serial[section]=(FD230.serial[section]||0)+1;
  var d=collect(),buttons=qa('#completedMedicalCard [data-save],#summarySelfPay');buttons.forEach(function(b){b.disabled=true;});
  var status=$('cardSaveStatus');if(!status){status=document.createElement('p');status.id='cardSaveStatus';status.setAttribute('role','status');$('completedMedicalCard').appendChild(status);}status.textContent='Saving…';
- return fd230Request('section-save',section,d,true).then(function(r){FD.data=Object.assign({},FD.data,d,{sectionProgress:r.sectionProgress||FD.data.sectionProgress});fd254Summary();fd230Request('section-sync',section,{},false).catch(function(){});if(section==='insurance'&&d.paymentChoice!=='SELF_PAY'){FD230.insuranceKey=fd230PolicyKey(d);queueEligibilityFromCurrentData(d).then(fd254Summary).catch(function(){FD.eligibility={status:'UNAVAILABLE'};fd254Summary();});}}).catch(function(e){status.textContent=e.message+' Please try saving again.';buttons.forEach(function(b){b.disabled=false;});});
+ FD230.queue=FD230.queue.catch(function(){}).then(function(){return fd230Request('section-save',section,d,true);}).then(function(r){FD.data=Object.assign({},FD.data,d,{sectionProgress:r.sectionProgress||FD.data.sectionProgress});fd254Summary();fd230Request('section-sync',section,{},false).catch(function(){});if(section==='insurance'&&d.paymentChoice!=='SELF_PAY'){FD230.insuranceKey=fd230PolicyKey(d);queueEligibilityFromCurrentData(d).then(fd254Summary).catch(function(){FD.eligibility={status:'UNAVAILABLE'};fd254Summary();});}}).catch(function(e){status.textContent=e.message+' Please try saving again.';buttons.forEach(function(b){b.disabled=false;});});
+ return FD230.queue;
 }
+// A selected directory result is saved as one unit; the manual-name input handler clears directory metadata.
 function fd269Pharmacy(summary){
  var city=clean($(summary?'edit-pharmCity':'pharmacyCity').value),state=$(summary?'edit-pharmState':'pharmacyState').value,zip=clean($(summary?'edit-pharmZip':'pharmacyZip').value),results=$(summary?'summaryPharmResults':'pharmacyResults');
  if(!/^\d{5}$/.test(zip)&&!(city&&state)){results.textContent='Enter a town/city and state, or a five-digit ZIP code.';return;}
@@ -3048,7 +3052,7 @@ function fd269Pharmacy(summary){
  var name=summary?'':clean($('pharmacyNameSearch').value);
  results.textContent='Searching pharmacies…';var p=new URLSearchParams({action:'pharmacy-search',t:FD.token,name:name,city:city,state:state,zip:zip});
  return fetch(GATEWAY_URL+'?'+p).then(function(r){return r.json();}).then(function(r){if(!r.success)throw new Error(r.error||'Search unavailable.');results.replaceChildren();if(!r.results||!r.results.length){results.textContent='No pharmacies found. Try a nearby city or ZIP.';return;}
- r.results.forEach(function(ph){var b=document.createElement('button');b.type='button';b.className='pharmacy-result';b.textContent=ph.name+' · '+ph.address;b.onclick=function(){setValue('pharmacy',ph.name);setValue('pharmacyAddress',ph.address);setValue('pharmacyNpi',ph.npi);setValue('pharmacyPhone',ph.phone);renderPharmacySelection();if(summary)fd269SaveCard('additional');else{results.replaceChildren();$('pharmacy').dispatchEvent(new Event('input',{bubbles:true}));}};results.appendChild(b);});
+ r.results.forEach(function(ph){var b=document.createElement('button');b.type='button';b.className='pharmacy-result';b.textContent=ph.name+' · '+ph.address;b.onclick=function(){setValue('pharmacy',ph.name);setValue('pharmacyAddress',ph.address);setValue('pharmacyNpi',ph.npi);setValue('pharmacyPhone',ph.phone);renderPharmacySelection();if(summary)fd269SaveCard('additional');else{results.replaceChildren();if(FD.data.officeSections)FD.data.officeSections.additional=false;if(FD.data.sectionProgress&&FD.data.sectionProgress.additional)FD.data.sectionProgress.additional.submittedAt='';fd230Render();fd230Save('additional',false);}};results.appendChild(b);});
  }).catch(function(e){results.textContent=e.message+' Please try again or ask the office for help.';});
 }
 function fd269Schedule(){
@@ -3101,4 +3105,5 @@ boot();
 </script>
 </body>
 </html>
+
 
