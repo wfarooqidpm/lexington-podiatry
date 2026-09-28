@@ -2648,7 +2648,7 @@ function fd230Request(action,section,data,submit,uploads){
  if(FD.demo)return Promise.resolve({success:true,status:'DEMO',data:data||{},contractSigned:action==='sign-contract',sectionProgress:Object.assign({},FD.data.sectionProgress||{},submit?{[section]:{savedAt:new Date().toISOString(),submittedAt:new Date().toISOString()}}:{[section]:{savedAt:new Date().toISOString(),submittedAt:''}})});
  // Retry only an explicit lock refusal: the gateway has not written anything.
  // Never replay timeouts, network failures, uploads, or downstream side effects.
- var payload=JSON.stringify({action:action,token:FD.token,step:section,submit:!!submit,clientVersion:'v0.27.7',signatureImage:action==='sign-contract'&&FD.demoSignature&&FD.demoSignature.type==='drawn'?FD.demoSignature.image:'',data:data||{},uploads:uploads||[]});
+ var payload=JSON.stringify({action:action,token:FD.token,step:section,submit:!!submit,clientVersion:'v0.29.2',signatureImage:action==='sign-contract'&&FD.demoSignature&&FD.demoSignature.type==='drawn'?FD.demoSignature.image:'',data:data||{},uploads:uploads||[]});
  function attempt(number){
   var controller=typeof AbortController!=='undefined'?new AbortController():null;
   var timer=setTimeout(function(){if(controller)controller.abort()},action==='sign-contract'?45000:25000);
