@@ -399,8 +399,15 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 
   <!-- PANEL 3 SLOTS -->
   <div class="panel" id="panel3">
+    <div class="form-group">
+      <label>Appointment mode</label>
+      <div class="mode-grid" id="newModeGrid">
+        <button type="button" class="mode-card" data-mode="In Person" onclick="selectNewVisitMode(this)">In person<span>Visit the Midtown office</span></button>
+        <button type="button" class="mode-card" data-mode="Virtual" onclick="selectNewVisitMode(this)">Virtual<span>Secure telemedicine visit</span></button>
+      </div>
+    </div>
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:8px;">Select an available appointment time. All times are Eastern.</p>
-    <div id="slotContainer"><div class="schedule-loader" role="status" aria-live="polite"><span class="schedule-spinner" aria-hidden="true"></span><span class="schedule-loading-copy">Finding available appointments<span class="schedule-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></span></div></div>
+    <div id="slotContainer"><p class="loading-slots">Choose in person or virtual to see available times.</p></div>
     <div class="form-nav" style="margin-top:24px;"><button class="btn btn-ink" onclick="goToStep3New()" id="btnStep3Next" disabled>Continue to your information</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
   </div>
 
@@ -691,6 +698,17 @@ function openReturningBooking() {
   document.getElementById('returningSlotContainer').innerHTML = '<p class="loading-slots">Choose in person or virtual to see available times.</p>';
 }
 
+function selectNewVisitMode(btn) {
+  state.visitMode = btn.getAttribute('data-mode');
+  state.selectedSlot = null;
+  state.bookingPayload = null;
+  document.querySelectorAll('#newModeGrid .mode-card').forEach(function(el) {
+    el.classList.toggle('selected', el === btn);
+  });
+  document.getElementById('btnStep3Next').disabled = true;
+  loadSlots('slotContainer');
+}
+
 function selectVisitMode(btn) {
   if (!hasVerifiedReturningPatient_()) {
     showReturningVerification_('Your verification is missing or expired. Please verify your record again.');
@@ -712,6 +730,13 @@ function selectType(el) {
   var type = el ? el.getAttribute('data-type') : null;
   if (!type) return;
   if (state.patientType === 'returning' && type !== 'returning') clearReturningVerification_();
+  if (state.patientType !== type) {
+    state.visitMode = null;
+    document.querySelectorAll('#newModeGrid .mode-card').forEach(function(card) {
+      card.classList.remove('selected');
+    });
+  }
+  document.getElementById('btnStep3Next').disabled = true;
   state.patientType = type;
   state.selectedSlot = null;
   state.bookingPayload = null;
@@ -727,7 +752,8 @@ function goToStep2() {
   setStep(2);
   if (state.patientType === 'new') {
     document.getElementById('panel3').classList.add('active');
-    loadSlots('slotContainer');
+    if (state.visitMode) loadSlots('slotContainer');
+    else document.getElementById('slotContainer').innerHTML = '<p class="loading-slots">Choose in person or virtual to see available times.</p>';
   } else if (hasVerifiedReturningPatient_()) {
     openReturningBooking();
   } else {
@@ -737,7 +763,7 @@ function goToStep2() {
 }
 
 function goToStep3New() {
-  if (!state.selectedSlot) return;
+  if (!state.visitMode || !state.selectedSlot) return;
   setStep(3);
   document.getElementById('panel2New').classList.add('active');
 }
@@ -806,7 +832,17 @@ function goToStep3Returning() {
   openReturningBooking();
 }
 
+var slotLoadGeneration = 0;
+
 function loadSlots(containerId) {
+  var generation = ++slotLoadGeneration;
+  var patientType = state.patientType;
+  var visitMode = state.visitMode;
+  var verificationSession = state.verificationSession;
+  function isCurrentRequest() {
+    return generation === slotLoadGeneration && patientType === state.patientType &&
+      visitMode === state.visitMode && verificationSession === state.verificationSession;
+  }
   calViewYear = null; calViewMonth = null;
   var targetId = containerId || 'slotContainer';
   var container = document.getElementById(targetId);
@@ -828,6 +864,7 @@ function loadSlots(containerId) {
   )
     .then(function(r) { return r.json(); })
     .then(function(data) {
+      if (!isCurrentRequest()) return;
       if (!data || !data.success) {
         var slotError = String((data && data.error) || 'Unable to load appointment times.');
         var err = new Error(slotError);
@@ -838,6 +875,7 @@ function loadSlots(containerId) {
       renderSlots(data.slots || [], targetId);
     })
     .catch(function(err) {
+      if (!isCurrentRequest()) return;
       if (err && err.verificationSessionError) {
         showReturningVerification_('Your verification expired before the appointment times loaded. Please verify your record again.');
         return;
@@ -1036,6 +1074,7 @@ function buildWebsiteBookingPayload() {
   };
 
   if (state.patientType === 'new') {
+    payload.visitMode = state.visitMode;
     payload.firstName = document.getElementById('npFirst').value.trim();
     payload.lastName = document.getElementById('npLast').value.trim();
     payload.dob = document.getElementById('npDob').value;
@@ -1356,3 +1395,4 @@ initMagic271();
 </script>
 </body>
 </html>
+
