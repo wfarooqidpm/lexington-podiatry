@@ -832,7 +832,17 @@ function goToStep3Returning() {
   openReturningBooking();
 }
 
+var slotLoadGeneration = 0;
+
 function loadSlots(containerId) {
+  var generation = ++slotLoadGeneration;
+  var patientType = state.patientType;
+  var visitMode = state.visitMode;
+  var verificationSession = state.verificationSession;
+  function isCurrentRequest() {
+    return generation === slotLoadGeneration && patientType === state.patientType &&
+      visitMode === state.visitMode && verificationSession === state.verificationSession;
+  }
   calViewYear = null; calViewMonth = null;
   var targetId = containerId || 'slotContainer';
   var container = document.getElementById(targetId);
@@ -854,6 +864,7 @@ function loadSlots(containerId) {
   )
     .then(function(r) { return r.json(); })
     .then(function(data) {
+      if (!isCurrentRequest()) return;
       if (!data || !data.success) {
         var slotError = String((data && data.error) || 'Unable to load appointment times.');
         var err = new Error(slotError);
@@ -864,6 +875,7 @@ function loadSlots(containerId) {
       renderSlots(data.slots || [], targetId);
     })
     .catch(function(err) {
+      if (!isCurrentRequest()) return;
       if (err && err.verificationSessionError) {
         showReturningVerification_('Your verification expired before the appointment times loaded. Please verify your record again.');
         return;
