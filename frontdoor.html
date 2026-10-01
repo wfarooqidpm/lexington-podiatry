@@ -2596,7 +2596,7 @@ function fd230Open(key){var box=$('section-'+key);if(!box)return;box.open=true;b
 function fd230Build(){
  document.body.classList.add('four-sections');
  var host=q('.layout > div'),panels={};qa('.panel[data-panel]').forEach(function(p){panels[p.dataset.panel]=p});
- var received=document.createElement('section');received.id='registrationReceived';received.className='registration-received';received.setAttribute('role','status');received.innerHTML='<div class="closed-door" aria-hidden="true">🚪</div><h2>Registration received</h2><p>Your personal information, insurance information, and signed contract have been submitted. You are ready to come into the office.</p>';host.appendChild(received);
+ var received=document.createElement('section');received.id='registrationReceived';received.className='registration-received';received.setAttribute('role','status');received.innerHTML='<div class="closed-door" aria-hidden="true">🚪</div><h2>Contract received</h2><p>Your signed contract is saved. You can still review and submit the sections below.</p>';host.appendChild(received);
  var placement={personal:['1'],insurance:['2','5'],contract:['4','6'],additional:['3']};
  FD230.keys.forEach(function(k,i){var box=document.createElement('details');box.id='section-'+k;box.className='intake-layer';box.open=i===0;
  if(k==='additional')box.classList.add('optional-card');
@@ -2625,7 +2625,12 @@ function fd230Build(){
 }
 function fd230ShowRegistrationReceived(){
  var received=$('registrationReceived');if(received)received.classList.add('show');
- ['personal','insurance','contract'].forEach(function(k){var box=$('section-'+k);if(box)box.open=false;});
+ // Signing is not proof that every section was submitted. Collapse completed
+ // sections once; later redraws must leave a reopened form usable for editing.
+ if(FD230.registrationShown)return;
+ FD230.registrationShown=true;
+ var progress=FD.data.sectionProgress||{};
+ ['personal','insurance','contract'].forEach(function(k){var box=$('section-'+k),done=k==='contract'?FD230.signed:progress[k]&&progress[k].submittedAt;if(box&&done)box.open=false;});
  var additional=$('section-additional');if(additional)additional.open=true;
 }
 function fd230MedicalText(snapshot){
@@ -3117,6 +3122,5 @@ boot();
 </script>
 </body>
 </html>
-
 
 
