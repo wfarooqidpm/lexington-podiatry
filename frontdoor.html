@@ -2553,7 +2553,7 @@ $('fuSubmitBtn').addEventListener('click',completeFollowUp_);
 (function(){var card=$('insuranceCardSection'),details=$('insuranceDetailsSection');if(card&&details&&details.parentNode)details.parentNode.insertBefore(card,details);})();
 
 /* Four-section registration; saves and downstream sync have separate lifetimes. */
-var FD230={keys:['personal','insurance','contract','additional'],labels:['My information','Insurance','Contract','Medical card'],queue:Promise.resolve(),timers:{},submitting:{},signed:false,medicalLocked:false,uploads:{},insuranceKey:'',serial:{},polling:false};
+var FD230={keys:['personal','insurance','contract','additional'],labels:['My information','Insurance','Contract','Medical card'],queue:Promise.resolve(),timers:{},submitting:{},signed:false,medicalLocked:false,uploads:{},insuranceKey:'',serial:{},edits:{},polling:false};
 function fd239StateValue(value){
  var v=String(value||'').trim();if(!v)return 'NY';
  var options=Array.from($('state').options),match=options.find(function(o){return o.value.toUpperCase()===v.toUpperCase()||o.textContent.toUpperCase()===v.toUpperCase();});
@@ -2609,9 +2609,13 @@ function fd230Build(){
  button.addEventListener('click',function(){fd230Save(k,true)});actions.appendChild(button);
  var note=document.createElement('span');note.id='sectionNote-'+k;note.className='save-state';note.setAttribute('role','status');actions.appendChild(note);content.appendChild(actions);host.appendChild(box);
  box.addEventListener('input',function(e){if(e.target.type==='file')return;
+ FD230.edits[k]=(FD230.edits[k]||0)+1;
  if(k==='personal'||k==='insurance'){if(FD230.insuranceKey!==fd230PolicyKey(collect())){FD.insuranceUnlocked=true;FD.eligibility=null;}}
  if(FD.data.officeSections)FD.data.officeSections[k]=false;if(k==='personal'&&['address1','address2','city','state','zip'].indexOf(e.target.id)>=0)FD.data.addressConfirmed=false;
- if(FD.data.sectionProgress&&FD.data.sectionProgress[k])FD.data.sectionProgress[k].submittedAt='';fd230Render();clearTimeout(FD230.timers[k]);FD230.timers[k]=setTimeout(function(){fd230Save(k,false)},900);});
+ if(FD.data.sectionProgress&&FD.data.sectionProgress[k])FD.data.sectionProgress[k].submittedAt='';
+ // Coalesce progress painting while leaving native typing and focus untouched.
+ clearTimeout(FD230.paintTimer);FD230.paintTimer=setTimeout(fd230Render,80);
+ clearTimeout(FD230.timers[k]);FD230.timers[k]=setTimeout(function(){fd230Save(k,false)},900);});
  box.addEventListener('change',function(e){if(e.target.type==='file')fd230UploadFiles();});
  });
  var additionalBody=$('section-additional').querySelector('.section-body');
@@ -2685,6 +2689,7 @@ function fd230Save(section,submit){
  if(submit&&FD230.submitting[section])return;
  clearTimeout(FD230.timers[section]);
  var snapshot=collect();snapshot.addressConfirmed=!!FD.data.addressConfirmed||!!(submit&&(section==='personal'||section==='contract'));var signing=section==='contract'&&submit,sequence=(FD230.serial[section]||0)+1;FD230.serial[section]=sequence;
+ var editsAtRequest=Object.assign({},FD230.edits);
  var button=$(signing?'sectionSignBtn':'sectionSubmit-'+section),note=$('sectionNote-'+section);
  if(submit&&section==='personal'){var missing=['firstName','lastName','dob','phone','email','address1','city','state','zip'].filter(function(k){return !String(snapshot[k]||'').trim();});if(missing.length){note.textContent='Please complete the highlighted personal details, then Save & continue.';missing.forEach(function(k){$(k).setAttribute('aria-invalid','true')});$(missing[0]).focus();return;}['firstName','lastName','dob','phone','email','address1','city','state','zip'].forEach(function(k){$(k).removeAttribute('aria-invalid')});}
  if(signing){try{if(!FD.agreement||!Array.isArray(FD.agreement.sections)||!FD.agreement.sections.length)throw new Error('Please reload so the contract text is available before signing.');['confirmationPolicyAccepted','noShowPolicyAccepted','privacyAcknowledged','treatmentConsent','financialPolicyAcknowledged','agreementAccepted'].forEach(function(k){if(!snapshot[k])throw new Error('Please review the contract acknowledgements before signing.');});if(!snapshot.signatureName)throw new Error('Please type your name to sign.');if(frontDoorIsVirtual_()&&!snapshot.telemedicineConsent)throw new Error('Please accept telemedicine consent for your video visit.');}catch(e){note.textContent=e.message;return;}}
@@ -2694,7 +2699,14 @@ function fd230Save(section,submit){
  FD230.queue=FD230.queue.catch(function(){}).then(function(){if(!submit&&sequence!==FD230.serial[section])return null;return fd230Request(signing?'sign-contract':'section-save',section,snapshot,submit)}).then(function(res){
   if(!res)return;
   if(signing&&!res.contractSigned){note.textContent='Your signature is processing. You may complete the optional medical card while we confirm it.';fd230CheckContract(0);fd230Open('additional');return;}
-  FD.data=Object.assign({},FD.data,snapshot,{sectionProgress:res.sectionProgress||FD.data.sectionProgress||{}});FD230.signed=!!(FD230.signed||res.contractSigned);fd230Render();
+  // A slow response acknowledges its snapshot, not text entered since then.
+  // Preserve live fields and keep every subsequently edited section unsubmitted.
+  var progress=Object.assign({},res.sectionProgress||FD.data.sectionProgress||{});
+  FD230.keys.forEach(function(k){if((FD230.edits[k]||0)!==(editsAtRequest[k]||0))progress[k]=Object.assign({},progress[k]||{},{submittedAt:''});});
+  var changedSinceRequest=(FD230.edits[section]||0)!==(editsAtRequest[section]||0);
+  if((FD230.edits.personal||0)!==(editsAtRequest.personal||0))snapshot.addressConfirmed=!!FD.data.addressConfirmed;
+  FD.data=Object.assign({},FD.data,snapshot,collect(),{sectionProgress:progress});FD230.signed=!!(FD230.signed||res.contractSigned);fd230Render();
+  if(changedSinceRequest&&!signing){note.textContent='New changes waiting to save…';return;}
   note.textContent=signing?'Registration submitted. You are ready for the office.':submit?(section==='additional'?'Medical card saved.':'Submitted. You can add missing details later.'):'Draft saved.';
   if(submit){
    // Downstream work never blocks the next section or contract submission.
@@ -3122,5 +3134,4 @@ boot();
 </script>
 </body>
 </html>
-
 
