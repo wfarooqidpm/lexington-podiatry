@@ -267,6 +267,8 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 .booking-edit{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;min-height:44px;padding:8px 15px;font:500 14px var(--sans);cursor:pointer;}.booking-edit:disabled{opacity:.5;cursor:default;}
 .booking-sidebar{display:grid;grid-template-columns:1fr 1fr;gap:18px;}.booking-sidebar .sidebar-card{margin:0;background:transparent;padding:20px;}.booking-sidebar .patient-summary{display:none!important;}
 .btn-ink{background:#284b3d;border-radius:9px;}.btn-ink:hover{background:#1e3c30;}.secure-section{background:transparent;border:0;padding:0;margin-bottom:0;}.secure-section-label,.secure-badge{display:none;}.verify-box{border:0;background:transparent;padding:0;}.confirm-box{border:0;background:transparent;padding:12px;}
+#returningModeGrid,#panel2Returning .form-row,#returningEmailCodeFields,#returningLegacyPhoneField{display:none;}
+#panel2ReturnForm>.form-group{display:none;}
 #reviewSummary{background:transparent!important;border:0!important;padding:0!important;margin:0!important;}#panel4 .form-nav{margin-top:20px;}
 @media(max-width:640px){.booking-completed,.booking-sidebar{grid-template-columns:1fr;}.panel.active{padding:20px 16px;}.booking-main .wrap,.booking-hero .wrap{padding-left:18px;padding-right:18px;}.booking-hero h1{font-size:29px;text-align:left;}.booking-main{padding-top:18px;}.step-tab{letter-spacing:.06em;margin-right:16px;}.booking-task-title{font-size:23px;}}
 </style>
@@ -323,28 +325,28 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 
 <div class="booking-main"><div class="wrap"><div class="booking-grid">
 <div class="booking-form-area">
-  <p class="booking-intro">Choose your visit, review your details, and book your appointment.</p>
+  <p class="booking-intro">Enter your details, choose your visit and time, then book your appointment.</p>
   <div class="booking-completed" id="bookingCompletedCards" hidden>
     <section class="booking-summary-card" id="bookingAppointmentCard" hidden>
-      <div class="booking-summary-head"><h2>Your appointment</h2><button type="button" class="booking-edit" id="bookingEditAppointment" onclick="goBack(2)">Edit</button></div>
+      <div class="booking-summary-head"><h2>Your appointment</h2><button type="button" class="booking-edit" id="bookingEditAppointment" onclick="goBack(3)">Edit</button></div>
       <p id="bookingAppointmentTime"></p><p class="booking-summary-meta" id="bookingAppointmentMeta"></p><p class="booking-summary-status" id="bookingAppointmentStatus"></p>
     </section>
     <section class="booking-summary-card" id="bookingInfoCard" hidden>
-      <div class="booking-summary-head"><h2>Your information</h2><button type="button" class="booking-edit" id="bookingEditInfo" onclick="goBack(3)">Edit</button></div>
+      <div class="booking-summary-head"><h2>Your information</h2><button type="button" class="booking-edit" id="bookingEditInfo" onclick="goBack(1)">Edit</button></div>
       <p id="bookingInfoName"></p><p class="booking-summary-meta" id="bookingInfoMeta"></p><p class="booking-summary-status" id="bookingInfoStatus"></p>
     </section>
   </div>
 
   <div class="steps" id="stepIndicator">
-    <div class="step-tab active" id="stepTab1">Visit type</div>
-    <div class="step-tab" id="stepTab2">Date &amp; time</div>
-    <div class="step-tab" id="stepTab3">Your info</div>
-    <div class="step-tab" id="stepTab4">Confirm</div>
+    <div class="step-tab active" id="stepTab1">Your info</div>
+    <div class="step-tab" id="stepTab2">Visit &amp; mode</div>
+    <div class="step-tab" id="stepTab3">Date &amp; time</div>
+    <div class="step-tab" id="stepTab4">Book</div>
   </div>
 
   <!-- PANEL 1 -->
-  <div class="panel active" id="panel1">
-    <h2 class="booking-task-title">Let’s book your visit</h2>
+  <div class="panel" id="panel1">
+    <h2 class="booking-task-title">Choose your visit</h2>
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:24px;">Are you a new patient or have you visited Lexington Podiatry before?</p>
     <div class="type-grid">
       <button class="type-card" id="cardNew" onclick="selectType(this)"  data-type="new">
@@ -358,13 +360,20 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
         <span class="tc-time" id="returningDurationLabel">15 min appointment</span>
       </button>
     </div>
+    <div class="form-group">
+      <label>Appointment mode</label>
+      <div class="mode-grid" id="newModeGrid">
+        <button type="button" class="mode-card" data-mode="In Person" onclick="selectCombinedMode(this)">In person<span>Visit the Midtown office</span></button>
+        <button type="button" class="mode-card" data-mode="Virtual" onclick="selectCombinedMode(this)">Virtual<span>Secure telemedicine visit</span></button>
+      </div>
+    </div>
     <div class="form-nav" style="margin-top:32px;">
-      <button class="btn btn-ink" onclick="goToStep2()" id="btnStep1Next" disabled>Continue</button>
+      <button class="btn btn-ink" onclick="goToStep2()" id="btnStep1Next" disabled>Choose date &amp; time</button><button class="btn-back" onclick="goBack(1)">← Back</button>
     </div>
   </div>
 
   <!-- PANEL 2A NEW PATIENT -->
-  <div class="panel" id="panel2New">
+  <div class="panel active" id="panel2New">
     <h2 class="booking-task-title">Your information</h2>
 
     <div class="secure-section">
@@ -380,14 +389,14 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
       <div class="form-group"><label for="npEmail">Email address</label><input type="email" id="npEmail" autocomplete="email" placeholder="jane@example.com"></div>
       <div class="secure-badge">🔒 Encrypted in transit</div>
     </div>
-    <div class="form-nav"><button class="btn btn-ink" onclick="validateNewInfoAndReview()">Review &amp; confirm</button><button class="btn-back" onclick="goBack(2)">← Back</button></div>
+    <div class="form-nav"><button class="btn btn-ink" onclick="validateNewInfoAndReview()">Continue to visit details</button></div>
   </div>
 
   <!-- PANEL 2B RETURNING VERIFY -->
   <div class="panel" id="panel2Returning">
     <div class="verify-box">
       <div class="vb-title">Let's find your record</div>
-      <div class="vb-sub" id="returningVerifyInstructions">Enter your name, date of birth, and email as they appear in your patient record.</div>
+      <div class="vb-sub" id="returningVerifyInstructions">We’ll use the details you entered to find your patient record. You can go back to edit them.</div>
       <div class="form-row">
         <div class="form-group"><label for="rpFirst">First name</label><input type="text" id="rpFirst" autocomplete="given-name" placeholder="Jane"></div>
         <div class="form-group"><label for="rpLast">Last name</label><input type="text" id="rpLast" autocomplete="family-name" placeholder="Smith"></div>
@@ -412,7 +421,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 
   <!-- PANEL 2C RETURNING SHORT FORM -->
   <div class="panel" id="panel2ReturnForm">
-    <p style="font-size:15px;color:var(--ink-soft);margin-bottom:24px;">Welcome back! Tell us about this follow-up, then choose a time.</p>
+    <p style="font-size:15px;color:var(--ink-soft);margin-bottom:24px;">Choose an available time for your follow-up.</p>
     <div class="form-group">
       <label>Appointment mode</label>
       <div class="mode-grid" id="returningModeGrid">
@@ -424,22 +433,15 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
       <p style="font-size:15px;color:var(--ink-soft);margin-bottom:8px;">Select an available appointment time. All times are Eastern.</p>
       <div id="returningSlotContainer"><div class="schedule-loader" role="status" aria-live="polite"><span class="schedule-spinner" aria-hidden="true"></span><span class="schedule-loading-copy">Finding available appointments<span class="schedule-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></span></div></div>
     </div>
-    <div class="form-nav" style="margin-top:24px;"><button class="btn btn-ink" onclick="submitReturningBooking()" id="btnReturnReview" disabled>Confirm appointment</button><button class="btn-back" onclick="backToVisitType()">← Back</button></div>
+    <div class="form-nav" style="margin-top:24px;"><button class="btn btn-ink" onclick="goToStep4()" id="btnReturnReview" disabled>Review &amp; book</button><button class="btn-back" onclick="backToVisitType()">← Back</button></div>
   </div>
 
   <!-- PANEL 3 SLOTS -->
   <div class="panel" id="panel3">
     <h2 class="booking-task-title">Choose your appointment</h2>
-    <div class="form-group">
-      <label>Appointment mode</label>
-      <div class="mode-grid" id="newModeGrid">
-        <button type="button" class="mode-card" data-mode="In Person" onclick="selectNewVisitMode(this)">In person<span>Visit the Midtown office</span></button>
-        <button type="button" class="mode-card" data-mode="Virtual" onclick="selectNewVisitMode(this)">Virtual<span>Secure telemedicine visit</span></button>
-      </div>
-    </div>
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:8px;">Select an available appointment time. All times are Eastern.</p>
     <div id="slotContainer"><p class="loading-slots">Choose in person or virtual to see available times.</p></div>
-    <div class="form-nav" style="margin-top:24px;"><button class="btn btn-ink" onclick="goToStep3New()" id="btnStep3Next" disabled>Continue to your information</button><button class="btn-back" onclick="goBack(1)">← Back</button></div>
+    <div class="form-nav" style="margin-top:24px;"><button class="btn btn-ink" onclick="goToStep3New()" id="btnStep3Next" disabled>Review &amp; book</button><button class="btn-back" onclick="goBack(2)">← Back</button></div>
   </div>
 
   <!-- PANEL 4 REVIEW -->
@@ -600,9 +602,8 @@ function renderBookingCards() {
   var showAppointment = !!state.selectedSlot && state.currentStep > 1;
   var fields = ['npFirst','npLast','npDob','npPhone','npEmail'];
   var complete = fields.every(function(id) { return !!byId(id).value.trim(); });
-  var showInfo = state.currentStep > 1 && (returning
-    ? !!(state.verifiedName && state.verificationSession)
-    : complete && state.currentStep >= 4);
+  var verified = returning && !!(state.verifiedName && state.verificationSession);
+  var showInfo = state.currentStep > 1 && (complete || verified);
   byId('bookingCompletedCards').hidden = !showAppointment && !showInfo;
   byId('bookingAppointmentCard').hidden = !showAppointment;
   byId('bookingInfoCard').hidden = !showInfo;
@@ -611,18 +612,18 @@ function renderBookingCards() {
   byId('bookingAppointmentStatus').textContent = state.bookingCommitted ? '✓ Appointment booked' : 'Selected · not booked yet';
   byId('bookingEditAppointment').disabled = !!state.bookingCommitted;
   byId('bookingEditInfo').disabled = !!state.bookingCommitted;
-  byId('bookingEditInfo').hidden = returning;
-  byId('bookingInfoName').textContent = returning ? (state.verifiedName || '') : byId('npFirst').value.trim() + ' ' + byId('npLast').value.trim();
-  byId('bookingInfoMeta').textContent = returning ? (state.verifiedEmail || '') : byId('npDob').value + '\n' + bookingPhoneNumber_('INTERNATIONAL') + '\n' + byId('npEmail').value.trim();
-  byId('bookingInfoStatus').textContent = returning ? '✓ Record found' : (state.bookingCommitted ? '✓ Information received' : 'Ready to submit');
+  byId('bookingEditInfo').hidden = false;
+  byId('bookingInfoName').textContent = verified ? (state.verifiedName || '') : byId('npFirst').value.trim() + ' ' + byId('npLast').value.trim();
+  byId('bookingInfoMeta').textContent = verified ? (state.verifiedEmail || '') : byId('npDob').value + '\n' + bookingPhoneNumber_('INTERNATIONAL') + '\n' + byId('npEmail').value.trim();
+  byId('bookingInfoStatus').textContent = verified ? '✓ Record found' : (state.bookingCommitted ? '✓ Information received' : 'Ready to submit');
 }
 
 function configureStepTabs() {
-  var returning = state.patientType === 'returning';
-  document.getElementById('stepTab1').textContent = 'Visit type';
-  document.getElementById('stepTab2').textContent = returning ? 'Appointment' : 'Date & time';
-  document.getElementById('stepTab3').textContent = 'Your info';
-  document.getElementById('stepTab3').style.display = returning ? 'none' : '';
+  document.getElementById('stepTab1').textContent = 'Your info';
+  document.getElementById('stepTab2').textContent = 'Visit & mode';
+  document.getElementById('stepTab3').textContent = 'Date & time';
+  document.getElementById('stepTab3').style.display = '';
+  document.getElementById('stepTab4').textContent = 'Book';
 }
 
 function updatePatientSummary() {
@@ -729,17 +730,17 @@ function clearReturningVerification_(message) {
 }
 
 function showReturningVerification_(message) {
+  var mode = state.visitMode;
   clearReturningVerification_(message);
+  state.visitMode = mode;
   configureStepTabs();
-  setStep(2);
+  setStep(3);
   document.getElementById('panel2Returning').classList.add('active');
   // The server enforces verification rate limits.
 }
 
 function backToVisitType() {
-  clearReturningVerification_();
-  setStep(1);
-  document.getElementById('panel1').classList.add('active');
+  goBack(2);
 }
 
 function openReturningBooking() {
@@ -747,14 +748,14 @@ function openReturningBooking() {
     showReturningVerification_('Please verify your patient record before choosing an appointment time.');
     return;
   }
+  if (!state.visitMode) { goBack(2); return; }
   configureStepTabs();
-  setStep(2);
+  setStep(3);
   document.getElementById('panel2ReturnForm').classList.add('active');
-  updatePatientSummary();
   state.selectedSlot = null;
-  renderBookingCards();
   document.getElementById('btnReturnReview').disabled = true;
-  document.getElementById('returningSlotContainer').innerHTML = '<p class="loading-slots">Choose in person or virtual to see available times.</p>';
+  updatePatientSummary();
+  loadSlots('returningSlotContainer');
 }
 
 function selectNewVisitMode(btn) {
@@ -791,44 +792,54 @@ function selectVisitMode(btn) {
 function selectType(el) {
   var type = el ? el.getAttribute('data-type') : null;
   if (!type) return;
+  var mode = state.visitMode;
   if (state.patientType === 'returning' && type !== 'returning') clearReturningVerification_();
-  if (state.patientType !== type) {
-    state.visitMode = null;
-    document.querySelectorAll('#newModeGrid .mode-card').forEach(function(card) {
-      card.classList.remove('selected');
-    });
-  }
-  document.getElementById('btnStep3Next').disabled = true;
   state.patientType = type;
+  state.visitMode = mode;
   state.selectedSlot = null;
-  renderBookingCards();
   state.bookingPayload = null;
   document.getElementById('cardNew').classList.toggle('selected', type === 'new');
   document.getElementById('cardReturning').classList.toggle('selected', type === 'returning');
-  if (type === 'new') document.getElementById('patientSummaryCard').classList.remove('show');
+  document.getElementById('btnStep1Next').disabled = !state.visitMode;
   configureStepTabs();
-  document.getElementById('btnStep1Next').disabled = false;
+  renderBookingCards();
+}
+
+function selectCombinedMode(btn) {
+  state.visitMode = btn.getAttribute('data-mode');
+  state.selectedSlot = null;
+  state.bookingPayload = null;
+  document.querySelectorAll('#newModeGrid .mode-card').forEach(function(el) {
+    el.classList.toggle('selected', el === btn);
+  });
+  document.getElementById('btnStep1Next').disabled = !state.patientType;
+  renderBookingCards();
 }
 
 function goToStep2() {
-  if (!state.patientType) return;
-  setStep(2);
+  if (!state.patientType || !state.visitMode) return;
+  state.selectedSlot = null;
+  document.getElementById('btnStep3Next').disabled = true;
+  document.getElementById('btnReturnReview').disabled = true;
+  setStep(3);
   if (state.patientType === 'new') {
     document.getElementById('panel3').classList.add('active');
-    if (state.visitMode) loadSlots('slotContainer');
-    else document.getElementById('slotContainer').innerHTML = '<p class="loading-slots">Choose in person or virtual to see available times.</p>';
+    loadSlots('slotContainer');
   } else if (hasVerifiedReturningPatient_()) {
     openReturningBooking();
   } else {
+    [['npFirst','rpFirst'],['npLast','rpLast'],['npDob','rpDob'],['npEmail','rpVerifyEmail']].forEach(function(pair) {
+      document.getElementById(pair[1]).value = document.getElementById(pair[0]).value;
+    });
     document.getElementById('panel2Returning').classList.add('active');
     restoreVerificationAttempts_();
+    verifyReturning();
   }
 }
 
 function goToStep3New() {
   if (!state.visitMode || !state.selectedSlot) return;
-  setStep(3);
-  document.getElementById('panel2New').classList.add('active');
+  goToStep4();
 }
 
 function validateNewInfoAndReview() {
@@ -850,7 +861,8 @@ function validateNewInfoAndReview() {
     phoneError.classList.remove('show');
   }
   if (!valid) return;
-  goToStep4();
+  setStep(2);
+  document.getElementById('panel1').classList.add('active');
 }
 
 function confirmReturningCode() {
@@ -1113,6 +1125,7 @@ function goToStep4() {
   if (state.patientType === 'returning' && !validateReturningAppointment()) return;
   setStep(4);
   document.getElementById('panel4').classList.add('active');
+  document.getElementById('btnSubmit').textContent = state.patientType === 'returning' ? 'Confirm appointment' : 'Create appointment & continue';
   document.getElementById('reviewSummary').textContent = 'Your selected time is not booked until you confirm below.';
 }
 
@@ -1191,7 +1204,7 @@ function loadBookingConfig() {
     document.getElementById('returningEmailCodeFields').style.display = emailCode ? 'block' : 'none';
     document.getElementById('returningLegacyPhoneField').style.display = emailCode ? 'none' : 'block';
     document.getElementById('returningVerifyInstructions').textContent = emailCode
-      ? 'Enter your name, date of birth, and email as they appear in your patient record.'
+      ? 'We’ll use the details you entered to find your patient record. You can go back to edit them.'
       : 'Enter your name and the last 4 digits of your phone number on file.';
     document.getElementById('btnVerify').textContent = emailCode ? 'Find my record' : 'Find my record';
 
@@ -1364,21 +1377,21 @@ function submitBooking() {
 
 
 function goBack(toStep) {
+  if (state.bookingCommitted) return;
   setStep(toStep);
-  if (toStep === 1) { document.getElementById('panel1').classList.add('active'); }
-  else if (toStep === 2) {
-    if (state.patientType === 'new') { document.getElementById('panel3').classList.add('active'); }
-    else if (hasVerifiedReturningPatient_()) { document.getElementById('panel2ReturnForm').classList.add('active'); }
-    else { document.getElementById('panel2Returning').classList.add('active'); }
+  if (toStep === 1) document.getElementById('panel2New').classList.add('active');
+  else if (toStep === 2) document.getElementById('panel1').classList.add('active');
+  else if (toStep === 3) {
+    if (state.patientType === 'new') document.getElementById('panel3').classList.add('active');
+    else if (hasVerifiedReturningPatient_()) document.getElementById('panel2ReturnForm').classList.add('active');
+    else goToStep2();
   }
-  else if (toStep === 3) { document.getElementById('panel2New').classList.add('active'); }
 }
 
 function goBackFromReview() {
-  goBack(state.patientType === 'returning' ? 2 : 3);
+  goBack(3);
 }
 
-// The booking tab keeps a private random key; email approval never exposes the booking session.
 var magicPending271=null,magicTimer271=null,magicBusy271=false;
 var bridge271={channel:null,ready:null,peer:null,origin:null,pending:{},next:0};
 function random271(n){var b=new Uint8Array(n);crypto.getRandomValues(b);return Array.from(b,function(v){return v.toString(16).padStart(2,'0');}).join('');}
@@ -1403,6 +1416,7 @@ async function verifyReturning(){
  if(!first||!last||!dob||!email){showVerifyResult('Please enter your name, date of birth, and email address.',false);return;}
  magicBusy271=true;var btn=document.getElementById('btnVerify');btn.disabled=true;btn.textContent='Finding your record…';showVerifyResult('Checking your details…','info');
  try{var result=await call271({action:'booking-match',firstName:first,lastName:last,dob:dob,email:email});
+ if(first!==document.getElementById('npFirst').value.trim()||last!==document.getElementById('npLast').value.trim()||dob!==document.getElementById('npDob').value||email!==document.getElementById('npEmail').value.trim()||state.patientType!=='returning'||state.currentStep!==3)return;
  if(!result.success||!result.matched||!result.session)throw new Error(result.error||'We could not match those details. Please call the office.');
  state.verificationSession=result.session;state.verifiedName=first+' '+last;state.verifiedEmail=email;state.verifiedPhone='';
  clearMagic271();showVerifyResult('Welcome back! Choose your appointment.',true);openReturningBooking();
@@ -1440,6 +1454,16 @@ async function routeReturningCard272(token) {
   } catch(err){status.textContent='Your appointment is booked. We could not check your saved information yet.';retry.hidden=false;retry.onclick=function(){routeReturningCard272(token);};}
 }
 
+['npFirst','npLast','npDob','npEmail'].forEach(function(id) {
+  document.getElementById(id).addEventListener('input', function() {
+    if (state.bookingCommitted) return;
+    state.verificationSession = null;
+    state.verifiedName = null;
+    state.selectedSlot = null;
+    state.bookingPayload = null;
+    renderBookingCards();
+  });
+});
 initialiseInternationalPhone_();
 if(!location.hash.startsWith("#verify="))loadBookingConfig();
 initMagic271();
