@@ -253,6 +253,22 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 @media(max-width:640px){.practice-banner{font-size:13px}.practice-banner-message{padding:12px 24px}.practice-banner-track{animation-duration:13s}}
 @media(prefers-reduced-motion:reduce){.practice-banner-track{width:100%;animation:none}.practice-banner-message{min-width:100%;white-space:normal;text-align:center}.practice-banner-message[aria-hidden="true"]{display:none}}
 
+/* Registration-style booking layout: summaries are local, never new writes. */
+.booking-hero{background:var(--ivory);color:var(--ink);border-bottom:1px solid var(--line-soft);padding:28px 0 20px;}
+.mobile-office-hours{display:block;}
+.booking-hero-grid{display:block;}.booking-hero h1{color:var(--ink);white-space:normal;font-size:36px;}.booking-hero h1 em{color:var(--brass);}.hero-hours{display:none;}
+.booking-main{padding:24px 0 64px;}.booking-main>.wrap,.booking-hero>.wrap{max-width:1040px;}.booking-grid{grid-template-columns:minmax(0,1fr);gap:28px;}
+.booking-intro{color:var(--ink-soft);margin-bottom:22px;font-size:16px;}
+.steps{margin-bottom:22px;}.step-tab.done{color:#387149;}.step-tab.done::before{content:'✓ ';}
+.panel.active{background:#fff;border:1px solid var(--line);border-top:3px solid var(--brass);border-radius:14px;padding:26px;}
+.booking-task-title{font-family:var(--serif);font-size:26px;font-weight:400;line-height:1.2;margin-bottom:16px;}
+.booking-completed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:24px;}.booking-completed[hidden],.booking-completed [hidden]{display:none!important;}
+.booking-summary-card{background:#fff;border:1px solid #dce3d8;border-radius:12px;padding:20px;min-width:0;}.booking-summary-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;}.booking-summary-head h2{font:500 18px var(--sans);}.booking-summary-card p{font-size:15px;overflow-wrap:anywhere;}.booking-summary-meta{color:var(--ink-soft);white-space:pre-line;}.booking-summary-status{color:#387149;font-size:13px!important;margin-top:10px;}
+.booking-edit{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:8px;min-height:44px;padding:8px 15px;font:500 14px var(--sans);cursor:pointer;}.booking-edit:disabled{opacity:.5;cursor:default;}
+.booking-sidebar{display:grid;grid-template-columns:1fr 1fr;gap:18px;}.booking-sidebar .sidebar-card{margin:0;background:transparent;padding:20px;}.booking-sidebar .patient-summary{display:none!important;}
+.btn-ink{background:#284b3d;border-radius:9px;}.btn-ink:hover{background:#1e3c30;}.secure-section{background:transparent;border:0;padding:0;margin-bottom:0;}.secure-section-label,.secure-badge{display:none;}.verify-box{border:0;background:transparent;padding:0;}.confirm-box{border:0;background:transparent;padding:12px;}
+#reviewSummary{background:transparent!important;border:0!important;padding:0!important;margin:0!important;}#panel4 .form-nav{margin-top:20px;}
+@media(max-width:640px){.booking-completed,.booking-sidebar{grid-template-columns:1fr;}.panel.active{padding:20px 16px;}.booking-main .wrap,.booking-hero .wrap{padding-left:18px;padding-right:18px;}.booking-hero h1{font-size:29px;text-align:left;}.booking-main{padding-top:18px;}.step-tab{letter-spacing:.06em;margin-right:16px;}.booking-task-title{font-size:23px;}}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NH5ZV4VP2X"></script>
@@ -307,6 +323,18 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 
 <div class="booking-main"><div class="wrap"><div class="booking-grid">
 <div class="booking-form-area">
+  <p class="booking-intro">Choose your visit, review your details, and book your appointment.</p>
+  <div class="booking-completed" id="bookingCompletedCards" hidden>
+    <section class="booking-summary-card" id="bookingAppointmentCard" hidden>
+      <div class="booking-summary-head"><h2>Your appointment</h2><button type="button" class="booking-edit" id="bookingEditAppointment" onclick="goBack(2)">Edit</button></div>
+      <p id="bookingAppointmentTime"></p><p class="booking-summary-meta" id="bookingAppointmentMeta"></p><p class="booking-summary-status" id="bookingAppointmentStatus"></p>
+    </section>
+    <section class="booking-summary-card" id="bookingInfoCard" hidden>
+      <div class="booking-summary-head"><h2>Your information</h2><button type="button" class="booking-edit" id="bookingEditInfo" onclick="goBack(3)">Edit</button></div>
+      <p id="bookingInfoName"></p><p class="booking-summary-meta" id="bookingInfoMeta"></p><p class="booking-summary-status" id="bookingInfoStatus"></p>
+    </section>
+  </div>
+
   <div class="steps" id="stepIndicator">
     <div class="step-tab active" id="stepTab1">Visit type</div>
     <div class="step-tab" id="stepTab2">Date &amp; time</div>
@@ -316,6 +344,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 
   <!-- PANEL 1 -->
   <div class="panel active" id="panel1">
+    <h2 class="booking-task-title">Let’s book your visit</h2>
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:24px;">Are you a new patient or have you visited Lexington Podiatry before?</p>
     <div class="type-grid">
       <button class="type-card" id="cardNew" onclick="selectType(this)"  data-type="new">
@@ -336,6 +365,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 
   <!-- PANEL 2A NEW PATIENT -->
   <div class="panel" id="panel2New">
+    <h2 class="booking-task-title">Your information</h2>
 
     <div class="secure-section">
       <div class="secure-section-label">Personal information</div>
@@ -399,6 +429,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 
   <!-- PANEL 3 SLOTS -->
   <div class="panel" id="panel3">
+    <h2 class="booking-task-title">Choose your appointment</h2>
     <div class="form-group">
       <label>Appointment mode</label>
       <div class="mode-grid" id="newModeGrid">
@@ -413,6 +444,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 
   <!-- PANEL 4 REVIEW -->
   <div class="panel" id="panel4">
+    <h2 class="booking-task-title">Review & book</h2>
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:28px;">Please review your details before submitting.</p>
     <div id="reviewSummary" style="border:1px solid var(--line-soft);border-radius:14px;padding:28px;margin-bottom:28px;background:#fff;font-size:15.5px;line-height:1.8;"></div>
     <div class="form-nav"><button class="btn btn-ink" onclick="submitBooking()" id="btnSubmit">Create appointment &amp; continue</button><button class="btn-back" onclick="goBackFromReview()">← Back</button></div>
@@ -559,6 +591,30 @@ function setStep(n) {
     if (i + 1 === n) t.classList.add('active');
   });
   state.currentStep = n;
+  renderBookingCards();
+}
+
+function renderBookingCards() {
+  var byId = function(id) { return document.getElementById(id); };
+  var returning = state.patientType === 'returning';
+  var showAppointment = !!state.selectedSlot && state.currentStep > 1;
+  var fields = ['npFirst','npLast','npDob','npPhone','npEmail'];
+  var complete = fields.every(function(id) { return !!byId(id).value.trim(); });
+  var showInfo = state.currentStep > 1 && (returning
+    ? !!(state.verifiedName && state.verificationSession)
+    : complete && state.currentStep >= 4);
+  byId('bookingCompletedCards').hidden = !showAppointment && !showInfo;
+  byId('bookingAppointmentCard').hidden = !showAppointment;
+  byId('bookingInfoCard').hidden = !showInfo;
+  byId('bookingAppointmentTime').textContent = showAppointment ? state.selectedSlot.label : '';
+  byId('bookingAppointmentMeta').textContent = (returning ? 'Follow-up visit' : 'New patient') + ' · ' + (state.visitMode || '');
+  byId('bookingAppointmentStatus').textContent = state.bookingCommitted ? '✓ Appointment booked' : 'Selected · not booked yet';
+  byId('bookingEditAppointment').disabled = !!state.bookingCommitted;
+  byId('bookingEditInfo').disabled = !!state.bookingCommitted;
+  byId('bookingEditInfo').hidden = returning;
+  byId('bookingInfoName').textContent = returning ? (state.verifiedName || '') : byId('npFirst').value.trim() + ' ' + byId('npLast').value.trim();
+  byId('bookingInfoMeta').textContent = returning ? (state.verifiedEmail || '') : byId('npDob').value + '\n' + bookingPhoneNumber_('INTERNATIONAL') + '\n' + byId('npEmail').value.trim();
+  byId('bookingInfoStatus').textContent = returning ? '✓ Record found' : (state.bookingCommitted ? '✓ Information received' : 'Ready to submit');
 }
 
 function configureStepTabs() {
@@ -576,6 +632,7 @@ function updatePatientSummary() {
   document.getElementById('patientSummaryType').textContent = 'Follow-up visit';
   document.getElementById('patientSummaryMode').textContent = state.visitMode || 'Choose in person or virtual';
   card.classList.add('show');
+  renderBookingCards();
 }
 
 var RETURNING_VERIFY_MAX_ATTEMPTS = 3;
@@ -656,6 +713,7 @@ function clearReturningVerification_(message) {
   state.verificationSession = null;
   state.visitMode = null;
   state.selectedSlot = null;
+  renderBookingCards();
   state.bookingPayload = null;
   document.getElementById('rpCode').value = '';
   document.getElementById('returningCodeField').style.display = 'none';
@@ -694,6 +752,7 @@ function openReturningBooking() {
   document.getElementById('panel2ReturnForm').classList.add('active');
   updatePatientSummary();
   state.selectedSlot = null;
+  renderBookingCards();
   document.getElementById('btnReturnReview').disabled = true;
   document.getElementById('returningSlotContainer').innerHTML = '<p class="loading-slots">Choose in person or virtual to see available times.</p>';
 }
@@ -701,11 +760,13 @@ function openReturningBooking() {
 function selectNewVisitMode(btn) {
   state.visitMode = btn.getAttribute('data-mode');
   state.selectedSlot = null;
+  renderBookingCards();
   state.bookingPayload = null;
   document.querySelectorAll('#newModeGrid .mode-card').forEach(function(el) {
     el.classList.toggle('selected', el === btn);
   });
   document.getElementById('btnStep3Next').disabled = true;
+  renderBookingCards();
   loadSlots('slotContainer');
 }
 
@@ -716,6 +777,7 @@ function selectVisitMode(btn) {
   }
   state.visitMode = btn.getAttribute('data-mode');
   state.selectedSlot = null;
+  renderBookingCards();
   state.bookingPayload = null;
   document.querySelectorAll('#returningModeGrid .mode-card').forEach(function(el) {
     el.classList.toggle('selected', el === btn);
@@ -739,6 +801,7 @@ function selectType(el) {
   document.getElementById('btnStep3Next').disabled = true;
   state.patientType = type;
   state.selectedSlot = null;
+  renderBookingCards();
   state.bookingPayload = null;
   document.getElementById('cardNew').classList.toggle('selected', type === 'new');
   document.getElementById('cardReturning').classList.toggle('selected', type === 'returning');
@@ -932,6 +995,7 @@ function jumpToDay(id) {
   if (isNaN(idx) || !slotDateOrder[idx]) return;
   activeSlotDateIndex = idx;
   state.selectedSlot = null;
+  renderBookingCards();
   state.bookingPayload = null;
   document.getElementById('btnStep3Next').disabled = true;
   document.getElementById('btnReturnReview').disabled = true;
@@ -1025,6 +1089,7 @@ function selectSlot(btn) {
   document.querySelectorAll('.slot-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
   state.selectedSlot = { iso: btn.dataset.iso, label: btn.dataset.label };
+  renderBookingCards();
   state.bookingPayload = null;
   document.getElementById('btnStep3Next').disabled = false;
   document.getElementById('btnReturnReview').disabled = false;
@@ -1048,22 +1113,7 @@ function goToStep4() {
   if (state.patientType === 'returning' && !validateReturningAppointment()) return;
   setStep(4);
   document.getElementById('panel4').classList.add('active');
-  var summary = '';
-  if (state.patientType === 'new') {
-    summary = '<b>Name:</b> ' + document.getElementById('npFirst').value + ' ' + document.getElementById('npLast').value + '<br>' +
-              '<b>Date of birth:</b> ' + document.getElementById('npDob').value + '<br>' +
-              '<b>Phone:</b> ' + bookingPhoneNumber_('INTERNATIONAL') + '<br>' +
-              '<b>Email:</b> ' + document.getElementById('npEmail').value + '<br>' +
-              '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
-              '<b>Type:</b> New patient (' + bookingDurationLabel('new') + ')';
-  } else {
-    summary = '<b>Name:</b> ' + escapeBookingHtml(state.verifiedName) + '<br>' +
-
-              '<b>Mode:</b> ' + escapeBookingHtml(state.visitMode) + '<br>' +
-              '<b>Appointment:</b> ' + state.selectedSlot.label + '<br>' +
-              '<b>Type:</b> Follow-up (' + bookingDurationLabel('returning') + ')';
-  }
-  document.getElementById('reviewSummary').innerHTML = summary;
+  document.getElementById('reviewSummary').textContent = 'Your selected time is not booked until you confirm below.';
 }
 
 function buildWebsiteBookingPayload() {
@@ -1246,6 +1296,7 @@ function reserveWebsiteAndStartFrontDoor() {
     }
 
     state.bookingCommitted = true;
+    renderBookingCards();
     state.bookingResult = data;
 
     if (state.patientType === 'returning') {
@@ -1395,4 +1446,3 @@ initMagic271();
 </script>
 </body>
 </html>
-

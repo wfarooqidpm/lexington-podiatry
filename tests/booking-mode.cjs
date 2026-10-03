@@ -3,7 +3,7 @@ const html=fs.readFileSync(process.argv[2] || require('path').join(__dirname, '.
 function fn(name){const start=html.indexOf('function '+name+'(');assert(start>=0,'Missing new-patient mode handler: '+name);const tail=html.slice(start);const next=tail.slice(1).search(/^function /m);return next<0?tail.split('</script>')[0]:tail.slice(0,next+1);}
 const elements={};const el=id=>elements[id]||(elements[id]={value:id==='npDob'?'2000-01-01':'Test',disabled:false,style:{},classList:{toggle(){},remove(){},add(){}}});
 let loads=[];const cards=[{getAttribute:()=> 'In Person',classList:{toggle(){}}},{getAttribute:()=> 'Virtual',classList:{toggle(){}}}];
-const c={state:{patientType:'new',visitMode:null,selectedSlot:null,bookingPayload:null},document:{getElementById:el,querySelectorAll:()=>cards},loadSlots:id=>loads.push({id,mode:c.state.visitMode}),bookingPhoneNumber_:()=>'+12125550100',setStep(){}};
+const c={state:{patientType:'new',visitMode:null,selectedSlot:null,bookingPayload:null},document:{getElementById:el,querySelectorAll:()=>cards},loadSlots:id=>loads.push({id,mode:c.state.visitMode}),bookingPhoneNumber_:()=>'+12125550100',setStep(){},renderBookingCards(){}};
 vm.createContext(c);vm.runInContext(fn('selectNewVisitMode')+'\n'+fn('buildWebsiteBookingPayload'),c);
 const newPanel=html.slice(html.indexOf('<div class="panel" id="panel3">'),html.indexOf('<!-- PANEL 4 REVIEW -->'));
 assert(newPanel.includes('id="newModeGrid"'),'New-patient mode controls must be visible with slots');
@@ -26,3 +26,4 @@ console.log('PASS: visible new-patient mode controls; both modes load filtered s
  assert.deepEqual(renders,[['virtual']]);
  console.log('PASS: slower stale mode response cannot replace current slots.');
 })().catch(err=>{console.error(err);process.exitCode=1});
+
