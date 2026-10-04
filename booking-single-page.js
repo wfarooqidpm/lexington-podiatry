@@ -111,28 +111,31 @@ function fd331Submit(){
  }).finally(function(){state.bookingBusy=false;fd331El('bookingInputs').disabled=!!state.bookingCommitted;fd331El('btnSubmit').textContent=state.bookingCommitted?'Continue registration':'Book appointment';fd331Render();});
 }
 // Keep the real booking DOM intact: email confirmation opens scheduling in this tab.
-// Credentials live only in memory; loading the link alone never approves it.
+// Opening the email link confirms possession; tokens remain in memory only.
+// Reopening is bounded by the server expiry and uses one durable booking identity.
 function fd331Approval(){
  var fragment=window.lexBookingVerificationFragment||location.hash;delete window.lexBookingVerificationFragment;
  var match=fragment.match(/^#verify=(VR-[a-f0-9]{32})\.([a-f0-9]{64})(?:\.(ip|vv))?$/);if(!match)return false;
  history.replaceState(null,'',location.pathname);
- document.querySelector('main').insertAdjacentHTML('beforeend','<section class="booking-section" id="fd331Approval" style="margin:0 28px 28px"><div class="booking-eyebrow">CONTINUE YOUR BOOKING</div><h2>Welcome back</h2><p>Confirm your identity, then choose your appointment time right here.</p><button class="btn btn-ink" id="fd331Approve" type="button">🔒 Confirm &amp; choose a time</button><p id="fd331ApprovalStatus" role="status"></p><p><a href="booking.html">Start again</a></p></section>');
+ document.querySelector('main').insertAdjacentHTML('beforeend','<section class="booking-section" id="fd331Approval" style="margin:0 28px 28px"><div class="booking-eyebrow">CONTINUE YOUR BOOKING</div><h2 id="fd331ApprovalTitle">Welcome back</h2><p id="fd331OpeningNote">We’re opening your appointment times…</p><button class="btn btn-ink" id="fd331Approve" type="button" hidden>Try again</button><p id="fd331ApprovalStatus" role="status"></p><p><a href="booking.html">Start again</a></p></section>');
  document.querySelector('.booking-main').hidden=true;
- var continuationKey=random271(32);
  fd331El('fd331Approve').onclick=async function(){
-  var button=this;if(button.disabled)return;button.disabled=true;fd331El('fd331ApprovalStatus').textContent='Confirming…';
+  var button=fd331El('fd331Approve');if(button.disabled)return;button.disabled=true;button.hidden=true;fd331El('fd331ApprovalStatus').textContent='Confirming…';
   try{
-   var result=await call271({action:'magic-approve',requestId:match[1],token:match[2],continuationKey:continuationKey});
+   var result=await call271({action:'magic-approve',requestId:match[1],token:match[2],continuationVersion:2});
+   if(result.success&&result.booked){fd331El('fd331OpeningNote').hidden=true;fd331El('fd331ApprovalTitle').textContent='Booking already received';fd331El('fd331ApprovalStatus').textContent='This link has already been used for a booking. Please check your confirmation. Need help? Call (212) 510-8665.';return;}
    if(!result.success||!result.approved||!result.verified||!result.session)throw new Error(result.error||'We could not continue your booking. Please try again.');
    var expiry=Date.parse(result.expiresAt);if(!isFinite(expiry)||expiry<=Date.now())throw new Error('This confirmation expired. Please start again.');
+   state.websiteBookingId=result.websiteBookingId;
    state.patientType='returning';state.visitMode=match[3]==='ip'?'In Person':match[3]==='vv'?'Virtual':null;
    state.verificationSession=result.session;state.verifiedName=result.firstName+' '+result.lastName;state.verifiedEmail='';state.verifiedPhone='';fd331.sessionExpires=expiry;
    fd331El('rpFirst').value=result.firstName;fd331El('rpLast').value=result.lastName;fd331El('rpDob').value=result.dob;
    fd331El('fd331Approval').hidden=true;document.querySelector('.booking-main').hidden=false;
    fd331El('verifyResult').textContent='🔓 Identity confirmed. Choose your appointment time.';
    fd331Initialize();fd331Slots();
-  }catch(err){fd331El('fd331ApprovalStatus').textContent=err.message;button.disabled=false;}
+  }catch(err){fd331El('fd331OpeningNote').hidden=true;fd331El('fd331ApprovalStatus').textContent=err.message;button.disabled=false;button.hidden=false;}
  };
+ fd331El('fd331Approve').onclick();
  return true;
 }
 // Bubble choices edit the existing draft; no writes, navigation, or new verification.
