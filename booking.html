@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <script>
 // Remove the one-use confirmation token before any analytics or third-party assets run.
-if (/^#verify=VR-[a-f0-9]{32}\.[a-f0-9]{64}$/.test(location.hash)) {
+if (/^#verify=VR-[a-f0-9]{32}\.[a-f0-9]{64}(?:\.(ip|vv))?$/.test(location.hash)) {
   window.lexBookingVerificationFragment = location.hash;
   history.replaceState(null, '', location.pathname + location.search);
 }
@@ -1417,6 +1417,6 @@ async function routeReturningCard272(token) {
 }
 
 </script>
-<script src="booking-single-page.js?v=332"></script>
+<script src="booking-single-page.js?v=333"></script>
 </body>
 </html>

@@ -60,11 +60,11 @@ async function fd331Confirm(){
   }
   if(pending.sent&&Date.now()-pending.created<60000){fd331El('verifyResult').textContent='Please check your email. You can request another link after one minute.';return;}
   fd331El('verifyResult').textContent='Sending confirmation…';
-  var result=await call271(Object.assign({action:'magic-start',requestId:pending.requestId,pollKey:pending.pollKey},identity));
+  var result=await call271(Object.assign({action:'magic-start',requestId:pending.requestId,pollKey:pending.pollKey,visitMode:state.visitMode},identity));
   if(generation!==fd331.generation||fd331.pending!==pending||key!==fd331IdentityKey())return;
   if(!result.success)throw new Error(result.error||'We could not send the confirmation. Please try again.');
   pending.sent=true;fd331El('btnVerify').textContent='Send again';
-  fd331El('verifyResult').textContent='If your details match a patient record, a link has been sent to the registered email. Open it and confirm your identity. Keep this page open.';
+  fd331El('verifyResult').textContent='If your details match a patient record, a link has been sent to the registered email. Choose Continue booking in that email. You can finish on the page it opens and close this tab.';
   fd331Poll();
  }catch(err){if(generation===fd331.generation)fd331El('verifyResult').textContent=err.message||'Please try again.';}
  finally{if(generation===fd331.generation){fd331.busy=false;fd331El('btnVerify').disabled=false;}}
@@ -76,6 +76,7 @@ async function fd331Poll(){
  try{
   var result=await call271({action:'magic-poll',requestId:pending.requestId,pollKey:pending.pollKey});
   if(generation!==fd331.generation||fd331.pending!==pending||pending.identity!==fd331IdentityKey())return;
+  if(result.continued){fd331.pending=null;fd331El('verifyResult').textContent='Continue in the page opened from your email. You can close this tab.';return;}
   if(result.expired){fd331VerificationExpired();return;}
   if(!result.success)throw new Error(result.error||'The confirmation check could not complete.');
   if(result.verified&&result.session){
@@ -103,12 +104,29 @@ function fd331Submit(){
   fd331El('bookingMessage').textContent=(err&&err.message)||'Unable to complete booking. Please try again or call the office.';
  }).finally(function(){state.bookingBusy=false;fd331El('bookingInputs').disabled=!!state.bookingCommitted;fd331El('btnSubmit').textContent=state.bookingCommitted?'Continue registration':'Book appointment';fd331Render();});
 }
+// Keep the real booking DOM intact: email confirmation opens scheduling in this tab.
+// Credentials live only in memory; loading the link alone never approves it.
 function fd331Approval(){
  var fragment=window.lexBookingVerificationFragment||location.hash;delete window.lexBookingVerificationFragment;
- var match=fragment.match(/^#verify=(VR-[a-f0-9]{32})\.([a-f0-9]{64})$/);if(!match)return false;
+ var match=fragment.match(/^#verify=(VR-[a-f0-9]{32})\.([a-f0-9]{64})(?:\.(ip|vv))?$/);if(!match)return false;
  history.replaceState(null,'',location.pathname);
- document.querySelector('main').innerHTML='<section class="booking-section" style="max-width:480px;margin:28px auto"><h1>Confirm your identity</h1><p>Unlock appointment times on your original booking page.</p><button class="btn btn-ink" id="fd331Approve" type="button">🔒 Confirm identity</button><p id="fd331ApprovalStatus" role="status"></p></section>';
- fd331El('fd331Approve').onclick=async function(){var button=this;button.disabled=true;fd331El('fd331ApprovalStatus').textContent='Confirming…';try{var result=await call271({action:'magic-approve',requestId:match[1],token:match[2]});if(!result.success||!result.approved)throw new Error(result.error||'Unable to confirm.');button.textContent='🔓 Identity confirmed';fd331El('fd331ApprovalStatus').textContent='Return to your original booking page. Appointment times will unlock there.';}catch(err){fd331El('fd331ApprovalStatus').textContent=err.message;button.disabled=false;}};
+ document.querySelector('main').insertAdjacentHTML('beforeend','<section class="booking-section" id="fd331Approval" style="margin:0 28px 28px"><div class="booking-eyebrow">CONTINUE YOUR BOOKING</div><h2>Welcome back</h2><p>Confirm your identity, then choose your appointment time right here.</p><button class="btn btn-ink" id="fd331Approve" type="button">🔒 Confirm &amp; choose a time</button><p id="fd331ApprovalStatus" role="status"></p><p><a href="booking.html">Start again</a></p></section>');
+ document.querySelector('.booking-main').hidden=true;
+ var continuationKey=random271(32);
+ fd331El('fd331Approve').onclick=async function(){
+  var button=this;if(button.disabled)return;button.disabled=true;fd331El('fd331ApprovalStatus').textContent='Confirming…';
+  try{
+   var result=await call271({action:'magic-approve',requestId:match[1],token:match[2],continuationKey:continuationKey});
+   if(!result.success||!result.approved||!result.verified||!result.session)throw new Error(result.error||'We could not continue your booking. Please try again.');
+   var expiry=Date.parse(result.expiresAt);if(!isFinite(expiry)||expiry<=Date.now())throw new Error('This confirmation expired. Please start again.');
+   state.patientType='returning';state.visitMode=match[3]==='ip'?'In Person':match[3]==='vv'?'Virtual':null;
+   state.verificationSession=result.session;state.verifiedName=result.firstName+' '+result.lastName;state.verifiedEmail='';state.verifiedPhone='';fd331.sessionExpires=expiry;
+   fd331El('rpFirst').value=result.firstName;fd331El('rpLast').value=result.lastName;fd331El('rpDob').value=result.dob;
+   fd331El('fd331Approval').hidden=true;document.querySelector('.booking-main').hidden=false;
+   fd331El('verifyResult').textContent='🔓 Identity confirmed. Choose your appointment time.';
+   fd331Initialize();fd331Slots();
+  }catch(err){fd331El('fd331ApprovalStatus').textContent=err.message;button.disabled=false;}
+ };
  return true;
 }
 // Bubble choices edit the existing draft; no writes, navigation, or new verification.
@@ -140,7 +158,9 @@ function fd332Flow(){
 }
 // Compatibility hooks used by the shared slot renderer and booking response handler.
 renderBookingCards=fd331Render;setStep=fd331SetStep;showReturningVerification_=fd331VerificationExpired;updatePatientSummary=fd331Render;
-if(!fd331Approval()){
+function fd331Initialize(){
  ['npFirst','npLast','npDob','npPhone','npEmail','rpFirst','rpLast','rpDob'].forEach(function(id){fd331El(id).addEventListener('input',function(){if(state.bookingBusy||state.bookingCommitted)return;state.bookingPayload=null;if(id.indexOf('rp')===0){fd331CancelVerification();fd331Slots();}else fd331Render();});});
  initialiseInternationalPhone_();loadBookingConfig();fd331Render();
 }
+
+if(!fd331Approval())fd331Initialize();
