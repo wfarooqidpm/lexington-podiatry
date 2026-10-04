@@ -1,5 +1,6 @@
 /* Approved single-page booker. Reuses the existing scheduling/booking gateway;
  * editing is local, and follow-up slots require possession of the registered email. */
+var fd332 = {edit:''};
 var fd331 = {generation:0, pending:null, timer:null, busy:false, slotKey:'', sessionExpires:0};
 function fd331El(id){return document.getElementById(id);}
 function fd331Identity(){return {firstName:fd331El('rpFirst').value.trim(),lastName:fd331El('rpLast').value.trim(),dob:fd331El('rpDob').value};}
@@ -23,6 +24,7 @@ function fd331Render(){
  fd331El('btnSubmit').disabled=state.bookingBusy||(!state.bookingCommitted&&!ready);
  fd331El('bookingSelection').textContent=state.patientType?((returning?'Follow-up':'First visit')+' · '+(state.visitMode||'Choose visit mode')+(state.selectedSlot?' · '+state.selectedSlot.label:'')):'Choose your visit details above.';
  if(verified){fd331El('btnVerify').textContent='🔓 Identity confirmed';fd331El('btnVerify').disabled=true;}
+ fd332Flow();
 }
 function fd331Slots(){
  var allowed=!!state.patientType&&!!state.visitMode&&(state.patientType==='new'||fd331Verified());
@@ -34,9 +36,14 @@ function fd331Slots(){
 function fd331SelectType(button){
  if(state.bookingBusy||state.bookingCommitted)return;
  var type=button.getAttribute('data-type');if(type!==state.patientType){fd331CancelVerification();state.selectedSlot=null;state.bookingPayload=null;}
- state.patientType=type;fd331Slots();
+ state.patientType=type;fd332.edit=state.visitMode?'':'mode';fd331Slots();
 }
-function fd331SelectMode(button){if(state.bookingBusy||state.bookingCommitted||state.visitMode===button.getAttribute('data-mode'))return;state.visitMode=button.getAttribute('data-mode');state.selectedSlot=null;state.bookingPayload=null;fd331Slots();}
+function fd331SelectMode(button){
+ if(state.bookingBusy||state.bookingCommitted)return;
+ fd332.edit='';var mode=button.getAttribute('data-mode');
+ if(state.visitMode===mode){fd331Render();return;}
+ state.visitMode=mode;state.selectedSlot=null;state.bookingPayload=null;fd331Slots();
+}
 function fd331VerificationExpired(message){fd331CancelVerification();fd331El('verifyResult').textContent=message||'Your confirmation expired. Please request a new email.';fd331Slots();}
 async function fd331Confirm(){
  if(fd331.busy||state.bookingBusy||state.patientType!=='returning'||fd331Verified())return;
@@ -103,6 +110,33 @@ function fd331Approval(){
  document.querySelector('main').innerHTML='<section class="booking-section" style="max-width:480px;margin:28px auto"><h1>Confirm your identity</h1><p>Unlock appointment times on your original booking page.</p><button class="btn btn-ink" id="fd331Approve" type="button">🔒 Confirm identity</button><p id="fd331ApprovalStatus" role="status"></p></section>';
  fd331El('fd331Approve').onclick=async function(){var button=this;button.disabled=true;fd331El('fd331ApprovalStatus').textContent='Confirming…';try{var result=await call271({action:'magic-approve',requestId:match[1],token:match[2]});if(!result.success||!result.approved)throw new Error(result.error||'Unable to confirm.');button.textContent='🔓 Identity confirmed';fd331El('fd331ApprovalStatus').textContent='Return to your original booking page. Appointment times will unlock there.';}catch(err){fd331El('fd331ApprovalStatus').textContent=err.message;button.disabled=false;}};
  return true;
+}
+// Bubble choices edit the existing draft; no writes, navigation, or new verification.
+function fd332Edit(section){
+ if(state.bookingBusy||state.bookingCommitted)return;
+ fd332.edit=section;fd331Render();
+}
+function fd332Flow(){
+ var done=state.currentStep===5,type=state.patientType,mode=state.visitMode;
+ var ready=!!type&&!!mode&&(type==='returning'?fd331Verified():fd331ValidNew());
+ var askType=!type||fd332.edit==='type';
+ var askMode=!askType&&(!mode||fd332.edit==='mode');
+ var details=!askType&&!askMode&&(!ready||fd332.edit==='info'||(type==='new'&&!state.selectedSlot&&fd332.edit!=='time'));
+ fd331El('visitTypeQuestion').hidden=!askType;
+ fd331El('visitModeQuestion').hidden=!askMode;
+ fd331El('bookingIdentityIntro').hidden=true;
+ fd331El('identitySection').hidden=!details||done;
+ fd331El('panel3').hidden=!ready||askType||askMode||done;
+ fd331El('bookingFinish').hidden=done||!ready||!state.selectedSlot||askType||askMode;
+ fd331El('bookingPath').hidden=!type||done;
+ fd331El('pathTypeText').textContent=type==='new'?'First visit':'Returning patient';
+ fd331El('pathModeText').textContent=mode||(askType?'Visit mode':'Choose visit mode');
+ fd331El('pathIdentityText').textContent=ready?(type==='returning'?'Identity confirmed':fd331El('npFirst').value.trim()+' '+fd331El('npLast').value.trim()):(type==='returning'?'Confirm identity':'Your details');
+ fd331El('pathTimeText').textContent=state.selectedSlot?state.selectedSlot.label:'Choose a time';
+ ['pathDown','pathBack','pathIdentity','pathTime'].forEach(function(id){fd331El(id).hidden=!mode;});
+ fd331El('pathTime').disabled=!ready;
+ ['pathType','pathMode','pathIdentity','pathTime'].forEach(function(id){var current=id===(askType?'pathType':askMode?'pathMode':!ready||fd332.edit==='info'?'pathIdentity':'pathTime');fd331El(id).classList.toggle('current',current);fd331El(id).setAttribute('aria-current',current?'step':'false');});
+ fd331El('bookingConnectionStatus').hidden=askType||askMode;
 }
 // Compatibility hooks used by the shared slot renderer and booking response handler.
 renderBookingCards=fd331Render;setStep=fd331SetStep;showReturningVerification_=fd331VerificationExpired;updatePatientSummary=fd331Render;
