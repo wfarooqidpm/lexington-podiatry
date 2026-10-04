@@ -328,6 +328,25 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 @media(max-width:840px){.booking-window{margin:18px 16px 24px}}
 @media(max-width:640px){.booking-window{margin:14px 10px 22px;border-radius:14px}.booking-window .booking-main>.wrap,.booking-window .booking-hero>.wrap{padding-left:18px;padding-right:18px}.booking-window .booking-hero h1{font-size:25px}.booking-path{padding:12px;grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr)}.booking-window .booking-label,.booking-window .booking-section h2{font-size:21px}}
 
+
+/* Preserve the established ivory/stone/brass motif within the contained window. */
+.booking-window{background:var(--ivory);border-color:rgba(140,109,31,.25);box-shadow:0 10px 32px rgba(43,33,24,.06)}
+.booking-window .booking-hero,.booking-window .booking-main{background:var(--ivory)}
+.booking-window .booking-hero h1{font-family:var(--serif);font-size:32px;font-weight:400;line-height:1.15}.booking-window .booking-hero h1 em{color:var(--brass);font-weight:400}
+.booking-window #visitTypeQuestion,.booking-window #visitModeQuestion,.booking-window .booking-section{background:var(--ivory)}
+.booking-window .booking-path{background:var(--stone);border-color:rgba(140,109,31,.17)}
+.booking-window .path-bubble{background:var(--ivory);border-color:rgba(140,109,31,.25);color:var(--ink-soft)}
+.booking-window .path-bubble small,.booking-window .path-caption{color:var(--ink-soft)}
+.booking-window .path-bubble.current{background:#e9e2ce;border-color:#b7a776;color:var(--walnut)}
+.booking-window .path-arrow{color:#a49260}
+.booking-window .booking-label,.booking-window .booking-section h2{font-family:var(--serif);font-weight:400;font-size:27px}
+.booking-window #visitTypeQuestion:before,.booking-window #visitModeQuestion:before,.booking-window .booking-section:before{color:var(--brass)}
+.booking-window .type-card,.booking-window .mode-card{background:var(--stone);border-color:rgba(140,109,31,.5);color:var(--ink)}
+.booking-window .type-card:hover,.booking-window .mode-card:hover{background:#eae3d2;box-shadow:0 0 0 1px var(--brass)}
+.booking-window .type-card:after,.booking-window .mode-card:after{color:var(--brass)}
+.booking-window input{background:#fdfaf3;border-color:rgba(140,109,31,.25)}
+@media(max-width:640px){.booking-window .booking-hero h1{font-size:28px}.booking-window .booking-label,.booking-window .booking-section h2{font-size:24px}}
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NH5ZV4VP2X"></script>
@@ -365,7 +384,7 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 <div id="practiceBannerWrap" class="practice-banner-wrap"></div>
 <div class="booking-hero"><div class="wrap"><div class="booking-hero-grid">
   <div class="booking-title">
-    <h1>Let’s get you scheduled.</h1>
+    <h1>Book with <em>Dr. Farooqi</em></h1>
   </div>
   <div class="hero-hours" aria-label="Office hours">
     <h2>Office hours</h2>
@@ -381,7 +400,7 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 </div></div></div>
 
 <div class="booking-main"><div class="wrap">
-<p class="booking-intro">With Dr. Wiqar Farooqi</p>
+<p class="booking-intro">Let’s get you scheduled.</p>
 <fieldset id="bookingInputs" class="booking-inputs">
 <nav id="bookingPath" class="booking-path" aria-label="Booking status; select a previous choice to edit" hidden>
 <span class="path-caption">Your booking <span>· Previous choices can be edited</span></span>
