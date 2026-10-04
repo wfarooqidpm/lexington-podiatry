@@ -1,16 +1,19 @@
-const fs=require('fs'),vm=require('vm'),assert=require('assert');
-const html=fs.readFileSync(require('path').join(__dirname,'../booking.html'),'utf8');
-assert(html.includes('class="panel active" id="panel2New"'),'Your information must be the initial screen');
-const typePanel=html.slice(html.indexOf('id="panel1"'),html.indexOf('<!-- PANEL 2A'));
-assert(typePanel.includes('id="newModeGrid"'),'Visit type and mode must share one panel');
-function fn(name){let i=html.indexOf('function '+name+'(');assert(i>=0,name);let s=html.slice(i),n=s.slice(1).search(/^function /m);return n<0?s.split('</script>')[0]:s.slice(0,n+1);}
-const els={};const el=id=>els[id]||(els[id]={value:'Test',style:{},disabled:false,classList:{add(){},remove(){},toggle(){}}});
-const steps=[],loads=[];const c={state:{patientType:'new',visitMode:'Virtual',selectedSlot:{label:'Old'}},document:{getElementById:el,querySelectorAll:()=>[]},setStep:n=>steps.push(n),loadSlots:id=>loads.push(id),hasVerifiedReturningPatient_:()=>false,restoreVerificationAttempts_(){},verifyReturning(){},renderBookingCards(){},validBookingPhone_:()=>true,goToStep4:()=>steps.push(4)};vm.createContext(c);vm.runInContext(fn('goToStep2')+'\n'+fn('goToStep3New')+'\n'+fn('validateNewInfoAndReview'),c);
-c.validateNewInfoAndReview();assert.equal(steps.at(-1),2);assert.equal(loads.length,0);
-c.goToStep2();assert.equal(steps.at(-1),3);assert.equal(loads.at(-1),'slotContainer');
-c.state.selectedSlot={label:'New slot'};c.goToStep3New();assert.equal(steps.at(-1),4);
-c.state.patientType='returning';c.goToStep2();assert.equal(el('rpFirst').value,el('npFirst').value);assert.equal(loads.length,1,'Unverified follow-up cannot load slots');
-console.log('PASS information → combined visit/mode → slots → review; follow-up identity prefilled and gated.');
-vm.runInContext(fn('selectCombinedMode')+'\n'+fn('selectType'),c);c.configureStepTabs=()=>{};c.clearReturningVerification_=()=>{};c.state.patientType=null;c.state.visitMode=null;const before=loads.length;c.selectCombinedMode({getAttribute:()=> 'Virtual'});assert.equal(el('btnStep1Next').disabled,true);c.selectType({getAttribute:()=> 'new'});assert.equal(el('btnStep1Next').disabled,false);assert.equal(c.state.visitMode,'Virtual');assert.equal(loads.length,before,'Selecting visit and mode does not fetch or save');
-console.log('PASS combined visit/mode requires both choices and performs no server calls.');
-c.state.visitMode='Virtual';c.clearReturningVerification_=()=>{c.state.visitMode=null;c.state.verificationSession=null;};vm.runInContext(fn('showReturningVerification_'),c);c.showReturningVerification_('Expired');assert.equal(c.state.visitMode,'Virtual');assert.equal(steps.at(-1),3);console.log('PASS expired verification preserves the chosen visit mode.');
+const fs=require('fs'),vm=require('vm'),assert=require('assert'),crypto=require('crypto');
+const base=require('path').join(__dirname,'..'),html=fs.readFileSync(base+'/booking.html','utf8'),controller=fs.readFileSync(base+'/booking-single-page.js','utf8');
+const elements={};for(const [,id] of html.matchAll(/\bid="([^"]+)"/g))elements[id]={value:'',hidden:false,disabled:false,textContent:'',innerHTML:'',style:{},dataset:{},listeners:{},checkValidity(){return true;},setAttribute(k,v){this[k]=v},getAttribute(k){return this[k]},classList:{add(){},remove(){},toggle(){}},addEventListener(k,f){this.listeners[k]=f;}};
+const get=id=>{assert(elements[id],'Missing real markup for '+id);return elements[id];};
+let calls=[],loads=[],timers=[],bookings=0,pollReply={success:true,pending:true};
+const c={console,Date,TextEncoder,Uint8Array,crypto:crypto.webcrypto,URL,location:{hash:'',pathname:'/booking.html'},history:{},document:{hidden:false,getElementById:get,querySelectorAll:()=>[],querySelector:()=>({})},window:{crypto:crypto.webcrypto,addEventListener(){}},setTimeout:f=>{timers.push(f);return timers.length},clearTimeout(){}};
+vm.createContext(c);for(const m of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g))if(m[1].includes('var BOOKING_CLIENT_VERSION'))vm.runInContext(m[1],c);
+const realConfig=c.loadBookingConfig;c.loadBookingConfig=()=>{};c.call271=async p=>{calls.push(p);return p.action==='magic-poll'?pollReply:{success:true,pending:true}};c.loadSlots=id=>loads.push({id,type:c.state.patientType,session:c.state.verificationSession});c.verifyFrontDoorGatewayVersion=()=>Promise.resolve();c.reserveWebsiteAndStartFrontDoor=()=>{bookings++;return Promise.resolve()};
+vm.runInContext(controller,c);
+(async()=>{
+ const button=v=>({getAttribute:()=>v});c.fd331SelectType(button('returning'));c.fd331SelectMode(button('In Person'));assert.equal(loads.length,0);assert.match(get('slotContainer').innerHTML,/Confirm your identity/);assert.equal(get('panel2Returning').hidden,false);
+ get('rpFirst').value='Test';get('rpLast').value='Person';get('rpDob').value='1988-04-12';await c.fd331Confirm();await new Promise(setImmediate);assert.equal(calls[0].action,'magic-start');assert(!('email' in calls[0]));assert.equal(calls[0].pollKey.length,64);assert.equal(loads.length,0);assert.equal(get('btnSubmit').disabled,true);
+ pollReply={success:true,verified:true,session:'confirmed',expiresAt:new Date(Date.now()+600000).toISOString()};await c.fd331Poll();assert.equal(loads.length,1);assert.equal(c.state.verificationSession,'confirmed');assert.match(get('btnVerify').textContent,/Identity confirmed/);
+ c.selectSlot({dataset:{iso:'2026-10-05T14:00:00Z',label:'Monday 10 AM'},classList:{add(){}}});assert.equal(get('btnSubmit').disabled,false);c.fd331SelectMode(button('In Person'));assert(c.state.selectedSlot,'Selecting same mode preserves selection');
+ c.bookingFetch271=()=>Promise.resolve({json:()=>Promise.resolve({success:true})});c.renderPracticeBanners=()=>{};await realConfig();assert.match(get('btnVerify').textContent,/Identity confirmed/);
+ get('rpFirst').value='Changed';get('rpFirst').listeners.input();assert.equal(c.state.verificationSession,null);assert.equal(c.state.selectedSlot,null);assert.equal(get('btnSubmit').disabled,true);assert.match(get('slotContainer').innerHTML,/Confirm/);
+ c.fd331SelectType(button('new'));assert.equal(get('panel2New').hidden,false);assert.equal(loads.at(-1).type,'new');for(const id of ['npFirst','npLast','npDob','npPhone','npEmail'])get(id).value='Test';c.selectSlot({dataset:{iso:'2026-10-05T14:00:00Z',label:'Monday 10 AM'},classList:{add(){}}});assert.equal(get('btnSubmit').disabled,false);c.fd331Submit();c.fd331Submit();await new Promise(setImmediate);assert.equal(bookings,1);assert.equal(get('bookingInputs').disabled,false);
+ console.log('PASS locked follow-up times, no email input payload, email approval unlock, identity edits revoke, new-patient direct selection, one booking submission.');
+})().catch(e=>{console.error(e);process.exitCode=1});

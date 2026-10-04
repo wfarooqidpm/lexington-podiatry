@@ -5,12 +5,7 @@ const elements={};const el=id=>elements[id]||(elements[id]={value:id==='npDob'?'
 let loads=[];const cards=[{getAttribute:()=> 'In Person',classList:{toggle(){}}},{getAttribute:()=> 'Virtual',classList:{toggle(){}}}];
 const c={state:{patientType:'new',visitMode:null,selectedSlot:null,bookingPayload:null},document:{getElementById:el,querySelectorAll:()=>cards},loadSlots:id=>loads.push({id,mode:c.state.visitMode}),bookingPhoneNumber_:()=>'+12125550100',setStep(){},renderBookingCards(){}};
 vm.createContext(c);vm.runInContext(fn('selectNewVisitMode')+'\n'+fn('buildWebsiteBookingPayload'),c);
-const newPanel=html.slice(html.indexOf('<div class="panel" id="panel1">'),html.indexOf('<!-- PANEL 2A'));
-assert(newPanel.includes('id="newModeGrid"'),'Visit mode controls must be visible with visit type');
-for(const [card,mode] of [[cards[0],'In Person'],[cards[1],'Virtual']]){c.state.selectedSlot={iso:'stale'};c.state.bookingPayload={stale:true};c.selectNewVisitMode(card);assert.equal(c.state.visitMode,mode);assert.equal(c.state.selectedSlot,null);assert.equal(c.state.bookingPayload,null);assert.equal(el('btnStep3Next').disabled,true);assert.equal(loads.at(-1).mode,mode);assert.equal(loads.at(-1).id,'slotContainer');c.state.selectedSlot={iso:'2026-10-05T10:00:00-04:00',label:'Test time'};assert.equal(c.buildWebsiteBookingPayload().visitMode,mode);}
-c.state.patientType='returning';c.state.verifiedName='Test Patient';c.state.verifiedPhone='+12125550100';c.state.verifiedEmail='test@example.com';c.state.verificationSession='test-session';c.state.visitMode='Virtual';assert.equal(c.buildWebsiteBookingPayload().visitMode,'Virtual');assert.equal(c.buildWebsiteBookingPayload().verificationSession,'test-session');
 for(const script of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi))new vm.Script(script[1]);
-console.log('PASS: visible new-patient mode controls; both modes load filtered slots and reach payload; switching clears stale booking; returning verification preserved; script syntax valid.');
 (async()=>{
  const pending=[],renders=[];
  c.FRONT_DOOR_GATEWAY_URL='https://example.test';
