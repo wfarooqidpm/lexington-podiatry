@@ -302,6 +302,18 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 footer .wrap,.booking-help{display:none!important}footer{padding:15px;background:transparent;border-top:1px solid var(--line);color:var(--ink-soft)}footer:after{content:'353 Lexington Ave, Room 1502 · New York, NY';display:block;text-align:center;font-size:13px}
 @media(max-width:640px){.type-grid{grid-template-columns:1fr}.booking-label,.booking-section h2{font-size:22px}.booking-hero h1{font-size:29px}.booking-header-help{font-size:12px}.nav .wrap{gap:12px;flex-wrap:wrap}.booking-path{grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr)}.path-bubble{font-size:14px;padding:8px}.booking-section{margin-top:20px}.type-card{min-height:80px}}
 
+
+/* Status is deliberately quiet; the white task surface is where patients act. */
+.booking-path{max-width:420px;gap:4px 0;grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);grid-template-rows:auto auto auto auto;margin-bottom:24px}
+.path-caption{grid-area:1/1/2/4;font:600 12px var(--sans);color:var(--ink-soft);padding-bottom:8px}.path-caption span{font-weight:400}
+#pathType{grid-area:2/1}#pathMode{grid-area:2/3}#pathIdentity{grid-area:4/3}#pathTime{grid-area:4/1}#pathAcross{grid-area:2/2}#pathDown{grid-area:3/3}#pathBack{grid-area:4/2}
+.path-bubble{min-height:44px;padding:6px 12px;font-size:13px;font-weight:500;background:#f1eee7;border:1px solid #d1d4cc;color:#535e56}
+.path-bubble small{font-size:10px;margin-bottom:2px;color:#6a716b}.path-bubble.current{background:#e8ede8;color:#294e3d;border-color:#a9b8ae}.path-arrow{font-size:18px;color:#9a9c8f}
+#visitTypeQuestion,#visitModeQuestion,.booking-section{padding:24px;background:#fff;border:1px solid var(--line-soft);border-top:3px solid #294e3d;border-radius:12px}
+#visitTypeQuestion:before,#visitModeQuestion:before,.booking-section:before{content:'Your next step';display:block;font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:#294e3d;margin-bottom:10px}
+.type-card,.mode-card{background:#fafbf8;border:1.5px solid #294e3d}.type-card:hover,.mode-card:hover{background:#e8ede8;box-shadow:0 0 0 1px #294e3d}
+@media(max-width:640px){.booking-path{max-width:100%}.path-bubble{font-size:13px;padding:6px 10px}#visitTypeQuestion,#visitModeQuestion,.booking-section{padding:18px}}
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NH5ZV4VP2X"></script>
@@ -357,7 +369,8 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 <div class="booking-main"><div class="wrap">
 <p class="booking-intro">With Dr. Wiqar Farooqi</p>
 <fieldset id="bookingInputs" class="booking-inputs">
-<nav id="bookingPath" class="booking-path" aria-label="Your booking choices" hidden>
+<nav id="bookingPath" class="booking-path" aria-label="Booking status; select a previous choice to edit" hidden>
+<span class="path-caption">Your booking <span>· Previous choices can be edited</span></span>
 <button id="pathType" type="button" class="path-bubble" onclick="fd332Edit('type')"><small>Visit</small><span id="pathTypeText"></span></button>
 <span id="pathAcross" class="path-arrow" aria-hidden="true">→</span>
 <button id="pathMode" type="button" class="path-bubble" onclick="fd332Edit('mode')"><small>Location</small><span id="pathModeText"></span></button>
