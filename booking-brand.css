@@ -69,3 +69,13 @@ footer{border-top:1px solid var(--line-soft);padding:18px 12px}footer:after{cont
  .path-track #pathType{grid-area:1/1}.path-track #pathAcross{grid-area:2/1}.path-track #pathMode{grid-area:3/1}.path-track #pathDown{grid-area:4/1}.path-track #pathIdentity{grid-area:5/1}.path-track #pathBack{grid-area:6/1}.path-track #pathTime{grid-area:7/1}
  .path-track .path-arrow:before,.path-track #pathBack:before{content:'↓'}
 }
+
+/* Give the email handoff a clear next step and room around secondary actions. */
+#panel2Returning #verifyResult{margin-top:20px;line-height:1.65}
+.email-next-steps{max-width:560px;margin:18px 0 24px;padding:18px 20px;background:#e9ede4;border-radius:14px;color:#2b2118}
+.email-next-steps p{margin:0;line-height:1.65}
+.email-next-steps p+p{margin-top:12px}
+.email-edit{margin:12px 0 12px 16px;padding:10px 0;border:0;background:transparent;color:#594b3b;text-decoration:underline;text-underline-offset:4px;cursor:pointer;font:inherit}
+.email-help{margin:24px 0 0;padding-top:20px;border-top:1px solid #ded8cb;font-size:14px;line-height:1.7}
+.email-help a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:480px){.email-edit{margin-left:12px}.email-next-steps{padding:16px}}
