@@ -1,18 +1,24 @@
 /* Approved single-page booker. Reuses the existing scheduling/booking gateway;
  * editing is local, and follow-up slots require possession of the registered email. */
 var fd332 = {edit:''};
-var fd331 = {generation:0, pending:null, timer:null, busy:false, slotKey:'', sessionExpires:0};
+var fd331 = {generation:0, pending:null, emailSent:false, timer:null, busy:false, slotKey:'', sessionExpires:0};
 function fd331El(id){return document.getElementById(id);}
 function fd331Identity(){return {firstName:fd331El('rpFirst').value.trim(),lastName:fd331El('rpLast').value.trim(),dob:fd331El('rpDob').value};}
 function fd331IdentityKey(){var p=fd331Identity();return [p.firstName,p.lastName,p.dob].join('|');}
 function fd331Verified(){return !!(state.verificationSession && fd331.sessionExpires>Date.now());}
 function fd331ValidNew(){return ['npFirst','npLast','npDob','npPhone','npEmail'].every(function(id){var e=fd331El(id);return !!e.value.trim()&&e.checkValidity();})&&validBookingPhone_();}
 function fd331CancelVerification(){
- fd331.generation++;clearTimeout(fd331.timer);fd331.pending=null;fd331.busy=false;fd331.sessionExpires=0;
+ fd331.generation++;clearTimeout(fd331.timer);fd331.pending=null;fd331.emailSent=false;fd331.busy=false;fd331.sessionExpires=0;
  state.verificationSession=null;state.verifiedName=null;state.verifiedEmail=null;state.verifiedPhone=null;
  fd331El('btnVerify').disabled=false;fd331El('btnVerify').textContent='🔒 Confirm identity';fd331El('verifyResult').textContent='';
 }
+function fd331EditIdentity(){fd331CancelVerification();fd332.edit='info';fd331Slots();}
 function fd331Render(){
+ var waiting=fd331.emailSent&&!fd331Verified();
+ fd331El('returningIdentityTitle').textContent=waiting?'Check your email':'Confirm your identity';
+ fd331El('returningVerifyInstructions').textContent=waiting?'If your details match your patient record, you’ll receive an email at your registered address.':'We’ll send a confirmation link to the email address on your patient record.';
+ fd331El('returningIdentityFields').hidden=waiting;
+ ['emailNextSteps','editIdentityDetails','emailIdentityHelp'].forEach(function(id){fd331El(id).hidden=!waiting;});
  var returning=state.patientType==='returning',verified=returning&&fd331Verified();
  fd331El('bookingIdentityIntro').hidden=!!state.patientType;
  fd331El('panel2New').hidden=state.patientType!=='new';fd331El('panel2Returning').hidden=!returning;
@@ -63,8 +69,8 @@ async function fd331Confirm(){
   var result=await call271(Object.assign({action:'magic-start',requestId:pending.requestId,pollKey:pending.pollKey,visitMode:state.visitMode},identity));
   if(generation!==fd331.generation||fd331.pending!==pending||key!==fd331IdentityKey())return;
   if(!result.success)throw new Error(result.error||'We could not send the confirmation. Please try again.');
-  pending.sent=true;fd331El('btnVerify').textContent='Send again';
-  fd331El('verifyResult').textContent='If your details match a patient record, a link has been sent to the registered email. Choose Continue booking in that email. You can finish on the page it opens and close this tab.';
+  pending.sent=true;fd332.edit='';fd331.emailSent=true;fd331El('btnVerify').textContent='Send again';fd331Render();
+  fd331El('verifyResult').textContent='You can request another link after one minute.';
   fd331Poll();
  }catch(err){if(generation===fd331.generation)fd331El('verifyResult').textContent=err.message||'Please try again.';}
  finally{if(generation===fd331.generation){fd331.busy=false;fd331El('btnVerify').disabled=false;}}
