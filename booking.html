@@ -314,6 +314,20 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 .type-card,.mode-card{background:#fafbf8;border:1.5px solid #294e3d}.type-card:hover,.mode-card:hover{background:#e8ede8;box-shadow:0 0 0 1px #294e3d}
 @media(max-width:640px){.booking-path{max-width:100%}.path-bubble{font-size:13px;padding:6px 10px}#visitTypeQuestion,#visitModeQuestion,.booking-section{padding:18px}}
 
+
+/* Keep the complete booking experience inside one window, with status above work. */
+.booking-window{max-width:800px;margin:28px auto 32px;background:#fff;border:1px solid #d8d9d0;border-radius:18px;box-shadow:0 10px 35px rgba(35,43,36,.07);overflow:hidden}
+.booking-window .booking-hero{background:#f3f1e9;padding:22px 0 0;border:0}.booking-window .booking-hero h1{font:500 28px var(--sans)}
+.booking-window .booking-main{padding:8px 0 26px}.booking-window .booking-intro{font-size:14px;margin-bottom:18px}
+.booking-window .booking-main>.wrap,.booking-window .booking-hero>.wrap{max-width:none;padding-left:28px;padding-right:28px}
+.booking-window .booking-main{background:linear-gradient(#f3f1e9 0 55px,#fff 55px)}
+.booking-path{max-width:none;padding:14px 18px 16px;background:#f4f4ee;border:1px solid #e3e4dc;border-radius:11px;grid-template-columns:minmax(0,180px) 26px minmax(0,180px);justify-content:start;margin-bottom:20px}
+#visitTypeQuestion,#visitModeQuestion,.booking-section{border:0;border-radius:0;padding:18px 0 0;background:#fff;margin-top:0}
+.booking-window .booking-label,.booking-window .booking-section h2{font-size:24px;margin-bottom:18px}
+.booking-window .booking-finish{padding-top:18px}.booking-window #bookingMessage:empty{display:none}.booking-window #bookingConnectionStatus:empty{display:none}
+@media(max-width:840px){.booking-window{margin:18px 16px 24px}}
+@media(max-width:640px){.booking-window{margin:14px 10px 22px;border-radius:14px}.booking-window .booking-main>.wrap,.booking-window .booking-hero>.wrap{padding-left:18px;padding-right:18px}.booking-window .booking-hero h1{font-size:25px}.booking-path{padding:12px;grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr)}.booking-window .booking-label,.booking-window .booking-section h2{font-size:21px}}
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NH5ZV4VP2X"></script>
@@ -347,7 +361,7 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
   <a class="btn btn-ink" href="/booking">Book online</a>
 </nav><div class="booking-header-help">Need help? <a href="tel:+12125108665">(212) 510-8665</a></div></div></header>
 
-<main>
+<main class="booking-window">
 <div id="practiceBannerWrap" class="practice-banner-wrap"></div>
 <div class="booking-hero"><div class="wrap"><div class="booking-hero-grid">
   <div class="booking-title">
