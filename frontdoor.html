@@ -371,6 +371,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .coverage-neutral h3,.coverage-neutral .insurance-loaded-meta,.coverage-inactive h3,.coverage-inactive .insurance-loaded-meta{color:inherit}
 .coverage-neutral .insurance-loaded-check{background:#777169}.coverage-inactive .insurance-loaded-check{background:#a83c35}
 .coverage-status{font-size:12px;font-weight:600}
+/* Insurance registration collects information; it does not verify coverage. */
+#insuranceEntryMethods,#insuranceLoadedCard,#coverageBenefits,#deductibleAlert,#eligibilityBox,#discoveryOffer,#discoveryResultBox,#eligibilitySideCard,#discoverySideCard,#officeBenefits,#fuCoverageSide,#fuVerifyInsuranceBtn,#demographicsLockNote,#insuranceLockNote,#payerVerified,#planVerified,#groupVerified,#insuranceCardDefaultNote,#insuranceCardVerifiedNote,#insuranceCardNeedsHelpNote{display:none!important}
 </style>
 </head>
 
@@ -429,14 +431,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     </div>
 
     <div id="fuInsuranceCard" class="fu-card locked">
-      <div class="fu-head"><div><div class="fu-kicker">Previously verified</div><h3>Insurance information</h3></div><span class="fu-lock" aria-hidden="true">🔒</span></div>
+      <div class="fu-head"><div><div class="fu-kicker">On file</div><h3>Insurance information</h3></div><span class="fu-lock" aria-hidden="true">🔒</span></div>
       <div id="fuInsuranceSummary"></div>
       <div class="fu-actions">
         <button class="btn primary" type="button" id="fuInsuranceCorrectBtn">Information is correct</button>
         <button class="btn secondary" type="button" id="fuInsuranceChangeBtn">Report insurance change</button>
       </div>
       <div id="fuInsuranceEdit" class="fu-change-panel hidden">
-        <div class="callout gold"><strong>Enter the new insurance exactly as shown on the card.</strong><div style="margin-top:5px">We will verify it live before you can submit, then show a new visit estimate when the payer returns enough benefit detail.</div></div>
+        <div class="callout gold"><strong>Enter the new insurance exactly as shown on the card.</strong><div style="margin-top:5px">Your updated insurance will be saved for office review. Coverage is not checked here.</div></div>
         <div id="fuInsuranceFormMount"></div>
         <div class="fu-actions"><button class="btn primary" type="button" id="fuVerifyInsuranceBtn">Verify updated insurance</button><button class="btn secondary" type="button" id="fuCancelInsuranceChangeBtn">Keep insurance on file</button></div>
         <div id="fuEstimateMount" class="fu-estimate-mount"></div>
@@ -588,41 +590,19 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <div class="grid2">
         <div class="field">
           <label for="insuranceCarrier">Insurance company <span class="req">*</span></label>
-          <input id="insuranceCarrier" type="text" list="insuranceCarrierOptions" autocomplete="off">
-          <datalist id="insuranceCarrierOptions">
-            <option value="Aetna"></option>
-            <option value="Cigna"></option>
-            <option value="Anthem BCBS"></option>
-            <option value="UnitedHealthcare"></option>
-            <option value="Oxford"></option>
-            <option value="TRICARE"></option>
-            <option value="Medicare"></option>
-            <option value="1199 SEIU"></option>
-            <option value="AARP Medicare Supplement"></option>
-          </datalist>
+          <input id="insuranceCarrier" type="text" list="insuranceCarrierOptions" autocomplete="off" placeholder="Search insurance company or plan" aria-describedby="insuranceOptionsStatus">
+          <datalist id="insuranceCarrierOptions"></datalist>
+          <input id="charmPracticePayerId" type="hidden">
+          <div id="insuranceOptionsStatus" class="note" role="status">Loading the office insurance list…</div>
         </div>
-        <div class="field">
-          <label for="payerId">Payer ID <span style="font-weight:500;text-transform:none;letter-spacing:0">(optional)</span> <span class="verified-label hidden" id="payerVerified">verified</span></label>
-          <input id="payerId" type="text" list="payerIdOptions" autocomplete="off" placeholder="e.g. 06111">
-          <datalist id="payerIdOptions">
-            <option value="06111">Oxford</option>
-            <option value="87726">UnitedHealthcare</option>
-            <option value="60054">Aetna</option>
-            <option value="62308">Cigna</option>
-            <option value="803">Anthem BCBS of New York</option>
-            <option value="99727">TRICARE East</option>
-            <option value="CMS">Traditional Medicare</option>
-            <option value="36273">AARP UnitedHealthcare</option>
-          </datalist>
-          <div class="payer-id-hint">If you know it, enter the payer ID exactly as printed, including leading zeroes.</div>
-        </div>
+        <input id="payerId" type="hidden"><span id="payerVerified" class="hidden"></span>
         <div id="partialInsuranceNotice288" class="notice hidden" role="status" style="grid-column:1/-1;background:#fff7e3;border:1px solid #e7c66f;padding:14px;border-radius:8px"></div>
 <div class="field"><label for="memberId">Member ID <span class="req">*</span></label><input id="memberId" type="text" autocomplete="off" aria-describedby="partialInsuranceNotice288"></div>
         <div class="field"><label for="insurancePlan">Plan name <span class="verified-label hidden" id="planVerified">verified</span></label><input id="insurancePlan" type="text"></div>
         <div class="field"><label for="groupId">Group number <span class="verified-label hidden" id="groupVerified">verified</span></label><input id="groupId" type="text" autocomplete="off"></div>
       </div>
 
-      <p class="note">For Medicare Advantage, enter the insurance company shown on the card (for example Aetna, Anthem, UnitedHealthcare, Humana, or Wellcare), rather than “Medicare Advantage.” We only ask for policyholder details if the payer says they are needed.</p>
+      <p class="note">Choose the insurance company or plan shown on your card. If it is not listed, type its name and save your details for staff review. Saving does not check coverage.</p>
 
       <div id="eligibilityBox" class="callout hidden" style="margin-top:16px">
         <strong id="eligibilityTitle">Checking your coverage…</strong>
@@ -634,7 +614,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
         </div>
       </div>
 
-      <div id="subscriberFields" class="hidden"></div>
+      <label class="check" style="margin-top:16px"><input id="subscriberDifferent" type="checkbox"><span>This policy is in someone else's name</span></label>
+      <div id="subscriberFields" class="grid3 hidden" style="margin-top:12px">
+        <div class="field"><label for="subscriberFirstName">Policyholder first name</label><input id="subscriberFirstName" type="text" autocomplete="off"></div>
+        <div class="field"><label for="subscriberLastName">Policyholder last name</label><input id="subscriberLastName" type="text" autocomplete="off"></div>
+        <div class="field"><label for="subscriberDob">Policyholder date of birth</label><input id="subscriberDob" type="date" autocomplete="off"></div>
+      </div>
 
       <div id="discoveryOffer" class="discovery-offer hidden">
         <strong>We could not verify that insurance automatically.</strong>
@@ -653,7 +638,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     </div>
 
     <div class="section" id="insuranceCardSection">
-      <div class="section-title">Insurance card</div>
+      <div class="section-title">Insurance card</div><div id="officeCardReceipt" class="callout hidden" role="status">Insurance card on file. You can add a replacement below.</div>
 
       <input class="hidden" id="insuranceCardVerifiedRadio" type="radio" name="insuranceCardStatus" value="verified">
 
@@ -680,7 +665,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
             <div class="field"><label for="insuranceFront">Insurance card — front</label><input id="insuranceFront" type="file" accept="image/jpeg,image/png,application/pdf"></div>
             <div class="field"><label for="insuranceBack">Insurance card — back</label><input id="insuranceBack" type="file" accept="image/jpeg,image/png,application/pdf"></div>
           </div>
-          <button class="btn primary" type="button" id="analyzeInsuranceCardBtn" style="margin-top:12px">Read card &amp; check coverage</button>
+          <button class="btn primary" type="button" id="analyzeInsuranceCardBtn" style="margin-top:12px">Read card details</button>
           <div id="insuranceAnalyzeStatus" class="note" style="margin-top:8px"></div>
         </div>
       </div>
@@ -701,7 +686,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
       <label class="check"><input id="hasSecondary" type="checkbox"><span id="secondaryPrompt">I have secondary insurance</span></label>
       <div id="secondaryFields" class="hidden" style="margin-top:18px">
         <div class="grid2">
-          <div class="field"><label for="secondaryCarrier">Secondary insurance company <span class="req">*</span></label><input id="secondaryCarrier" type="text"></div>
+          <div class="field"><label for="secondaryCarrier">Secondary insurance company <span class="req">*</span></label><input id="secondaryCarrier" type="text" list="insuranceCarrierOptions" autocomplete="off"></div>
           <div class="field"><label for="secondaryMemberId">Secondary member ID <span class="req">*</span></label><input id="secondaryMemberId" type="text"></div>
           <div class="field"><label for="secondaryGroupId">Secondary group number</label><input id="secondaryGroupId" type="text"></div>
         </div>
@@ -870,7 +855,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
   <section class="panel" data-panel="5">
     <h2>Your estimate</h2>
-    <p class="intro" id="estimateIntro">Here is the amount we can estimate from the insurance benefit information available today.</p>
+    <p class="intro" id="estimateIntro">Insurance coverage is not checked during registration. Self-pay pricing is shown when applicable.</p>
 
     <div id="estimateReady" class="financial-box initial-estimate-ready hidden">
       <div class="estimate-kicker">Initial visit</div>
@@ -1166,7 +1151,7 @@ function selectSelfPay_(showMessage){
   if(FD.discoveryTimer){clearInterval(FD.discoveryTimer);FD.discoveryTimer=null;}
   FD.estimate=selfPayEstimateFromPrice_();
   applyPaymentChoiceUI_();
-  if(showMessage)toast('Self-pay selected. Insurance verification is skipped.');
+  if(showMessage)toast('Self-pay selected.');
 }
 function applyPaymentChoiceUI_(){
   var self=isSelfPay();
@@ -1502,34 +1487,7 @@ function pollDiscovery(){
   FD.discoveryTimer=setInterval(tick,4000);
 }
 
-function startDiscovery(){
-  var data=collect();
-
-  if(!data.firstName||!data.lastName||!data.dob||!data.address1||!data.city||!data.state||!data.zip){
-    toast('Please complete your name, date of birth, and address first.');
-    showStep(1);
-    return;
-  }
-
-  applyDiscoveryResult({
-    success:true,
-    status:'QUEUED',
-    message:'Searching for active insurance coverage…'
-  });
-
-  requestDiscovery(data).then(function(res){
-    if(!res.success)throw new Error(res.error||'Could not start the coverage search.');
-    applyDiscoveryResult(res);
-    pollDiscovery();
-    toast('Coverage search started. You can keep going.');
-  }).catch(function(err){
-    FD.discovery=null;
-    $('discoveryResultBox').classList.add('hidden');
-    $('discoverySideCard').classList.add('hidden');
-    renderDiscoveryOffer();
-    toast(err.message||'Could not start the coverage search.');
-  });
-}
+function startDiscovery(){return fd333NoCheck();}
 
 function apiEligibilityStatus(){
   var params=new URLSearchParams({
@@ -1977,19 +1935,7 @@ function keepFollowUpInsurance_(){
   FD.eligibility=null;FD.estimate=null;FD.insuranceEstimate=null;renderFollowUpStatus_();
 }
 
-function verifyFollowUpInsurance_(){
-  var data=collect(),base=FD.data.reviewBaseline.insurance||{};
-  if(!data.insuranceCarrier||!data.memberId){toast('Enter the new insurance company and member ID first.');return}
-  var same=[clean(base.carrier),normalizePayerId(base.payerId),clean(base.memberId),clean(base.groupNumber)].join('|').toLowerCase()===
-    [data.insuranceCarrier,data.payerId,data.memberId,data.groupId].join('|').toLowerCase();
-  if(same){toast('Those details match the insurance already on file. Choose “Information is correct.”');return}
-  FD.data.followUpReview.insuranceChanged=true;FD.data.followUpReview.insuranceStatus='';
-  Object.keys(data).forEach(function(k){FD.data[k]=data[k]});
-  $('fuVerifyInsuranceBtn').disabled=true;$('fuVerifyInsuranceBtn').textContent='Checking coverage…';
-  queueEligibilityFromCurrentData(followUpCollect_()).then(function(){toast('Coverage check started. This card will turn green when the payer confirms it is active.');})
-    .catch(function(err){toast(err.message||'The coverage check could not be started.');})
-    .finally(function(){$('fuVerifyInsuranceBtn').disabled=false;$('fuVerifyInsuranceBtn').textContent='Verify updated insurance';});
-}
+function verifyFollowUpInsurance_(){FD.data.followUpReview=FD.data.followUpReview||{};FD.data.followUpReview.insuranceChanged=true;FD.data.followUpReview.insuranceStatus='CHANGED — SAVED';return fd333NoCheck();}
 
 function showFollowUpHealthChange_(reset){
   var r=FD.data.followUpReview=FD.data.followUpReview||{};r.healthChanged=true;r.healthStatus='';
@@ -2283,8 +2229,8 @@ function collect(){
     insuranceAssistanceRequested:needsStaffInsuranceHelp(),
     insuranceCarrier:isSelfPay()?'Self-pay':clean($('insuranceCarrier').value),payerId:isSelfPay()?'':normalizePayerId($('payerId').value),insurancePlan:isSelfPay()?'':clean($('insurancePlan').value),
     memberId:isSelfPay()?'':clean($('memberId').value),groupId:isSelfPay()?'':clean($('groupId').value),
-    subscriberFirstName:clean(FD.data.subscriberFirstName||''),subscriberLastName:clean(FD.data.subscriberLastName||''),
-    subscriberDob:clean(FD.data.subscriberDob||''),
+    subscriberFirstName:clean($('subscriberFirstName').value),subscriberLastName:clean($('subscriberLastName').value),
+    subscriberDob:clean($('subscriberDob').value),
     insuranceCardStatus:isSelfPay()?'not_applicable':radioValue('insuranceCardStatus'),photoIdStatus:radioValue('photoIdStatus'),
     hasSecondaryInsurance:isSelfPay()?false:$('hasSecondary').checked,secondaryCarrier:isSelfPay()?'':clean($('secondaryCarrier').value),
     secondaryMemberId:isSelfPay()?'':clean($('secondaryMemberId').value),secondaryGroupId:isSelfPay()?'':clean($('secondaryGroupId').value),
@@ -2478,14 +2424,15 @@ function analyzeInsuranceCard(){
     if(!res.success)throw new Error(res.error||'The card could not be read.');
     var x=res.extracted||{};
     if(x.insuranceCarrier)setValue('insuranceCarrier',x.insuranceCarrier);
-    if(x.payerId)setValue('payerId',x.payerId);
+    setValue('payerId','');
     if(x.memberId)setValue('memberId',x.memberId);
     if(x.groupId)setValue('groupId',x.groupId);
     setRadio('insuranceCardStatus','upload');updateConditionalFields();
-    $('insuranceAnalyzeStatus').textContent=x.memberId?'Card details found. Checking coverage…':'We could not read every field. Please review the fields below.';
-    return queueEligibilityFromCurrentData(collect());
+    fd333SelectCarrier();
+    $('insuranceCarrier').dispatchEvent(new Event('input',{bubbles:true}));
+    $('insuranceAnalyzeStatus').textContent='Card details read. Please review and save them.';
   }).then(function(){
-    FD.busy=false;setBusy(false,'');$('insuranceAnalyzeStatus').textContent=insuranceIsActive()?'Card read complete. Active coverage is shown above.':'Card read complete. Review the information and continue.';
+    FD.busy=false;setBusy(false,'');$('insuranceAnalyzeStatus').textContent='Card details read. Review the information and save.';
   }).catch(function(err){FD.busy=false;setBusy(false,'');$('insuranceAnalyzeStatus').textContent='Please review or enter the card details below.';toast(err.message||'The card could not be read.');});
 }
 
@@ -2587,7 +2534,7 @@ function fd230Render(){
  fd276AddressPrompt();
  if(!$('sectionProgress230'))return;
  var states=fd230Progress();
- $('sectionProgress230').innerHTML=FD230.keys.map(function(k,i){var state=states[i],status=state==='green'?(k==='insurance'&&paymentChoice()!=='SELF_PAY'?(FD.eligibility&&FD.eligibility.status==='ACTIVE'?'Verified':'Saved · verification pending'):k==='personal'&&!(FD.data.sectionProgress&&FD.data.sectionProgress.personal&&FD.data.sectionProgress.personal.submittedAt)?'On file':'Submitted'):state==='yellow'?(k==='personal'&&FD.data.addressReview&&!FD.data.addressConfirmed?'Review & submit':k==='insurance'?'Entered · not verified':'Saved · not submitted'):state==='black'?'Verification failed':'Not entered';
+ $('sectionProgress230').innerHTML=FD230.keys.map(function(k,i){var state=states[i],status=state==='green'?(k==='insurance'&&paymentChoice()!=='SELF_PAY'?'Saved for the office':k==='personal'&&!(FD.data.sectionProgress&&FD.data.sectionProgress.personal&&FD.data.sectionProgress.personal.submittedAt)?'On file':'Submitted'):state==='yellow'?(k==='personal'&&FD.data.addressReview&&!FD.data.addressConfirmed?'Review & submit':k==='insurance'?'Entered · not submitted':'Saved · not submitted'):state==='black'?'Verification failed':'Not entered';
  return '<button type="button" class="section-track-item '+state+'" onclick="fd230Open(\''+k+'\')" aria-label="'+FD230.labels[i]+': '+status+'"><span class="section-track-dot">'+(state==='green'?'✓':k==='additional'?'+':i+1)+'</span><span><strong>'+(k==='additional'?'+ Medical card':FD230.labels[i])+'</strong><small>'+(k==='additional'?(state==='green'?'Saved':'Optional'):status)+'</small></span></button>';
  }).join('');
  if(FD230.signed){$('sectionSignBtn').disabled=true;$('sectionSignBtn').textContent='Contract signed';$('sectionNote-contract').textContent='Your signed contract is saved.';fd230ShowRegistrationReceived();}
@@ -2755,7 +2702,6 @@ function fd230Save(section,submit){
   if(submit){
    // Downstream work never blocks the next section or contract submission.
    // Submitted revisions are picked up by the installed office worker.
-   if(section==='insurance'&&snapshot.paymentChoice!=='SELF_PAY'&&snapshot.insuranceCarrier&&snapshot.memberId){FD230.insuranceKey=fd230PolicyKey(snapshot);Promise.resolve().then(function(){if(FD230.insuranceKey!==fd230PolicyKey(collect()))return;return queueEligibilityFromCurrentData(snapshot)}).then(fd230Render).catch(function(){fd230Render()});}
    if(signing){fd230ShowRegistrationReceived();fd230Open('additional');}
    else if(section==='additional'){FD230.medicalLocked=true;fd230RenderMedicalCard();}
    else{var next=FD230.keys[FD230.keys.indexOf(section)+1];if(next)fd230Open(next);}
@@ -2763,9 +2709,9 @@ function fd230Save(section,submit){
  }).catch(function(e){note.textContent=e.message+' Your entries are still on this page.';if(signing)fd230CheckContract(0);}).finally(function(){clearTimeout(timer);if(submit){FD230.submitting[section]=false;button.disabled=section==='contract'&&FD230.signed;button.textContent=section==='contract'&&FD230.signed?'Contract signed':buttonLabel;button.removeAttribute('aria-busy');}});
 }
 function fd230UploadFiles(){
- ['insuranceFront','insuranceBack','photoIdFile'].forEach(function(id){var el=$(id),file=el&&el.files[0];if(!file)return;var key=[file.name,file.size,file.lastModified].join('|');if(FD230.uploads[id]===key)return;
+ ['insuranceFront','insuranceBack','photoIdFile'].forEach(function(id){var el=$(id),file=el&&el.files[0];if(!file)return;var key=[file.name,file.size,file.lastModified].join('|');FD230.pendingUploads=FD230.pendingUploads||{};if(FD230.uploads[id]===key||FD230.pendingUploads[id]===key)return;FD230.pendingUploads[id]=key;
  var kind={insuranceFront:'insurance_front',insuranceBack:'insurance_back',photoIdFile:'photo_id'}[id];
- fileToUpload(file,kind).then(function(upload){return fd230Request('section-upload','insurance',{},false,[upload])}).then(function(res){FD230.uploads[id]=key;FD.uploadsOnFile=res.uploadsOnFile;$('sectionNote-insurance').textContent='Upload saved.';}).catch(function(){ $('sectionNote-insurance').textContent='Upload not received yet. You can retry it or continue and bring it to the office.';});
+ fileToUpload(file,kind).then(function(upload){return fd230Request('section-upload','insurance',{},false,[upload])}).then(function(res){FD230.uploads[id]=key;FD.uploadsOnFile=Array.from(new Set((FD.uploadsOnFile||[]).concat(res.uploadsOnFile||[])));if(res.insuranceCardReviewRequired)FD.data.insuranceCardReviewRequired=true;$('sectionNote-insurance').textContent=res.message||'Upload saved.';}).catch(function(){ $('sectionNote-insurance').textContent='Upload not received yet. You can retry it or continue and bring it to the office.';}).finally(function(){if(FD230.pendingUploads[id]===key)delete FD230.pendingUploads[id];});
  });
 }
 var fd230OldSidebar=renderStatusSidebar;renderStatusSidebar=function(){fd230OldSidebar();fd230Render();};
@@ -2870,7 +2816,6 @@ function fd250CheckManual(){
  var btn=$('manualCoverageCheckBtn');btn.disabled=true;btn.textContent='Checking coverage…';queueEligibilityFromCurrentData(data).catch(function(e){toast(e.message||'Coverage could not be checked. You may continue to the contract.');}).finally(function(){btn.disabled=false;btn.textContent='Check coverage';});
 }
 function fd250Init(){
- var actions=document.createElement('div');actions.className='insurance-manual-actions';actions.innerHTML='<button class="btn primary" type="button" id="manualCoverageCheckBtn">Check coverage</button><span class="note">Uses the information above to run the coverage check.</span>';$('insuranceDetailsSection').appendChild(actions);$('manualCoverageCheckBtn').addEventListener('click',fd250CheckManual);
  $('editLoadedInsuranceBtn').addEventListener('click',function(){unlockInsuranceForChange();setRadio('insuranceEntryMethod','MANUAL');fd250RenderInsurance();fd230Open('insurance')});
  qa('input[name="insuranceEntryMethod"]').forEach(function(el){el.addEventListener('change',function(){if(el.value==='PHOTO')setRadio('insuranceCardStatus','upload');FD.insuranceUnlocked=true;applyPaymentChoiceUI_();fd230Render();})});
  qa('input[name="paymentChoice"]').forEach(function(el){el.addEventListener('change',fd250RenderInsurance)});
@@ -2908,7 +2853,6 @@ fd230MedicalText=function(d){var rows=fd251MedicalText(d);if(d.insuranceCarrier&
 var fd251Init=fd250Init;
 fd250Init=function(){
  fd251Init();
- $('insuranceBack').closest('.field').classList.add('hidden');
  var idSection=$('photoUpload').closest('.section');idSection.classList.add('hidden');setRadio('photoIdStatus','bring');
  var reminder=document.createElement('p');reminder.className='callout';reminder.textContent='Please bring a photo ID to your in-person appointment. We look forward to seeing you!';reminder.classList.toggle('hidden',frontDoorIsVirtual_()||fd263HasPhotoId());idSection.after(reminder);
  var secondary=$('secondaryFields');
@@ -2921,7 +2865,7 @@ fd250Init=function(){
  qa('input[name="secondaryMethod"]').forEach(function(el){el.onchange=function(){fd251SecondaryEditing=true;fd251SecondaryRender();};});
  $('hasSecondary').addEventListener('change',function(){fd251SecondaryEditing=true;fd251SecondaryRender();});
  if(!fd269Enabled()){$('secondaryUploadBtn').disabled=true;$('secondaryCardFile').disabled=true;$('secondaryUploadStatus').textContent='Secondary card uploads are not available yet. You can enter the details manually or bring your card to the visit.';}
- $('secondaryUploadBtn').onclick=function(){var file=$('secondaryCardFile').files[0],btn=this,note=$('secondaryUploadStatus');if(!file){note.textContent='Choose a photo or screenshot first.';return;}btn.disabled=true;note.textContent='Saving card…';fileToUpload(file,'secondary_insurance_front').then(function(upload){return fd230Request('section-upload','insurance',{},false,[upload]);}).then(function(res){FD.uploadsOnFile=res.uploadsOnFile||Array.from(new Set((FD.uploadsOnFile||[]).concat(['secondary_insurance_front'])));note.textContent='Secondary card saved.';fd251SecondaryEditing=false;fd251SecondaryRender();}).catch(function(e){note.textContent='The card could not be saved. Please try again or bring it to your visit.';}).finally(function(){btn.disabled=false;});};
+ $('secondaryUploadBtn').onclick=function(){var file=$('secondaryCardFile').files[0],btn=this,note=$('secondaryUploadStatus');if(btn.disabled)return;if(!file){note.textContent='Choose a photo or screenshot first.';return;}var fileKey=[file.name,file.size,file.lastModified].join('|');if(FD230.uploads.secondaryCardFile===fileKey)return;btn.disabled=true;note.textContent='Saving card…';fileToUpload(file,'secondary_insurance_front').then(function(upload){return fd230Request('section-upload','insurance',{},false,[upload]);}).then(function(res){FD230.uploads.secondaryCardFile=fileKey;FD.uploadsOnFile=Array.from(new Set((FD.uploadsOnFile||[]).concat(res.uploadsOnFile||['secondary_insurance_front'])));if(res.insuranceCardReviewRequired)FD.data.insuranceCardReviewRequired=true;note.textContent=res.insuranceCardReviewRequired?res.message:'Secondary card saved.';fd251SecondaryEditing=false;fd251SecondaryRender();}).catch(function(e){note.textContent='The card could not be saved. Please try again or bring it to your visit.';}).finally(function(){btn.disabled=false;});};
  if(clean($('secondaryCarrier').value)||clean($('secondaryMemberId').value)||(FD.uploadsOnFile||[]).indexOf('secondary_insurance_front')>=0)setCheck('hasSecondary',true);
  setRadio('secondaryMethod','MANUAL');fd251SecondaryRender();fd250RenderInsurance();
 };
@@ -3114,7 +3058,7 @@ function fd269SaveCard(section){
  clearTimeout(FD230.timers[section]);FD230.serial[section]=(FD230.serial[section]||0)+1;
  var d=collect(),buttons=qa('#completedMedicalCard [data-save],#summarySelfPay');buttons.forEach(function(b){b.disabled=true;});
  var status=$('cardSaveStatus');if(!status){status=document.createElement('p');status.id='cardSaveStatus';status.setAttribute('role','status');$('completedMedicalCard').appendChild(status);}status.textContent='Saving…';
- FD230.queue=fd330Enqueue(section,true,function(){return fd230Request('section-save',section,d,true);}).then(function(r){FD.data=Object.assign({},FD.data,d,{sectionProgress:r.sectionProgress||FD.data.sectionProgress});fd254Summary();if(section==='insurance'&&d.paymentChoice!=='SELF_PAY'){FD230.insuranceKey=fd230PolicyKey(d);queueEligibilityFromCurrentData(d).then(fd254Summary).catch(function(){FD.eligibility={status:'UNAVAILABLE'};fd254Summary();});}}).catch(function(e){status.textContent=e.message+' Please try saving again.';buttons.forEach(function(b){b.disabled=false;});});
+ FD230.queue=fd330Enqueue(section,true,function(){return fd230Request('section-save',section,d,true);}).then(function(r){FD.data=Object.assign({},FD.data,d,{sectionProgress:r.sectionProgress||FD.data.sectionProgress});fd254Summary();}).catch(function(e){status.textContent=e.message+' Please try saving again.';buttons.forEach(function(b){b.disabled=false;});});
  return FD230.queue;
 }
 // A selected directory result is saved as one unit; the manual-name input handler clears directory metadata.
@@ -3174,9 +3118,92 @@ var fd288CoverageBase=fd250RenderCoverage;fd250RenderCoverage=function(){fd288Co
 ['insuranceCarrier','memberId'].forEach(function(id){$(id).addEventListener('input',fd288PartialInsurance);$(id).addEventListener('change',fd288PartialInsurance);});
 var fd288DemoBase=demoFrontDoorResponse_;demoFrontDoorResponse_=function(){var r=fd288DemoBase();if(new URLSearchParams(location.search).get('test')==='partial-medicare'){r.booking.insuranceCarrier='Medicare';r.booking.payerId='CMS';r.booking.memberId='';r.intake.completed=false;r.intake.contractSigned=false;r.intake.data.paymentChoice='INSURANCE';r.intake.data.insuranceCarrier='Medicare';r.intake.data.memberId='';r.intake.data.payerId='CMS';r.intake.data.sectionProgress={};r.eligibility={status:'NOT REQUESTED'};}return r;};
 
+/* Native Charm insurance choices. No coverage lookup is part of registration. */
+var FD333={options:[],loaded:false,loading:false,initialCarrier:'',initialId:''};
+function fd333Name(value){return clean(value).toLowerCase();}
+function fd333SelectCarrier(){
+ var carrier=clean($('insuranceCarrier').value),name=fd333Name(carrier),id='',matches=FD333.options.filter(function(x){return fd333Name(x.name)===name;});
+ var restored=!!FD333.initialId&&name===fd333Name(FD333.initialCarrier);
+ if(restored){
+  if(!FD333.loaded||matches.some(function(x){return x.practicePayerId===FD333.initialId;}))id=FD333.initialId;
+ }else if(matches.length===1){id=matches[0].practicePayerId;}
+ $('charmPracticePayerId').value=id;$('payerId').value='';
+ if(!isSelfPay()){FD.eligibility={status:'NOT REQUESTED'};FD.estimate=null;FD.insuranceEstimate=null;}
+ var note=$('insuranceOptionsStatus');
+ if(id)note.textContent='Insurance selected. Save your details below; coverage is not checked here.';
+ else if(carrier)note.textContent='Your insurance details can be saved for staff review. Choose a listed plan if you see an exact match.';
+ else if(FD333.loaded)note.textContent='Choose your insurance company or plan. If it is not listed, type the name on your card.';
+ return id;
+}
+function fd333SetOptions(result){
+ if(!result||result.success!==true||!Array.isArray(result.options))throw new Error('Insurance list unavailable');
+ var options=result.options.filter(function(x){return x&&typeof x.practicePayerId==='string'&&/^\d{1,40}$/.test(x.practicePayerId)&&typeof x.name==='string'&&clean(x.name);}).map(function(x){return {practicePayerId:x.practicePayerId,name:clean(x.name)};});
+ if(options.length!==result.options.length||!options.length)throw new Error('Insurance list unavailable');
+ FD333.options=options;FD333.loaded=true;
+ var list=$('insuranceCarrierOptions'),seen={};list.replaceChildren();
+ options.forEach(function(x){var key=fd333Name(x.name);if(seen[key])return;seen[key]=true;var option=document.createElement('option');option.value=x.name;list.appendChild(option);});
+ fd333SelectCarrier();return result;
+}
+function fd333LoadOptions(){
+ if(FD333.loading||FD333.loaded)return Promise.resolve();FD333.loading=true;
+ $('insuranceOptionsStatus').textContent='Loading the office insurance list…';
+ var timer,work;
+ if(FD.demo)work=Promise.resolve({success:true,options:[{practicePayerId:'100000000000000001',name:'Example Health Plan'},{practicePayerId:'100000000000000002',name:'Example Supplemental Plan'}]});
+ else work=fetch(GATEWAY_URL+'?'+new URLSearchParams({action:'insurance-options',t:FD.token}),{cache:'no-store'}).then(function(r){return r.json();});
+ return Promise.race([work,new Promise(function(resolve,reject){timer=setTimeout(function(){reject(new Error('Insurance list unavailable'));},12000);})]).then(fd333SetOptions).catch(function(){
+  FD333.loaded=false;fd333SelectCarrier();$('insuranceOptionsStatus').textContent='The insurance list is temporarily unavailable. Type the name on your card and save; the office can review it.';
+ }).finally(function(){clearTimeout(timer);FD333.loading=false;});
+}
+var fd333Hydrate=hydrate;
+hydrate=function(){
+ fd333Hydrate();var d=FD.data||{},b=FD.booking||{};
+ FD333.initialCarrier=clean(d.insuranceCarrier||b.insuranceCarrier);FD333.initialId=typeof d.charmPracticePayerId==='string'?d.charmPracticePayerId:'';
+ setValue('charmPracticePayerId',FD333.initialId);
+ ['subscriberFirstName','subscriberLastName','subscriberDob'].forEach(function(id){setValue(id,d[id]||'');});
+ var has=!!(d.subscriberFirstName||d.subscriberLastName||d.subscriberDob);
+ var same=fd333Name(d.subscriberFirstName)===fd333Name(d.firstName||b.firstName)&&fd333Name(d.subscriberLastName)===fd333Name(d.lastName||b.lastName)&&!!d.subscriberDob&&d.subscriberDob===(d.dob||b.dob);
+ setCheck('subscriberDifferent',d.subscriberIsPatient===false||(has&&!same));fd333SelectCarrier();fd250RenderInsurance();
+};
+var fd333Collect=collect;
+collect=function(){var d=fd333Collect();d.charmPracticePayerId=isSelfPay()?'':fd333SelectCarrier();d.payerId='';d.subscriberIsPatient=!$('subscriberDifferent').checked;return d;};
+function fd333NoCheck(){return Promise.resolve({success:true,status:'NOT REQUESTED',disabled:true});}
+requestEligibility=requestDiscovery=queueEligibilityFromCurrentData=apiEligibilityStatus=apiDiscoveryStatus=fd333NoCheck;
+insuranceIsActive=function(){return false;};eligibilityPending=discoveryPending=function(){return false;};
+pollEligibility=pollDiscovery=function(){};
+applyEligibilityResult=function(){FD.eligibility={status:'NOT REQUESTED'};FD.estimate=null;FD.insuranceEstimate=null;};
+applyDiscoveryResult=function(){FD.discovery={status:'NOT REQUESTED'};};renderDiscoveryOffer=function(){};
+paymentChoice=function(){return radioValue('paymentChoice')==='SELF_PAY'?'SELF_PAY':'INSURANCE';};
+needsStaffInsuranceHelp=function(){return false;};
+renderInsuranceCardRequirement=function(){
+ var self=isSelfPay();$('insuranceCardSection').classList.toggle('hidden',self);$('insuranceCardChoicesWrap').classList.toggle('hidden',self);$('insuranceUploads').classList.toggle('hidden',self);
+ var received=$('officeCardReceipt');if(received){received.textContent=FD.data.insuranceCardReviewRequired?'Updated insurance card saved for staff review before any Charm update.':'Insurance card on file. You can add a replacement below.';}if(received)received.classList.toggle('hidden',self||!(FD.uploadsOnFile||[]).some(function(kind){return kind==='insurance_front'||kind==='insurance_back';}));
+};
+fd250RenderInsurance=function(){
+ var self=isSelfPay();['insuranceDetailsSection','insuranceCardSection','secondaryInsuranceSection','insuranceBillingPolicyCard'].forEach(function(id){if($(id))$(id).classList.toggle('hidden',self);});
+ $('insuranceEntryMethods').classList.add('hidden');$('staffHelpBox').classList.add('hidden');$('selfPayPriceBox').classList.toggle('hidden',!self);
+ if(self){$('selfPayPriceAmount').textContent='$120';$('selfPayPriceText').textContent='Initial visit · additional procedures are separate.';}
+ var choice=q('.payment-choice');if(choice){choice.classList.remove('hidden');choice.closest('.section').classList.remove('hidden');if(choice.previousElementSibling)choice.previousElementSibling.classList.remove('hidden');}
+ $('subscriberFields').classList.toggle('hidden',self||!$('subscriberDifferent').checked);renderInsuranceCardRequirement();fd251SecondaryRender();
+};
+fd268CoverageState=function(res,data){return data&&data.paymentChoice==='SELF_PAY'?'selfpay':'neutral';};
+fd268CoverageLabel=function(state){return state==='selfpay'?'Self-pay selected':'Coverage is not checked in registration';};
+var fd333Progress=fd230Progress;
+fd230Progress=function(){var states=fd333Progress(),index=FD230.keys.indexOf('insurance'),progress=(FD.data.sectionProgress||{}).insurance||{};states[index]=progress.submittedAt?'green':(clean($('insuranceCarrier').value)||clean($('memberId').value)||isSelfPay()?'yellow':'red');return states;};
+var fd333Financial=renderFinancialEligibility,fd333FinalFinancial=renderFinalFinancialSnapshot_;
+function fd333HideEstimate(){FD.estimate=null;FD.insuranceEstimate=null;['estimateReady','estimatePending','finalEstimateSnapshot','finalEstimatePending'].forEach(function(id){if($(id))$(id).classList.add('hidden');});}
+renderFinancialEligibility=function(){if(isSelfPay())return fd333Financial();fd333HideEstimate();};
+renderFinalFinancialSnapshot_=function(){if(isSelfPay())return fd333FinalFinancial();fd333HideEstimate();};
+var fd333Init=fd250Init;
+fd250Init=function(){fd333Init();setRadio('insuranceEntryMethod','MANUAL');fd250RenderInsurance();fd333LoadOptions();};
+var fd333Summary=fd254Summary;
+fd254Summary=function(){fd333Summary();['edit-insuranceCarrier','edit-secondaryCarrier'].forEach(function(id){if($(id))$(id).setAttribute('list','insuranceCarrierOptions');});};
+$('insuranceCarrier').addEventListener('input',fd333SelectCarrier);$('insuranceCarrier').addEventListener('change',fd333SelectCarrier);
+$('subscriberDifferent').addEventListener('change',function(){if(!this.checked)['subscriberFirstName','subscriberLastName','subscriberDob'].forEach(function(id){setValue(id,'');});fd250RenderInsurance();this.dispatchEvent(new Event('input',{bubbles:true}));});
+
 boot();
 </script>
 </body>
 </html>
+
 
 
