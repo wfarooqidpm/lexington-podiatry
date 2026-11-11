@@ -2955,7 +2955,11 @@ function fd254Ready(){
  // progress. Medical information remains optional. Neither grants consent or
  // fabricates section submissions; required edits still need a saved submit.
  var d=FD.data||{},p=d.sectionProgress||{};
- return !!(FD230.signed&&!(d.addressReview&&!d.addressConfirmed)&&
+ // An untouched optional section may be skipped. Once editing has begun, keep
+ // that draft on screen until its explicit save acknowledges the current edit.
+ var medicalDraft=!(p.additional&&p.additional.submittedAt)&&
+  ((p.additional&&p.additional.savedAt)||(FD230.edits&&FD230.edits.additional));
+ return !!(FD230.signed&&!medicalDraft&&!(d.addressReview&&!d.addressConfirmed)&&
   ((p.personal&&p.personal.submittedAt)||(d.officeSections&&d.officeSections.personal))&&
   p.insurance&&p.insurance.submittedAt);
 }
