@@ -2950,7 +2950,15 @@ apiPharmacySearch=function(name,location){if(FD.demo){searchPharmacy();return Pr
 /* Completed medical-card preview: four submitted sections, then a read-only summary. */
 var fd254Demo=demoFrontDoorResponse_;
 demoFrontDoorResponse_=function(){var r=fd254Demo();if(new URLSearchParams(location.search).get('test')==='completed'){r.intake.contractSigned=true;r.intake.completed=true;r.intake.data.sectionProgress={};['personal','insurance','contract','additional'].forEach(function(k){r.intake.data.sectionProgress[k]={submittedAt:'2026-09-13T12:00:00Z'};});}return r;};
-function fd254Ready(){var p=FD.data.sectionProgress||{};return FD230.signed&&['personal','insurance','additional'].every(function(k){return !!(p[k]&&p[k].submittedAt);});}
+function fd254Ready(){
+ // Current Charm demographics count as On file, as shown in registration
+ // progress. Medical information remains optional. Neither grants consent or
+ // fabricates section submissions; required edits still need a saved submit.
+ var d=FD.data||{},p=d.sectionProgress||{};
+ return !!(FD230.signed&&!(d.addressReview&&!d.addressConfirmed)&&
+  ((p.personal&&p.personal.submittedAt)||(d.officeSections&&d.officeSections.personal))&&
+  p.insurance&&p.insurance.submittedAt);
+}
 function fd263HasPhotoId(){return Array.isArray(FD.uploadsOnFile)&&FD.uploadsOnFile.indexOf('photo_id')>=0;}
 function fd262VisitType(value){var type=String(value||'').toUpperCase().replace(/[ _-]/g,'');return type==='NEW'?'New patient':(type==='RETURNING'||type==='FOLLOWUP'?'Follow up':'Visit type to be confirmed');}
 function fd264InsuranceIcon(carrier){
@@ -2996,7 +3004,11 @@ fd250RenderInsurance=function(){fd254Insurance();var box=q('.payment-choice').cl
 var fd254Render=fd230Render;
 fd230Render=function(){fd254Render();if(fd269Enabled()&&$('sectionProgress230'))$('sectionProgress230').innerHTML=$('sectionProgress230').innerHTML.replace(/\+ Medical card/g,'+ Medical information');};
 var fd254Save=fd230Save;
-fd230Save=function(section,submit){var result=fd254Save(section,submit);if(fd269Enabled()&&submit)FD230.queue.then(function(){FD230.medicalLocked=false;fd230RenderMedicalCard();fd254Summary();});return result;};
+fd230Save=function(section,submit){var edits=Object.assign({},FD230.edits||{}),result=fd254Save(section,submit);if(fd269Enabled()&&submit)FD230.queue.then(function(){
+ // Optional medical drafts do not block the card, but a slow save must never
+ // hide typing entered after the submitted snapshot.
+ if(FD230.keys.some(function(k){return (FD230.edits[k]||0)!==(edits[k]||0);}))return;
+ FD230.medicalLocked=false;fd230RenderMedicalCard();fd254Summary();});return result;};
 
 // Cutoff preview uses an absolute timestamp, never the formatted display string.
 function fd257Locked(booking,now){var start=Date.parse(booking.appointmentStart||'');return !Number.isFinite(start)||start-now<=4*60*60*1000;}
@@ -3204,6 +3216,7 @@ boot();
 </script>
 </body>
 </html>
+
 
 
 
