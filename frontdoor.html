@@ -2548,6 +2548,9 @@ function fd230Build(){
  FD230.keys.forEach(function(k,i){var box=document.createElement('details');box.id='section-'+k;box.className='intake-layer';box.open=i===0;
  if(k==='additional')box.classList.add('optional-card');
  var head=document.createElement('summary');head.innerHTML='<span class="section-number">'+(k==='additional'?'+':i+1)+'</span>'+FD230.labels[i]+(k==='additional'?' <small style="font:600 12px var(--sans);color:var(--ink-soft)">optional · may be updated later</small>':'');box.appendChild(head);
+ var refresh=document.createElement('button');refresh.type='button';refresh.id='sectionRefresh-'+k;refresh.className='section-refresh';refresh.textContent='↻';
+ refresh.title=refresh.ariaLabel=k==='personal'?'Reload demographics from Charm':k==='insurance'?'Reload insurance from Charm':k==='contract'?'Refresh saved contract status':'Reload saved medical information';
+ refresh.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();fd358Reload_(k);});head.appendChild(refresh);
  var content=document.createElement('div');content.className='section-body';box.appendChild(content);
  placement[k].forEach(function(n){content.appendChild(panels[n]);});
  var actions=document.createElement('div');actions.className='section-actions';
@@ -3216,6 +3219,78 @@ fd254Summary=function(){fd333Summary();['edit-insuranceCarrier','edit-secondaryC
 $('insuranceCarrier').addEventListener('input',fd333SelectCarrier);$('insuranceCarrier').addEventListener('change',fd333SelectCarrier);
 $('subscriberDifferent').addEventListener('change',function(){if(!this.checked)['subscriberFirstName','subscriberLastName','subscriberDob'].forEach(function(id){setValue(id,'');});fd250RenderInsurance();this.dispatchEvent(new Event('input',{bubbles:true}));});
 
+/* Explicit refresh is a read/review action. It replaces only the selected
+ * section, never signs, submits, verifies coverage or changes the Charm chart. */
+function fd358Snapshot_(section,res){
+ if(!res||res.success===false)throw new Error('Could not reload this section. Your entries are unchanged.');
+ var out={},saved=res.intake&&res.intake.data||{},chart=res.charmSnapshot||{};
+ if(section==='contract')return {fields:out,source:'saved registration',signed:!!(res.intake&&res.intake.contractSigned)};
+ if(section==='personal'){
+  var dem=chart.demographics;
+  if(!dem||!Object.keys(dem).some(function(k){return !!dem[k];}))throw new Error('Charm details could not be refreshed. Your entries are unchanged.');
+  ['firstName','lastName','dob','phone','email','address1','address2','city','state','zip'].forEach(function(k){if(dem[k]!=null&&String(dem[k]).trim())out[k]=dem[k];});
+  if(dem.address1&&dem.city&&dem.state&&dem.zip)out.address2=dem.address2||'';
+  return {fields:out,source:'Charm'};
+ }
+ if(section==='insurance'){
+  var ins=chart.insurance;
+  if(!ins||!ins.available||!ins.memberId)throw new Error('No unique active primary policy could be reloaded from Charm. Your entries are unchanged.');
+  out={paymentChoice:'INSURANCE',insuranceCarrier:ins.carrier||'',insurancePlan:ins.planName||'',memberId:ins.memberId,groupId:ins.groupNumber||'',charmPracticePayerId:ins.practicePayerId||'',payerId:''};
+  ['subscriberFirstName','subscriberLastName','subscriberDob'].forEach(function(k){out[k]=ins[k]||'';});
+  if(typeof ins.subscriberIsPatient==='boolean')out.subscriberIsPatient=ins.subscriberIsPatient;
+  return {fields:out,source:'Charm'};
+ }
+ if(section!=='additional')throw new Error('Unknown registration section.');
+ ['allergies','noKnownAllergies','medications','noCurrentMedications','medicalHistory','noMedicalHistory','medicalOther','surgicalHistory','noSurgicalHistory','familyHistory','pharmacy','pharmacyAddress','pharmacyNpi','pharmacyPhone','hpi'].forEach(function(k){if(Object.prototype.hasOwnProperty.call(saved,k))out[k]=saved[k];});
+ if(!Object.keys(out).length)throw new Error('No saved medical information is available. Your entries are unchanged.');
+ return {fields:out,source:'saved registration'};
+}
+function fd358Apply_(section,loaded,res){
+ var fields=loaded.fields;
+ // Collect live fields before patching so another section's edits survive.
+ FD.data=Object.assign({},FD.data,collect(),fields);
+ if(section==='contract'){FD230.signed=loaded.signed;fd230Render();return;}
+ Object.keys(fields).forEach(function(k){
+  if(k==='paymentChoice')setRadio(k,fields[k]);
+  else if(k==='subscriberIsPatient')setCheck('subscriberDifferent',!fields[k]);
+  else if(k==='medicalHistory')qa('#historyChecks input[type="checkbox"]').forEach(function(cb){cb.checked=fields[k].indexOf(cb.value)>=0;});
+  else if(typeof fields[k]==='boolean')setCheck(k,fields[k]);
+  else if($(k))setValue(k,k==='state'?fd239StateValue(fields[k]):fields[k]);
+ });
+ FD230.edits[section]=(FD230.edits[section]||0)+1;
+ FD.data.sectionProgress=FD.data.sectionProgress||{};
+ FD.data.sectionProgress[section]=Object.assign({},res.intake&&res.intake.data&&res.intake.data.sectionProgress&&res.intake.data.sectionProgress[section]||{},{submittedAt:''});
+ FD.data.officeSections=FD.data.officeSections||{};FD.data.officeSections[section]=false;
+ if(section==='personal'){FD.data.addressReview=null;FD.data.addressConfirmed=false;}
+ if(section==='insurance'){
+  FD.data.insuranceAssistanceRequested=false;FD.eligibility=null;FD.insuranceUnlocked=true;
+  FD333.initialCarrier=fields.insuranceCarrier;FD333.initialId=fields.charmPracticePayerId;
+  setRadio('insuranceEntryMethod','MANUAL');fd333SelectCarrier();fd250RenderInsurance();
+ }
+ if(section==='additional'){FD230.medicalLocked=false;updateConditionalFields();renderPharmacySelection();fd230RenderMedicalCard();}
+ fd230Render();fd230Open(section);
+}
+function fd358Reload_(section){
+ FD230.refreshing=FD230.refreshing||{};
+ if(FD230.refreshing[section]||FD230.submitting[section])return;
+ var button=$('sectionRefresh-'+section),save=$(section==='contract'?'sectionSignBtn':'sectionSubmit-'+section),note=$('sectionNote-'+section),saveDisabled=save.disabled;
+ FD230.refreshing[section]=true;button.disabled=true;button.setAttribute('aria-busy','true');save.disabled=true;
+ clearTimeout(FD230.timers[section]);var edits=FD230.edits[section]||0;
+ note.textContent=section==='personal'||section==='insurance'?'Reloading from Charm…':'Reloading saved registration…';
+ FD230.queue=fd330Enqueue(section,true,function(){
+  if(FD.saveIO&&FD.saveIO.pending&&FD.saveIO.pending[section])throw new Error('A previous save is still unconfirmed. Check its status before reloading.');
+  return apiGet();
+ }).then(function(res){
+  if((FD230.edits[section]||0)!==edits)throw new Error('You edited this section while it was reloading. Your newer entries were kept.');
+  var loaded=fd358Snapshot_(section,res);
+  var progress=res.intake&&res.intake.data&&res.intake.data.sectionProgress||{};
+  if(FD.saveIO){FD.saveIO.revisions=FD.saveIO.revisions||{};FD.saveIO.revisions[section]=String((progress[section]||{}).savedAt||'');}
+  fd358Apply_(section,loaded,res);
+  note.textContent=section==='contract'?(loaded.signed?'Your saved signed contract is on file.':'No signed contract is on file.'):('Loaded from '+loaded.source+'. Review, then '+(section==='additional'?'Submit medical information.':'Save & continue.'));
+ }).catch(function(e){note.textContent=e.message||'Could not reload. Your entries are unchanged.';}).finally(function(){FD230.refreshing[section]=false;button.disabled=false;button.removeAttribute('aria-busy');save.disabled=section==='contract'?FD230.signed:saveDisabled;});
+ return FD230.queue;
+}
+(function(){var style=document.createElement('style');style.textContent='.section-refresh{margin-left:auto;margin-right:8px;border:0;background:transparent;color:#50675b;font:600 22px/1 var(--sans);padding:6px 10px;cursor:pointer;border-radius:6px}.section-refresh:hover{background:#edf3ef}.section-refresh:focus-visible{outline:2px solid #50675b}.section-refresh:disabled{opacity:.45;cursor:wait}';document.head.appendChild(style);})();
 boot();
 </script>
 </body>
