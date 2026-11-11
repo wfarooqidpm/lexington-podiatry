@@ -2972,7 +2972,9 @@ function fd264InsuranceIcon(carrier){
 }
 function fd254Summary(){
  if(!fd269Enabled()||!$('completedMedicalCard'))return;
- var ready=fd254Ready()||fd273ReturningCard(),host=$('completedMedicalCard');document.body.classList.toggle('medical-summary-ready',ready);host.classList.toggle('hidden',!ready);$('demoNotice').classList.toggle('hidden',!ready&&!FD.demo);$('demoNotice').textContent=ready?(fd254Ready()?(FD.data.flowType==='FOLLOW_UP_REVIEW'&&!(FD.data.followUpReview||{}).completedAt?'✓ Appointment booked · Previous intake on file':'✓ Submitted and booked · Tap to modify'):'✓ Appointment booked · Tap to modify'):(FD.demo?'Fictional preview — entries stay in this demo.':'');if(!ready)return;
+ // A booked follow-up is not proof of submitted registration. Keep the
+ // full form reachable until its required sections and real contract are ready.
+ var ready=fd254Ready(),host=$('completedMedicalCard');document.body.classList.toggle('medical-summary-ready',ready);host.classList.toggle('hidden',!ready);$('demoNotice').classList.toggle('hidden',!ready&&!FD.demo);$('demoNotice').textContent=ready?(fd254Ready()?(FD.data.flowType==='FOLLOW_UP_REVIEW'&&!(FD.data.followUpReview||{}).completedAt?'✓ Appointment booked · Previous intake on file':'✓ Submitted and booked · Tap to modify'):'✓ Appointment booked · Tap to modify'):(FD.demo?'Fictional preview — entries stay in this demo.':'');if(!ready)return;
  var d=collect(),esc=escapeHtml;
  function field(id,label,value){return '<label class="snapshot-edit-label" for="edit-'+id+'">'+esc(label)+'</label><input id="edit-'+id+'" value="'+esc(value||'')+'">';}
  function actions(id){return '<div class="snapshot-actions"><button class="btn secondary" type="button" data-save="'+id+'">Save</button><button class="btn secondary" type="button" data-cancel>Cancel</button></div>';}
@@ -3111,7 +3113,7 @@ var fd269Eligibility=applyEligibilityResult;
 applyEligibilityResult=function(res){if(res&&res.success===false)FD.eligibility={status:'UNAVAILABLE'};fd269Eligibility(res);if(fd269Enabled())fd254Summary();};
 function fd273ReturningCard(){return !!FD.booking&&/^(RETURNING|FOLLOW[ -]?UP)$/i.test(String(FD.booking.patientType||''));}
 var fd273SummaryBase=fd254Summary;
-fd254Summary=function(){fd273SummaryBase();if(!fd273ReturningCard()||!$('completedMedicalCard'))return;
+fd254Summary=function(){fd273SummaryBase();if(!fd254Ready()||!fd273ReturningCard()||!$('completedMedicalCard'))return;
  var incomplete=!fd254Ready(),host=$('completedMedicalCard');
  host.classList.toggle('abbreviated-card',incomplete);
  if(incomplete){var health=host.querySelector('.snapshot-health');if(health)health.classList.add('hidden');
