@@ -2548,9 +2548,6 @@ function fd230Build(){
  FD230.keys.forEach(function(k,i){var box=document.createElement('details');box.id='section-'+k;box.className='intake-layer';box.open=i===0;
  if(k==='additional')box.classList.add('optional-card');
  var head=document.createElement('summary');head.innerHTML='<span class="section-number">'+(k==='additional'?'+':i+1)+'</span>'+FD230.labels[i]+(k==='additional'?' <small style="font:600 12px var(--sans);color:var(--ink-soft)">optional · may be updated later</small>':'');box.appendChild(head);
- var refresh=document.createElement('button');refresh.type='button';refresh.id='sectionRefresh-'+k;refresh.className='section-refresh';refresh.textContent='↻';
- refresh.title=refresh.ariaLabel=k==='personal'?'Reload demographics from Charm':k==='insurance'?'Reload insurance from Charm':k==='contract'?'Refresh saved contract status':'Reload saved medical information';
- refresh.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();fd358Reload_(k);});head.appendChild(refresh);
  var content=document.createElement('div');content.className='section-body';box.appendChild(content);
  placement[k].forEach(function(n){content.appendChild(panels[n]);});
  var actions=document.createElement('div');actions.className='section-actions';
@@ -3290,7 +3287,17 @@ function fd358Reload_(section){
  }).catch(function(e){note.textContent=e.message||'Could not reload. Your entries are unchanged.';}).finally(function(){FD230.refreshing[section]=false;button.disabled=false;button.removeAttribute('aria-busy');save.disabled=section==='contract'?FD230.signed:saveDisabled;});
  return FD230.queue;
 }
+function fd358Controls_(){
+ // The medical layout replaces its summary during initialization, so mount
+ // controls after all four section layouts have finished rather than in build.
+ FD230.keys.forEach(function(k){var box=$('section-'+k);if(!box||$('sectionRefresh-'+k))return;var head=box.querySelector('summary');if(!head)return;
+  var refresh=document.createElement('button');refresh.type='button';refresh.id='sectionRefresh-'+k;refresh.className='section-refresh';refresh.textContent='↻';
+  var label=k==='personal'?'Reload demographics from Charm':k==='insurance'?'Reload insurance from Charm':k==='contract'?'Refresh saved contract status':'Reload saved medical information';refresh.title=label;refresh.setAttribute('aria-label',label);
+  refresh.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();fd358Reload_(k);});head.appendChild(refresh);
+ });
+}
 (function(){var style=document.createElement('style');style.textContent='.section-refresh{margin-left:auto;margin-right:8px;border:0;background:transparent;color:#50675b;font:600 22px/1 var(--sans);padding:6px 10px;cursor:pointer;border-radius:6px}.section-refresh:hover{background:#edf3ef}.section-refresh:focus-visible{outline:2px solid #50675b}.section-refresh:disabled{opacity:.45;cursor:wait}';document.head.appendChild(style);})();
+var fd358Init=fd250Init;fd250Init=function(){fd358Init();fd358Controls_();};
 boot();
 </script>
 </body>
