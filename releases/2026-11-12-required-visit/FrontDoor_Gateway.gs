@@ -4513,10 +4513,10 @@ var FDGVisit360=(function(){
  var labels={problem:'What brings you in?',description:'Please describe your concern',side:'Which side?',location:'Where exactly?',toe:'Which toe?',border:'Which nail edge?',symptoms:'What does it feel or look like?',onset:'How did it start?',duration:'How long has this been going on?',course:'Since it started, is it…',worse:'What makes it worse?',better:'What makes it better?',treatment:'What have you tried, and did it help?'};
  function nail(h){return /toenail|hammertoe|lapping/.test(h.problem||'');}
  function keys(h){return ['problem','side','location','symptoms','onset','duration','course','worse','better','treatment'].concat(h.problem==='Other'?['description']:[],nail(h)?['toe']:[],h.problem==='Ingrown toenail'?['border']:[]);}
- function missing(h){h=h||{};return keys(h).filter(function(k){return !String(h[k]||'').trim()||(k==='problem'&&problems.indexOf(h.problem)<0);});}
+ function missing(h){h=h||{};return ['problem'].concat(h.problem==='Other'?['description']:[]).filter(function(k){return !String(h[k]||'').trim()||(k==='problem'&&problems.indexOf(h.problem)<0);});}
  function summary(h){h=h||{};var order=['problem','description','side','location','toe','border','symptoms','onset','duration','course','worse','better','treatment'];var titles={problem:'Concern',description:'Description',side:'Side',location:'Location',toe:'Toe',border:'Nail edge',symptoms:'Symptoms',onset:'Onset',duration:'Duration',course:'Course',worse:'Worse with',better:'Better with',treatment:'Treatment tried'};return order.filter(function(k){return keys(h).indexOf(k)>=0&&String(h[k]||'').trim();}).map(function(k){return titles[k]+': '+String(h[k]).trim();}).join('\n');}
 
 return {missing:missing,summary:summary};})();
 function fdg360MissingVisit_(h){return FDGVisit360.missing(h);}
-function fdg360ValidateVisit_(d){if(fdg360MissingVisit_(d.visitHistory).length)throw new Error("Please complete the required questions in Today’s visit.");}
+function fdg360ValidateVisit_(d){if(fdg360MissingVisit_(d.visitHistory).length)throw new Error("Please tell us your reason for visiting.");}
 function fdg360VisitSummary_(h){return FDGVisit360.summary(h);}
