@@ -980,6 +980,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 <footer><div class="wrap"><span>Lexington Podiatry · WAF Podiatry P.C.</span><span>353 Lexington Ave, Rm 1502 · New York, NY 10016</span></div></footer>
 
 <script src="/frontdoor-connection.js?v=272"></script>
+<script src="/visit-history.js?v=360"></script>
 <script>
 // Replace this after deploying FrontDoorGateway.gs as a separate Web App.
 var GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF/exec';
@@ -2510,6 +2511,7 @@ function fd230PolicyKey(d){return [d.paymentChoice,d.insuranceCarrier,d.payerId,
 function fd230Progress(){
  var p=FD.data.sectionProgress||{},d=FD.data||{};
  return FD230.keys.map(function(k){
+  if(k==='visit')return p.visit&&p.visit.submittedAt&&!FDVisit.missing(d.visitHistory).length?'green':d.visitHistory?'yellow':'red';
   if(k==='contract')return FD230.signed?'green':d.signatureName||d.agreementAccepted?'yellow':'red';
   if(k==='insurance'){
    if(paymentChoice()==='SELF_PAY'&&p.insurance&&p.insurance.submittedAt)return 'green';
@@ -2544,7 +2546,7 @@ function fd230Build(){
  document.body.classList.add('four-sections');
  var host=q('.layout > div'),panels={};qa('.panel[data-panel]').forEach(function(p){panels[p.dataset.panel]=p});
  var received=document.createElement('section');received.id='registrationReceived';received.className='registration-received';received.setAttribute('role','status');received.innerHTML='<div class="closed-door" aria-hidden="true">🚪</div><h2>Contract received</h2><p>Your signed contract is saved. You can still review and submit the sections below.</p>';host.appendChild(received);
- var placement={personal:['1'],insurance:['2','5'],contract:['4','6'],additional:['3']};
+ var placement={personal:['1'],insurance:['2','5'],visit:['7'],contract:['4','6'],additional:['3']};
  FD230.keys.forEach(function(k,i){var box=document.createElement('details');box.id='section-'+k;box.className='intake-layer';box.open=i===0;
  if(k==='additional')box.classList.add('optional-card');
  var head=document.createElement('summary');head.innerHTML='<span class="section-number">'+(k==='additional'?'+':i+1)+'</span>'+FD230.labels[i]+(k==='additional'?' <small style="font:600 12px var(--sans);color:var(--ink-soft)">optional · may be updated later</small>':'');box.appendChild(head);
@@ -3240,7 +3242,7 @@ function fd358Snapshot_(section,res){
   return {fields:out,source:'Charm'};
  }
  if(section!=='additional')throw new Error('Unknown registration section.');
- ['allergies','noKnownAllergies','medications','noCurrentMedications','medicalHistory','noMedicalHistory','medicalOther','surgicalHistory','noSurgicalHistory','familyHistory','pharmacy','pharmacyAddress','pharmacyNpi','pharmacyPhone','hpi'].forEach(function(k){if(Object.prototype.hasOwnProperty.call(saved,k))out[k]=saved[k];});
+ ['allergies','noKnownAllergies','medications','noCurrentMedications','medicalHistory','noMedicalHistory','medicalOther','surgicalHistory','noSurgicalHistory','familyHistory','pharmacy','pharmacyAddress','pharmacyNpi','pharmacyPhone'].forEach(function(k){if(Object.prototype.hasOwnProperty.call(saved,k))out[k]=saved[k];});
  if(!Object.keys(out).length)throw new Error('No saved medical information is available. Your entries are unchanged.');
  return {fields:out,source:'saved registration'};
 }
@@ -3300,6 +3302,7 @@ function fd358Controls_(){
 }
 (function(){var style=document.createElement('style');style.textContent='.section-refresh{margin-left:auto;margin-right:8px;border:0;background:transparent;color:#50675b;font:600 22px/1 var(--sans);padding:6px 10px;cursor:pointer;border-radius:6px}.section-refresh:hover{background:#edf3ef}.section-refresh:focus-visible{outline:2px solid #50675b}.section-refresh:disabled{opacity:.45;cursor:wait}';document.head.appendChild(style);})();
 var fd358Init=fd250Init;fd250Init=function(){fd358Init();fd358Controls_();};
+FDVisit.install();
 boot();
 </script>
 </body>
