@@ -6,10 +6,12 @@ function fd331El(id){return document.getElementById(id);}
 function fd331Identity(){return {firstName:fd331El('rpFirst').value.trim(),lastName:fd331El('rpLast').value.trim(),dob:fd331El('rpDob').value};}
 function fd331IdentityKey(){var p=fd331Identity();return [p.firstName,p.lastName,p.dob].join('|');}
 function fd331Verified(){return !!(state.verificationSession && fd331.sessionExpires>Date.now());}
+function fd331Pickup(){return state.bookingPurpose==='ORTHOTICS_PICKUP';}
 function fd331ValidNew(){return ['npFirst','npLast','npDob','npPhone','npEmail'].every(function(id){var e=fd331El(id);return !!e.value.trim()&&e.checkValidity();})&&validBookingPhone_();}
 function fd331CancelVerification(){
  fd331.generation++;clearTimeout(fd331.timer);fd331.pending=null;fd331.emailSent=false;fd331.busy=false;fd331.sessionExpires=0;
  state.verificationSession=null;state.verifiedName=null;state.verifiedEmail=null;state.verifiedPhone=null;
+ if(fd331Pickup()){state.bookingPurpose='';state.websiteBookingId=null;}
  fd331El('btnVerify').disabled=false;fd331El('btnVerify').textContent='🔒 Confirm identity';fd331El('verifyResult').textContent='';
 }
 function fd331EditIdentity(){fd331CancelVerification();fd332.edit='info';fd331Slots();}
@@ -28,7 +30,7 @@ function fd331Render(){
  document.querySelectorAll('#newModeGrid .mode-card').forEach(function(b){var selected=b.getAttribute('data-mode')===state.visitMode;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});
  var ready=!!state.selectedSlot&&!!state.visitMode&&(returning?verified:state.patientType==='new'&&fd331ValidNew());
  fd331El('btnSubmit').disabled=state.bookingBusy||(!state.bookingCommitted&&!ready);
- fd331El('bookingSelection').textContent=state.patientType?((returning?'Follow-up':'First visit')+' · '+(state.visitMode||'Choose visit mode')+(state.selectedSlot?' · '+state.selectedSlot.label:'')):'Choose your visit details above.';
+ fd331El('bookingSelection').textContent=state.patientType?((fd331Pickup()?'Orthotics pickup':returning?'Follow-up':'First visit')+' · '+(state.visitMode||'Choose visit mode')+(state.selectedSlot?' · '+state.selectedSlot.label:'')):'Choose your visit details above.';
  if(verified){fd331El('btnVerify').textContent='🔓 Identity confirmed';fd331El('btnVerify').disabled=true;}
  fd332Flow();
 }
@@ -40,12 +42,12 @@ function fd331Slots(){
  fd331Render();
 }
 function fd331SelectType(button){
- if(state.bookingBusy||state.bookingCommitted)return;
+ if(state.bookingBusy||state.bookingCommitted||fd331Pickup())return;
  var type=button.getAttribute('data-type');if(type!==state.patientType){fd331CancelVerification();state.selectedSlot=null;state.bookingPayload=null;}
  state.patientType=type;fd332.edit=state.visitMode?'':'mode';fd331Slots();
 }
 function fd331SelectMode(button){
- if(state.bookingBusy||state.bookingCommitted)return;
+ if(state.bookingBusy||state.bookingCommitted||fd331Pickup())return;
  fd332.edit='';var mode=button.getAttribute('data-mode');
  if(state.visitMode===mode){fd331Render();return;}
  state.visitMode=mode;state.selectedSlot=null;state.bookingPayload=null;fd331Slots();
@@ -127,7 +129,9 @@ function fd331Approval(){
    if(!result.success||!result.approved||!result.verified||!result.session)throw new Error(result.error||'We could not continue your booking. Please try again.');
    var expiry=Date.parse(result.expiresAt);if(!isFinite(expiry)||expiry<=Date.now())throw new Error('This confirmation expired. Please start again.');
    state.websiteBookingId=result.websiteBookingId;
-   state.patientType='returning';state.visitMode=match[3]==='ip'?'In Person':match[3]==='vv'?'Virtual':null;
+   // The private router sets the pickup purpose after confirming the email link.
+   state.bookingPurpose=result.bookingPurpose||'';
+   state.patientType='returning';state.visitMode=fd331Pickup()||match[3]==='ip'?'In Person':match[3]==='vv'?'Virtual':null;
    state.verificationSession=result.session;state.verifiedName=result.firstName+' '+result.lastName;state.verifiedEmail='';state.verifiedPhone='';fd331.sessionExpires=expiry;
    fd331El('rpFirst').value=result.firstName;fd331El('rpLast').value=result.lastName;fd331El('rpDob').value=result.dob;
    fd331El('fd331Approval').hidden=true;document.querySelector('.booking-main').hidden=false;
@@ -140,7 +144,7 @@ function fd331Approval(){
 }
 // Bubble choices edit the existing draft; no writes, navigation, or new verification.
 function fd332Edit(section){
- if(state.bookingBusy||state.bookingCommitted)return;
+ if(state.bookingBusy||state.bookingCommitted||(fd331Pickup()&&section!=='time'))return;
  fd332.edit=section;fd331Render();
 }
 function fd332Flow(){
@@ -156,11 +160,12 @@ function fd332Flow(){
  fd331El('panel3').hidden=!ready||askType||askMode||done;
  fd331El('bookingFinish').hidden=done||!ready||!state.selectedSlot||askType||askMode;
  fd331El('bookingPath').hidden=!type||done;
- fd331El('pathTypeText').textContent=type==='new'?'First visit':'Returning patient';
+ fd331El('pathTypeText').textContent=fd331Pickup()?'Orthotics pickup':type==='new'?'First visit':'Returning patient';
  fd331El('pathModeText').textContent=mode||(askType?'Visit mode':'Choose visit mode');
  fd331El('pathIdentityText').textContent=ready?(type==='returning'?'Identity confirmed':fd331El('npFirst').value.trim()+' '+fd331El('npLast').value.trim()):(type==='returning'?'Confirm identity':'Your details');
  fd331El('pathTimeText').textContent=state.selectedSlot?state.selectedSlot.label:'Choose a time';
  ['pathDown','pathBack','pathIdentity','pathTime'].forEach(function(id){fd331El(id).hidden=!mode;});
+ ['pathType','pathMode','pathIdentity'].forEach(function(id){fd331El(id).disabled=fd331Pickup();});
  fd331El('pathTime').disabled=!ready;
  ['pathType','pathMode','pathIdentity','pathTime'].forEach(function(id){var current=id===(askType?'pathType':askMode?'pathMode':!ready||fd332.edit==='info'?'pathIdentity':'pathTime');fd331El(id).classList.toggle('current',current);fd331El(id).setAttribute('aria-current',current?'step':'false');});
  fd331El('bookingConnectionStatus').hidden=askType||askMode;

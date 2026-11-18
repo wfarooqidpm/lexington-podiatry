@@ -619,7 +619,7 @@ function renderBookingCards() {
   byId('bookingAppointmentCard').hidden = !showAppointment;
   byId('bookingInfoCard').hidden = !showInfo;
   byId('bookingAppointmentTime').textContent = showAppointment ? state.selectedSlot.label : '';
-  byId('bookingAppointmentMeta').textContent = (returning ? 'Follow-up visit' : 'New patient') + ' · ' + (state.visitMode || '');
+  byId('bookingAppointmentMeta').textContent = (state.bookingPurpose === 'ORTHOTICS_PICKUP' ? 'Orthotics pickup' : returning ? 'Follow-up visit' : 'New patient') + ' · ' + (state.visitMode || '');
   byId('bookingAppointmentStatus').textContent = state.bookingCommitted ? '✓ Appointment booked' : 'Selected · not booked yet';
   byId('bookingEditAppointment').disabled = !!state.bookingCommitted;
   byId('bookingEditInfo').disabled = !!state.bookingCommitted;
@@ -1460,6 +1460,6 @@ async function routeReturningCard272(token) {
 }
 
 </script>
-<script src="booking-single-page.js?v=337"></script>
+<script src="booking-single-page.js?v=338"></script>
 </body>
 </html>
