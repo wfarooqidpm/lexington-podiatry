@@ -14,7 +14,6 @@ test('catalog links use the real booking controls, while email links keep their 
     const effects = [];
     vm.runInNewContext(handoff, {
       URLSearchParams,
-      window: {},
       location: { search },
       document: { querySelector: selector => selector },
       fd331El: id => id,
@@ -32,7 +31,6 @@ test('catalog links use the real booking controls, while email links keep their 
     assert.deepEqual(resolve(new URL(bookingUrl).search, true), []);
   }
   assert.deepEqual(resolve('?rwg_token=example'), ['initialized']);
-  assert.deepEqual(resolve('?mode=video'), ['initialized', '#newModeGrid [data-mode="Virtual"]']);
   assert.deepEqual(resolve('?visit=orthotics&mode=video'), ['initialized']);
   assert.deepEqual(resolve('?visit=returning&mode=invalid'), ['initialized', 'cardReturning']);
 });

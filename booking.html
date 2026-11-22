@@ -439,12 +439,6 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 @media(max-width:760px){.booking-services ul{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.booking-services{margin:0 12px 24px;padding:20px}}
 @media(max-width:460px){.booking-services ul{grid-template-columns:1fr}}
-.google-booking{margin:0 auto;padding:8px clamp(14px,4vw,32px) 28px;max-width:1080px}
-.google-booking iframe{display:block;width:100%;height:740px;border:1px solid var(--line);border-radius:14px;background:#fff}
-.google-booking p{margin:12px 0 0;color:var(--ink-soft);font-size:1rem}
-.google-booking p a{color:var(--brass-deep);text-decoration:underline;text-underline-offset:.18em}
-.google-booking p a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
-@media(max-width:640px){.google-booking iframe{height:860px}}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NH5ZV4VP2X"></script>
@@ -498,16 +492,6 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
   </div>
 </div></div></div>
 
-<template id="googleBookingTemplate">
-  <section class="google-booking" aria-label="In-office appointment availability">
-    <iframe title="Lexington Podiatry appointment times in Google Calendar"
-      src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2kYnTAGpRhI6tnzQ_1-0KF5c8RfVqi_ULJ0XKEneKvRMVDDPDmvRKncj1Jfprt6Lne1l695pQe?gv=true"
-      referrerpolicy="no-referrer"></iframe>
-    <p><a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2kYnTAGpRhI6tnzQ_1-0KF5c8RfVqi_ULJ0XKEneKvRMVDDPDmvRKncj1Jfprt6Lne1l695pQe" target="_blank" rel="noopener noreferrer">Open the calendar in a new tab</a></p>
-    <p>For video visits, <a href="/booking?mode=video">see video appointments</a>. Need help? <a href="tel:+12125108665">(212) 510-8665</a></p>
-  </section>
-</template>
-
 <div class="booking-main"><div class="wrap">
 <p class="booking-intro">Let’s get you scheduled.</p>
 <fieldset id="bookingInputs" class="booking-inputs">
@@ -525,8 +509,8 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 </nav>
 <div class="booking-choices" id="panel1">
  <div id="visitTypeQuestion"><h2 class="booking-label">Have you visited us before?</h2><div class="type-grid">
- <button type="button" class="type-card" id="cardNew" data-type="new" aria-pressed="false" onclick="fd331SelectType(this)"><svg class="choice-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="12" cy="10" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M3 28v-3a9 9 0 0 1 18 0v3M25 6v8m-4-4h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span class="tc-title">This is my first visit</span><span class="tc-time">I’m new to Lexington Podiatry</span><span id="newDurationLabel" hidden>30 min appointment</span></button>
- <button type="button" class="type-card" id="cardReturning" data-type="returning" aria-pressed="false" onclick="fd331SelectType(this)"><svg class="choice-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M7 9a11 11 0 1 1-1 13M7 3v7H1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 9v8l5 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span class="tc-title">I’m a returning patient</span><span class="tc-time">I’ve seen Dr. Farooqi before</span><span id="returningDurationLabel" hidden>15 min appointment</span></button>
+ <button type="button" class="type-card" id="cardNew" data-type="new" aria-pressed="false" onclick="fd331SelectType(this)"><svg class="choice-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="12" cy="10" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M3 28v-3a9 9 0 0 1 18 0v3M25 6v8m-4-4h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span class="tc-title">This is my first visit</span><span class="tc-time" id="newDurationLabel">30 min appointment</span></button>
+ <button type="button" class="type-card" id="cardReturning" data-type="returning" aria-pressed="false" onclick="fd331SelectType(this)"><svg class="choice-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M7 9a11 11 0 1 1-1 13M7 3v7H1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 9v8l5 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span class="tc-title">I’m a returning patient</span><span class="tc-time" id="returningDurationLabel">15 min appointment</span></button>
  </div></div>
  <div id="visitModeQuestion" hidden><h2 class="booking-label">How would you like to visit?</h2><div class="mode-grid" id="newModeGrid">
  <button type="button" class="mode-card" data-mode="In Person" aria-pressed="false" onclick="fd331SelectMode(this)"><svg class="choice-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="20" height="25" rx="2"/><path d="M12 29v-7h8v7M11 10h2m6 0h2m-10 6h2m6 0h2"/></svg>In person<small>353 Lexington Avenue</small></button>
@@ -1568,8 +1552,7 @@ async function routeReturningCard272(token) {
 }
 
 </script>
-<script src="/booking-calendar.js?v=1"></script>
-<script src="booking-single-page.js?v=340"></script>
+<script src="booking-single-page.js?v=339"></script>
 <script src="/booking-agent.js?v=1"></script>
 </body>
 </html>
