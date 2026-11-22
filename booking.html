@@ -439,6 +439,12 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 @media(max-width:760px){.booking-services ul{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.booking-services{margin:0 12px 24px;padding:20px}}
 @media(max-width:460px){.booking-services ul{grid-template-columns:1fr}}
+.google-booking{margin:0 auto;padding:8px clamp(14px,4vw,32px) 28px;max-width:1080px}
+.google-booking iframe{display:block;width:100%;height:740px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.google-booking p{margin:12px 0 0;color:var(--ink-soft);font-size:1rem}
+.google-booking p a{color:var(--brass-deep);text-decoration:underline;text-underline-offset:.18em}
+.google-booking p a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media(max-width:640px){.google-booking iframe{height:860px}}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NH5ZV4VP2X"></script>
@@ -491,6 +497,16 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
     <a class="sc-tel" href="tel:+12125108665">(212) 510-8665</a>
   </div>
 </div></div></div>
+
+<template id="googleBookingTemplate">
+  <section class="google-booking" aria-label="In-office appointment availability">
+    <iframe title="Lexington Podiatry appointment times in Google Calendar"
+      src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2kYnTAGpRhI6tnzQ_1-0KF5c8RfVqi_ULJ0XKEneKvRMVDDPDmvRKncj1Jfprt6Lne1l695pQe?gv=true"
+      referrerpolicy="no-referrer"></iframe>
+    <p><a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ2kYnTAGpRhI6tnzQ_1-0KF5c8RfVqi_ULJ0XKEneKvRMVDDPDmvRKncj1Jfprt6Lne1l695pQe" target="_blank" rel="noopener noreferrer">Open the calendar in a new tab</a></p>
+    <p>For video visits, <a href="/booking?mode=video">see video appointments</a>. Need help? <a href="tel:+12125108665">(212) 510-8665</a></p>
+  </section>
+</template>
 
 <div class="booking-main"><div class="wrap">
 <p class="booking-intro">Let’s get you scheduled.</p>
@@ -1552,7 +1568,8 @@ async function routeReturningCard272(token) {
 }
 
 </script>
-<script src="booking-single-page.js?v=339"></script>
+<script src="/booking-calendar.js?v=1"></script>
+<script src="booking-single-page.js?v=340"></script>
 <script src="/booking-agent.js?v=1"></script>
 </body>
 </html>
