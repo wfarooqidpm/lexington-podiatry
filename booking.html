@@ -11,6 +11,9 @@ if (/^#verify=VR-[a-f0-9]{32}\.[a-f0-9]{64}(?:\.(ip|vv))?$/.test(location.hash))
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Book an Appointment | Lexington Podiatry</title>
+<link rel="canonical" href="https://lexingtonpodiatry.nyc/booking">
+<link rel="alternate" type="application/json" title="Lexington Podiatry booking options" href="/booking-options.json">
+<link rel="service-desc" type="application/json" href="/booking-api.json">
 <meta name="description" content="Book an appointment with Dr. Wiqar Farooqi at Lexington Podiatry in Midtown Manhattan.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -468,7 +471,7 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 <p id="bookingMessage" role="status" aria-live="polite"></p><p id="bookingConnectionStatus" role="status" class="form-note" hidden>Connecting to secure scheduling…</p>
 <div id="panel5" hidden><div class="confirm-box"><div class="cb-icon">✓</div><h2>Appointment booked</h2><p class="cb-detail" id="bookingCompletionMessage">Your appointment is on the schedule.</p><div class="cb-slot" id="confirmedSlot"></div><p id="bookingCardRouteStatus" role="status"></p><a class="btn btn-ink" id="bookingCardRouteLink" hidden>View your booking card</a><button class="btn btn-ink" id="bookingCardRouteRetry" type="button" hidden>Check for my saved card</button></div></div>
 <div hidden><button id="btnStep3Next"></button><button id="btnReturnReview"></button><div id="patientSummaryCard"></div><div id="patientSummaryName"></div><div id="patientSummaryType"></div><div id="patientSummaryMode"></div><div id="returningModeGrid"></div><div id="returningSlotContainer"></div></div>
-<p class="booking-help">Need help? <a href="tel:+12125108665">(212) 510-8665</a> · 353 Lexington Ave, Rm 1502</p>
+<p class="booking-help"><a href="/appointments/">Explore visit types and services</a> · Need help? <a href="tel:+12125108665">(212) 510-8665</a> · 353 Lexington Ave, Rm 1502</p>
 </div></div></main>
 <aside class="practice-details" aria-label="Plan your visit">
   <section class="practice-detail" aria-labelledby="practiceHoursTitle">
@@ -1460,6 +1463,7 @@ async function routeReturningCard272(token) {
 }
 
 </script>
-<script src="booking-single-page.js?v=338"></script>
+<script src="booking-single-page.js?v=339"></script>
+<script src="/booking-agent.js?v=1"></script>
 </body>
 </html>

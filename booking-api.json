@@ -1,0 +1,210 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lexington Podiatry public booking discovery",
+    "version": "1.0.0",
+    "description": "Find practice services, first-visit availability, and booking links. The patient enters personal information and confirms the appointment on the practice website. Availability can change before confirmation."
+  },
+  "servers": [
+    {
+      "url": "https://lexingtonpodiatry.nyc"
+    }
+  ],
+  "paths": {
+    "/booking-options.json": {
+      "get": {
+        "operationId": "getBookingOptions",
+        "summary": "Read practice information, appointment types, services, and direct scheduling links",
+        "responses": {
+          "200": {
+            "description": "Booking catalog",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "practice",
+                    "bookingUrl",
+                    "visitOptions"
+                  ],
+                  "properties": {
+                    "practice": {
+                      "type": "object"
+                    },
+                    "bookingUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "bookingCompletion": {
+                      "type": "string"
+                    },
+                    "visitOptions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "patientType",
+                          "mode",
+                          "bookingUrl",
+                          "publicAvailability"
+                        ],
+                        "properties": {
+                          "patientType": {
+                            "type": "string",
+                            "enum": [
+                              "new",
+                              "returning"
+                            ]
+                          },
+                          "mode": {
+                            "type": "string",
+                            "enum": [
+                              "in-person",
+                              "video"
+                            ]
+                          },
+                          "bookingUrl": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "publicAvailability": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "services": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exec": {
+      "servers": [
+        {
+          "url": "https://script.google.com/macros/s/AKfycbxSHMxkLY-tjFPlm68FJVc7_yCVButR8TMQyuwyAWmZOVLwMyNOjXUkZ6gMw9HiOHpF",
+          "description": "Existing public first-visit availability gateway. Follow the HTTP redirect to the JSON response."
+        }
+      ],
+      "get": {
+        "operationId": "listNewPatientAppointmentTimes",
+        "summary": "Find open first-visit appointment times",
+        "description": "Availability is subject to change. Send the patient to the matching booking link from getBookingOptions to complete scheduling. A response with success=false means the lookup failed.",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "query",
+            "required": true,
+            "description": "Run the public availability lookup.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "slots"
+              ]
+            }
+          },
+          {
+            "name": "patientType",
+            "in": "query",
+            "required": true,
+            "description": "Public slot lookup applies to first visits. Follow-up times are available after email verification on the practice booking page.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "new"
+              ]
+            }
+          },
+          {
+            "name": "visitMode",
+            "in": "query",
+            "required": true,
+            "description": "Appointment location.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "In Person",
+                "Virtual"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Availability or a gateway-level error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "slots": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "iso",
+                          "visitMode",
+                          "durationMinutes"
+                        ],
+                        "properties": {
+                          "iso": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Start time as a UTC timestamp. Display in America/New_York."
+                          },
+                          "visitMode": {
+                            "type": "string",
+                            "enum": [
+                              "IN_PERSON",
+                              "VIRTUAL"
+                            ]
+                          },
+                          "durationMinutes": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "dateLabel": {
+                            "type": "string"
+                          },
+                          "timeLabel": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

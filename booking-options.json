@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0",
+  "practice": {
+    "name": "Lexington Podiatry",
+    "provider": "Wiqar Farooqi, DPM",
+    "specialty": "Podiatry",
+    "websiteUrl": "https://lexingtonpodiatry.nyc/",
+    "phone": "+12125108665",
+    "timeZone": "America/New_York",
+    "address": {
+      "street": "353 Lexington Avenue, Room 1502",
+      "city": "New York",
+      "region": "NY",
+      "postalCode": "10016",
+      "country": "US"
+    }
+  },
+  "appointmentsUrl": "https://lexingtonpodiatry.nyc/appointments/",
+  "bookingUrl": "https://lexingtonpodiatry.nyc/booking",
+  "openApiUrl": "https://lexingtonpodiatry.nyc/booking-api.json",
+  "bookingCompletion": "The patient completes and confirms the appointment on the practice booking page. Returning patients verify through their registered email before viewing times.",
+  "visitOptions": [
+    {
+      "patientType": "new",
+      "mode": "in-person",
+      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?visit=new&mode=in-person",
+      "publicAvailability": true
+    },
+    {
+      "patientType": "new",
+      "mode": "video",
+      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?visit=new&mode=video",
+      "publicAvailability": true
+    },
+    {
+      "patientType": "returning",
+      "mode": "in-person",
+      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?visit=returning&mode=in-person",
+      "publicAvailability": false
+    },
+    {
+      "patientType": "returning",
+      "mode": "video",
+      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?visit=returning&mode=video",
+      "publicAvailability": false
+    }
+  ],
+  "services": [
+    {
+      "name": "Bunions and hammertoes",
+      "url": "https://lexingtonpodiatry.nyc/bunions.html"
+    },
+    {
+      "name": "Heel pain and plantar fasciitis",
+      "url": "https://lexingtonpodiatry.nyc/heel-pain.html"
+    },
+    {
+      "name": "Ingrown and fungal toenails",
+      "url": "https://lexingtonpodiatry.nyc/nails.html"
+    },
+    {
+      "name": "Plantar warts",
+      "url": "https://lexingtonpodiatry.nyc/warts.html"
+    },
+    {
+      "name": "Foot and ankle sports injuries",
+      "url": "https://lexingtonpodiatry.nyc/sports-injuries.html"
+    },
+    {
+      "name": "Custom orthotics",
+      "url": "https://lexingtonpodiatry.nyc/orthotics.html"
+    },
+    {
+      "name": "Routine and diabetic foot care",
+      "url": "https://lexingtonpodiatry.nyc/routine-foot-care.html"
+    }
+  ]
+}
