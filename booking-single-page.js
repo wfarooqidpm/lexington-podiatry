@@ -145,8 +145,38 @@ function fd331Approval(){
 }
 // Bubble choices edit the existing draft; no writes, navigation, or new verification.
 function fd332Edit(section){
- if(state.bookingBusy||state.bookingCommitted||(fd331Pickup()&&section!=='time'))return;
+ if(state.bookingBusy||state.bookingCommitted||(fd331Pickup()&&section!=='time'&&section!=='confirm'))return;
+ if(section==='confirm'){
+  fd332.edit='';fd331Render();fd331El('btnSubmit').focus();return;
+ }
  fd332.edit=section;fd331Render();
+}
+function renderBookingProgress({type,mode,ready,showBooking,details,confirming,done}){
+ // First visits start with a time. Follow-up times require email verification.
+ var returning=type==='returning',pickup=fd331Pickup();
+ var time={section:'time',text:state.selectedSlot?.label||'Choose a time',disabled:returning&&!ready,controls:'panel3'};
+ var identity={section:'info',text:returning?(ready?'Identity confirmed':'Verify identity'):'Your details',disabled:pickup||(!returning&&!state.selectedSlot),controls:'identitySection'};
+ var confirm={section:'confirm',disabled:!ready||!state.selectedSlot,controls:'bookingFinish'};
+ var current=!showBooking?'':confirming?'confirm':details?'info':'time';
+ var first=returning?identity:time,second=returning?time:identity;
+
+ fd331El('bookingPath').hidden=!type||done;
+ fd331El('pathTrack').hidden=!mode;
+ fd331El('pathType').textContent=pickup?'Orthotics pickup':returning?'Returning patient':'First visit';
+ fd331El('pathMode').textContent=mode==='Virtual'?'Video visit':mode?'In person':'Choose visit mode';
+ fd331El('pathType').disabled=pickup;
+ fd331El('pathMode').disabled=pickup;
+ fd331El('pathFirstText').textContent=first.text;
+ fd331El('pathSecondText').textContent=second.text;
+
+ [['pathFirst',first],['pathSecond',second],['pathConfirm',confirm]].forEach(function([id,step]){
+  var button=fd331El(id);
+  button.dataset.section=step.section;
+  button.disabled=step.disabled;
+  button.setAttribute('aria-controls',step.controls);
+  button.setAttribute('aria-current',step.section===current?'step':'false');
+  button.classList.toggle('current',step.section===current);
+ });
 }
 function fd332Flow(){
  var done=state.currentStep===5,type=state.patientType,mode=state.visitMode;
@@ -155,7 +185,8 @@ function fd332Flow(){
  var askMode=!askType&&(!mode||fd332.edit==='mode');
  var showBooking=!askType&&!askMode&&!done;
  var details=type==='new'?!!state.selectedSlot&&fd332.edit!=='time':!ready||fd332.edit==='info';
- var showTimes=type==='new'?!state.selectedSlot||fd332.edit==='time':ready;
+ var showTimes=type==='new'?(!state.selectedSlot||fd332.edit==='time'):(ready&&fd332.edit!=='info');
+ var showConfirmation=showBooking&&ready&&!!state.selectedSlot&&fd332.edit!=='time';
  fd331El('visitTypeQuestion').hidden=!askType;
  fd331El('visitModeQuestion').hidden=!askMode;
  fd331El('bookingIdentityIntro').hidden=true;
@@ -164,17 +195,8 @@ function fd332Flow(){
  fd331El('bookingSlotModes').hidden=type!=='new';
  fd331El('bookingFollowUpLink').hidden=type!=='new';
  fd331El('bookingSlotTimeZone').textContent=type==='new'?'First-visit times · Eastern time':'All times are Eastern.';
- fd331El('bookingFinish').hidden=!showBooking||!ready||!state.selectedSlot||fd332.edit==='time';
- fd331El('bookingPath').hidden=!type||done;
- fd331El('pathTypeText').textContent=fd331Pickup()?'Orthotics pickup':type==='new'?'First visit':'Returning patient';
- fd331El('pathModeText').textContent=mode||(askType?'Visit mode':'Choose visit mode');
- fd331El('pathIdentityText').textContent=ready?(type==='returning'?'Identity confirmed':fd331El('npFirst').value.trim()+' '+fd331El('npLast').value.trim()):(type==='returning'?'Confirm identity':'Your details');
- fd331El('pathTimeText').textContent=state.selectedSlot?state.selectedSlot.label:'Choose a time';
- ['pathDown','pathBack','pathIdentity','pathTime'].forEach(function(id){fd331El(id).hidden=!mode;});
- ['pathType','pathMode'].forEach(function(id){fd331El(id).disabled=fd331Pickup();});
- fd331El('pathIdentity').disabled=fd331Pickup()||(type==='new'&&!state.selectedSlot);
- fd331El('pathTime').disabled=type==='new'?!mode:!ready;
- ['pathType','pathMode','pathIdentity','pathTime'].forEach(function(id){var current=id===(askType?'pathType':askMode?'pathMode':details?'pathIdentity':'pathTime');fd331El(id).classList.toggle('current',current);fd331El(id).setAttribute('aria-current',current?'step':'false');});
+ fd331El('bookingFinish').hidden=!showConfirmation;
+ renderBookingProgress({type,mode,ready,showBooking,details,confirming:showConfirmation&&fd332.edit!=='info',done});
  fd331El('bookingConnectionStatus').hidden=askType||askMode;
 }
 // Compatibility hooks used by the shared slot renderer and booking response handler.
