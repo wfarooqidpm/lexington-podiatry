@@ -52,22 +52,19 @@ footer{border-top:1px solid var(--line-soft);padding:18px 12px}footer:after{cont
 @media(max-width:640px){.booking-window{margin:16px 12px 18px;border-radius:20px}.booking-window .booking-hero{padding:24px 0}.booking-window .booking-hero>.wrap,.booking-window .booking-main>.wrap{padding-left:22px;padding-right:22px}.booking-window .booking-hero h1{font-size:29px}.booking-welcome{font-size:13px;max-width:25em;line-height:1.5}.booking-flourish{display:none}.booking-kicker{font-size:9px;letter-spacing:.16em;margin-bottom:10px}.booking-window .booking-main{padding:24px 0}.booking-window .booking-label,.booking-window .booking-section h2{font-size:25px}.booking-window .type-grid,.booking-window .mode-grid{grid-template-columns:1fr;gap:12px}.booking-window .type-card,.booking-window .mode-card{min-height:110px;padding:18px 58px 18px 62px}.choice-icon{position:absolute;left:20px;top:22px;width:25px;height:25px;margin:0}.booking-window .type-card .tc-title,.booking-window .mode-card{font-size:21px}.booking-window .type-card:after,.booking-window .mode-card:after{width:28px;height:28px;right:16px;bottom:20px;font-size:18px}.booking-window .booking-path{grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr)}.booking-window .path-bubble{font-size:11px}.booking-window .path-caption{font-size:10px}.practice-details{margin:0 12px 24px;grid-template-columns:1fr;gap:12px}.practice-detail:last-child{grid-column:auto}.practice-detail{padding:22px}.practice-hours{font-size:13px}#fd331Approval{margin:24px 22px!important}}
 @media(prefers-reduced-motion:reduce){.booking-window .type-card,.booking-window .mode-card,.booking-window .type-card:after,.booking-window .mode-card:after{transition:none}.booking-window .type-card:hover,.booking-window .mode-card:hover{transform:none}}
 
-/* The path uses available container width: straight on desktop, turns only when
-   the next pair cannot fit. Markup and keyboard order stay Visit → Location → You → Time. */
-.booking-window .booking-path{display:block;container-type:inline-size;container-name:booking-status}
-.booking-window .path-caption{display:block}
-.path-track{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr) 24px minmax(0,1fr) 24px minmax(0,1fr);gap:0;align-items:center}
-.path-track #pathType{grid-area:1/1}.path-track #pathAcross{grid-area:1/2}.path-track #pathMode{grid-area:1/3}.path-track #pathDown{grid-area:1/4}.path-track #pathIdentity{grid-area:1/5}.path-track #pathBack{grid-area:1/6}.path-track #pathTime{grid-area:1/7}
+.booking-window .booking-path{display:block}
+.booking-window .path-caption{display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;gap:4px 12px}
+.path-options{display:flex;flex-wrap:wrap;gap:0 12px}
+.path-options button{border:0;background:none;color:var(--ink);font:inherit;padding:4px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.path-options button:disabled{color:var(--ink-soft);cursor:default;text-decoration:none}
+.path-track{display:grid;grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr) 22px minmax(0,1fr);align-items:center}
 .path-track .path-arrow:before{content:'→'}.path-track .path-bubble{height:100%;min-width:0;overflow-wrap:anywhere}
-@container booking-status (max-width:660px){
- .path-track{grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);row-gap:5px}
- .path-track #pathDown{grid-area:2/3}.path-track #pathIdentity{grid-area:3/3}.path-track #pathBack{grid-area:3/2}.path-track #pathTime{grid-area:3/1}
- .path-track #pathDown:before{content:'↓'}.path-track #pathBack:before{content:'←'}
-}
-@container booking-status (max-width:280px){
- .path-track{grid-template-columns:minmax(0,1fr);row-gap:5px}
- .path-track #pathType{grid-area:1/1}.path-track #pathAcross{grid-area:2/1}.path-track #pathMode{grid-area:3/1}.path-track #pathDown{grid-area:4/1}.path-track #pathIdentity{grid-area:5/1}.path-track #pathBack{grid-area:6/1}.path-track #pathTime{grid-area:7/1}
- .path-track .path-arrow:before,.path-track #pathBack:before{content:'↓'}
+.booking-window .booking-section .slot-layout{grid-template-columns:minmax(245px,320px) minmax(0,1fr);gap:20px}
+.booking-window .booking-section .mini-cal{width:min(100%,320px)}
+@media(max-width:640px){
+ .path-track{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr) 14px minmax(0,1fr)}
+ .path-track .path-bubble{padding-inline:5px}
+ .booking-window .booking-section .slot-layout{grid-template-columns:minmax(0,1fr);gap:12px}
 }
 
 /* Give the email handoff a clear next step and room around secondary actions. */
