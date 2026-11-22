@@ -5,7 +5,10 @@ const elements={};const el=id=>elements[id]||(elements[id]={value:id==='npDob'?'
 let loads=[];const cards=[{getAttribute:()=> 'In Person',classList:{toggle(){}}},{getAttribute:()=> 'Virtual',classList:{toggle(){}}}];
 const c={state:{patientType:'new',visitMode:null,selectedSlot:null,bookingPayload:null},document:{getElementById:el,querySelectorAll:()=>cards},loadSlots:id=>loads.push({id,mode:c.state.visitMode}),bookingPhoneNumber_:()=>'+12125550100',setStep(){},renderBookingCards(){}};
 vm.createContext(c);vm.runInContext(fn('selectNewVisitMode')+'\n'+fn('buildWebsiteBookingPayload'),c);
-for(const script of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi))new vm.Script(script[1]);
+for (const [, attributes, source] of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+ if (/type=["']application\/ld\+json["']/i.test(attributes)) JSON.parse(source);
+ else new vm.Script(source);
+}
 (async()=>{
  const pending=[],renders=[];
  c.FRONT_DOOR_GATEWAY_URL='https://example.test';
