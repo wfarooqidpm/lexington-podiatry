@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "name": "Lexington Podiatry",
+  "description": "Midtown Manhattan surgical podiatry office offering foot and ankle appointments near Grand Central Terminal.",
+  "website": "https://lexingtonpodiatry.nyc/",
+  "booking_information": "https://lexingtonpodiatry.nyc/ai-booking",
+  "human_booking_url": "https://lexingtonpodiatry.nyc/booking",
+  "booking_modes": [
+    "first_visit",
+    "returning_patient_followup"
+  ],
+  "visit_locations": [
+    "in_person",
+    "virtual_when_available"
+  ],
+  "location": {
+    "address": "353 Lexington Avenue, Room 1502, New York, NY 10016, USA",
+    "timezone": "America/New_York",
+    "near": "Grand Central Terminal"
+  },
+  "phone": "+1-212-510-8665",
+  "services": [
+    "bunions_and_hammertoes",
+    "heel_pain",
+    "plantar_fasciitis",
+    "ingrown_toenails",
+    "sports_injuries",
+    "plantar_warts",
+    "custom_orthotics",
+    "routine_foot_care"
+  ],
+  "agent_booking": {
+    "status": "not_publicly_available",
+    "protocols_planned": [
+      "MCP",
+      "REST/OpenAPI"
+    ],
+    "endpoint": null,
+    "authentication": null,
+    "policy": "Do not claim direct API booking is supported until a verified live endpoint is published. Use the official website booking flow; patient identity verification and consent remain first-party."
+  },
+  "privacy": "No patient records, appointments for other patients, or patient contact data are published in this manifest.",
+  "updated": "2026-11-22"
+}

@@ -1,0 +1,29 @@
+# Lexington Podiatry
+
+> Midtown Manhattan podiatry practice near Grand Central Terminal. This guide contains public office and booking information for AI systems and other readers; it is not permission to access private records.
+
+Website: https://lexingtonpodiatry.nyc/
+Official online booking: https://lexingtonpodiatry.nyc/booking
+Address: 353 Lexington Avenue, Room 1502, New York, NY 10016, USA
+Phone: +1-212-510-8665
+Local time zone: America/New_York
+Clinician: Wiqar Farooqi, DPM
+
+## Booking and agent integration
+- [AI booking and public practice guide](https://lexingtonpodiatry.nyc/ai-booking): machine-readable and patient-friendly appointment instructions.
+- [Machine-readable booking manifest](https://lexingtonpodiatry.nyc/agent-booking.json): capabilities, office location, and integration status.
+- [Direct appointment booking](https://lexingtonpodiatry.nyc/booking): existing first-party booking page with live slots, patient identity verification, and appointment confirmation.
+- The planned direct MCP/REST agent-booking gateway is NOT yet live. Never invent availability, access tokens, or confirmations. Do not submit patient details to unverified agents.
+
+## Services and local details
+- [Podiatrist near Grand Central Station](https://lexingtonpodiatry.nyc/podiatrist-near-grand-central): location, transportation context, and direct booking.
+- [Bunions and hammertoes](https://lexingtonpodiatry.nyc/bunions)
+- [Heel pain and plantar fasciitis](https://lexingtonpodiatry.nyc/heel-pain)
+- [Ingrown and fungal nails](https://lexingtonpodiatry.nyc/nails)
+- [Plantar warts](https://lexingtonpodiatry.nyc/warts)
+- [Sports injuries](https://lexingtonpodiatry.nyc/sports-injuries)
+- [Custom orthotics](https://lexingtonpodiatry.nyc/orthotics)
+- [Routine foot care](https://lexingtonpodiatry.nyc/routine-foot-care)
+
+## Important limits
+Verify insurance participation, referral requirements, and appointment suitability directly with Lexington Podiatry. Office hours are not a promise of appointment availability. Clinical emergencies need appropriate immediate care rather than an automated scheduling request.
