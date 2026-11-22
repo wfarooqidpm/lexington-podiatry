@@ -30,6 +30,7 @@ test('catalog links use the real booking controls, while email links keep their 
     assert.deepEqual(resolve(new URL(bookingUrl).search), ['initialized', type, `#newModeGrid [data-mode="${value}"]`]);
     assert.deepEqual(resolve(new URL(bookingUrl).search, true), []);
   }
+  assert.deepEqual(resolve('?rwg_token=example'), ['initialized']);
   assert.deepEqual(resolve('?visit=orthotics&mode=video'), ['initialized']);
   assert.deepEqual(resolve('?visit=returning&mode=invalid'), ['initialized', 'cardReturning']);
 });
@@ -72,4 +73,18 @@ test('browser agent tools request only public first-visit slots and return appro
   context.document.getElementById = () => ({});
   vm.runInNewContext(read('booking-agent.js'), context);
   assert.equal(registered.size, 0);
+});
+
+test('booking holds the service directory and old appointment links lead there', () => {
+  const booking = read('booking.html');
+  const directory = booking.match(/<section class="booking-services"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+  assert.ok(directory, 'The service links belong on the booking page');
+  for (const service of catalog.services) {
+    assert.ok(directory.includes(`href="${new URL(service.url).pathname}"`));
+  }
+  const oldRoute = read('appointments/index.html');
+  assert.ok(oldRoute.includes('<meta http-equiv="refresh" content="0;url=/booking">'));
+  assert.ok(oldRoute.includes(`<link rel="canonical" href="${catalog.bookingUrl}">`));
+  assert.ok(!read('sitemap.xml').includes('/appointments/'));
+  assert.equal(catalog.appointmentsUrl, catalog.bookingUrl);
 });

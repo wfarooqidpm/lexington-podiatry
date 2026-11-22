@@ -14,6 +14,73 @@ if (/^#verify=VR-[a-f0-9]{32}\.[a-f0-9]{64}(?:\.(ip|vv))?$/.test(location.hash))
 <link rel="canonical" href="https://lexingtonpodiatry.nyc/booking">
 <link rel="alternate" type="application/json" title="Lexington Podiatry booking options" href="/booking-options.json">
 <link rel="service-desc" type="application/json" href="/booking-api.json">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://lexingtonpodiatry.nyc/booking#page",
+  "url": "https://lexingtonpodiatry.nyc/booking",
+  "name": "Book a podiatry appointment with Dr. Wiqar Farooqi",
+  "about": {
+    "@id": "https://lexingtonpodiatry.nyc/#practice"
+  },
+  "potentialAction": {
+    "@type": "ReserveAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://lexingtonpodiatry.nyc/booking"
+    }
+  },
+  "mentions": {
+    "@type": "ItemList",
+    "name": "Foot and ankle services",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Bunions and hammertoes",
+        "url": "https://lexingtonpodiatry.nyc/bunions.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Heel pain and plantar fasciitis",
+        "url": "https://lexingtonpodiatry.nyc/heel-pain.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Ingrown and fungal toenails",
+        "url": "https://lexingtonpodiatry.nyc/nails.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Plantar warts",
+        "url": "https://lexingtonpodiatry.nyc/warts.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": "Foot and ankle sports injuries",
+        "url": "https://lexingtonpodiatry.nyc/sports-injuries.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "name": "Custom orthotics",
+        "url": "https://lexingtonpodiatry.nyc/orthotics.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 7,
+        "name": "Routine and diabetic foot care",
+        "url": "https://lexingtonpodiatry.nyc/routine-foot-care.html"
+      }
+    ]
+  }
+}
+</script>
 <meta name="description" content="Book an appointment with Dr. Wiqar Farooqi at Lexington Podiatry in Midtown Manhattan.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -363,6 +430,15 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 @media(max-width:900px){.practice-details{max-width:800px;grid-template-columns:1fr 1fr}.practice-detail:last-child{grid-column:1/-1}}
 @media(max-width:580px){.practice-details{grid-template-columns:1fr;padding:0 10px;gap:12px;margin-bottom:24px}.practice-detail{padding:20px}.practice-detail:last-child{grid-column:auto}.practice-hours{font-size:14px}.practice-detail h2{font-size:22px}}
 
+.booking-services{max-width:1060px;margin:0 auto 34px;padding:24px;border:1px solid var(--line);border-radius:18px;background:var(--ivory);color:var(--ink)}
+.booking-services h2{margin:0 0 10px;font-family:Fraunces,Georgia,serif;font-size:24px;font-weight:400}
+.booking-services ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 20px;list-style:none;margin:0;padding:0}
+.booking-services a{display:inline-block;padding:5px 0;color:var(--brass-deep);font-size:1rem;text-decoration:underline;text-underline-offset:.2em}
+.booking-services a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+@media(max-width:1120px){.booking-services{margin-inline:24px}}
+@media(max-width:760px){.booking-services ul{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.booking-services{margin:0 12px 24px;padding:20px}}
+@media(max-width:460px){.booking-services ul{grid-template-columns:1fr}}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NH5ZV4VP2X"></script>
@@ -471,7 +547,7 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 <p id="bookingMessage" role="status" aria-live="polite"></p><p id="bookingConnectionStatus" role="status" class="form-note" hidden>Connecting to secure scheduling…</p>
 <div id="panel5" hidden><div class="confirm-box"><div class="cb-icon">✓</div><h2>Appointment booked</h2><p class="cb-detail" id="bookingCompletionMessage">Your appointment is on the schedule.</p><div class="cb-slot" id="confirmedSlot"></div><p id="bookingCardRouteStatus" role="status"></p><a class="btn btn-ink" id="bookingCardRouteLink" hidden>View your booking card</a><button class="btn btn-ink" id="bookingCardRouteRetry" type="button" hidden>Check for my saved card</button></div></div>
 <div hidden><button id="btnStep3Next"></button><button id="btnReturnReview"></button><div id="patientSummaryCard"></div><div id="patientSummaryName"></div><div id="patientSummaryType"></div><div id="patientSummaryMode"></div><div id="returningModeGrid"></div><div id="returningSlotContainer"></div></div>
-<p class="booking-help"><a href="/appointments/">Explore visit types and services</a> · Need help? <a href="tel:+12125108665">(212) 510-8665</a> · 353 Lexington Ave, Rm 1502</p>
+<p class="booking-help">Need help? <a href="tel:+12125108665">(212) 510-8665</a> · 353 Lexington Ave, Rm 1502</p>
 </div></div></main>
 <aside class="practice-details" aria-label="Plan your visit">
   <section class="practice-detail" aria-labelledby="practiceHoursTitle">
@@ -495,6 +571,19 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
     <div class="practice-contact"><a href="https://www.google.com/maps/search/?api=1&amp;query=Lexington+Podiatry+353+Lexington+Ave+New+York+NY+10016" target="_blank" rel="noopener">Get directions ↗</a><a href="tel:+12125108665">(212) 510-8665</a></div>
   </section>
 </aside>
+
+<section class="booking-services" id="services" aria-labelledby="booking-services-heading">
+  <h2 id="booking-services-heading">Foot and ankle services</h2>
+  <ul>
+    <li><a href="/bunions.html">Bunions and hammertoes</a></li>
+    <li><a href="/heel-pain.html">Heel pain and plantar fasciitis</a></li>
+    <li><a href="/nails.html">Ingrown and fungal toenails</a></li>
+    <li><a href="/warts.html">Plantar warts</a></li>
+    <li><a href="/sports-injuries.html">Foot and ankle sports injuries</a></li>
+    <li><a href="/orthotics.html">Custom orthotics</a></li>
+    <li><a href="/routine-foot-care.html">Routine and diabetic foot care</a></li>
+  </ul>
+</section>
 
 <footer>
   <div class="wrap mobile-office-hours">

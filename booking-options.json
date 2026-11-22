@@ -15,7 +15,7 @@
       "country": "US"
     }
   },
-  "appointmentsUrl": "https://lexingtonpodiatry.nyc/appointments/",
+  "appointmentsUrl": "https://lexingtonpodiatry.nyc/booking",
   "bookingUrl": "https://lexingtonpodiatry.nyc/booking",
   "openApiUrl": "https://lexingtonpodiatry.nyc/booking-api.json",
   "bookingCompletion": "The patient completes and confirms the appointment on the practice booking page. Returning patients verify through their registered email before viewing times.",
