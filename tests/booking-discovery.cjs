@@ -30,7 +30,9 @@ test('catalog links use the real booking controls, while email links keep their 
     assert.deepEqual(resolve(new URL(bookingUrl).search), ['initialized', type, `#newModeGrid [data-mode="${value}"]`]);
     assert.deepEqual(resolve(new URL(bookingUrl).search, true), []);
   }
-  assert.deepEqual(resolve('?rwg_token=example'), ['initialized']);
+  const firstVisitDefault = ['initialized', 'cardNew', '#newModeGrid [data-mode="In Person"]'];
+  assert.deepEqual(resolve(''), firstVisitDefault);
+  assert.deepEqual(resolve('?rwg_token=example'), firstVisitDefault);
   assert.deepEqual(resolve('?visit=orthotics&mode=video'), ['initialized']);
   assert.deepEqual(resolve('?visit=returning&mode=invalid'), ['initialized', 'cardReturning']);
 });

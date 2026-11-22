@@ -276,7 +276,14 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 @media(max-width:480px) { .reason-grid { grid-template-columns: 1fr; } }
 
 /* SLOT HYBRID: CALENDAR + COLLAPSIBLE */
-.slot-layout { display: grid; grid-template-columns: 1fr 200px; gap: 24px; align-items: start; }
+.slot-layout { display: grid; grid-template-columns: 200px minmax(0,1fr); gap: 24px; align-items: start; }
+.booking-slot-heading{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;}
+.booking-slot-modes{display:flex;gap:3px;padding:3px;border:1px solid var(--line);border-radius:9px;}
+.booking-slot-modes button{min-height:36px;padding:5px 10px;font:600 14px var(--sans);color:#284b3d;border:0;border-radius:6px;background:transparent;cursor:pointer;}
+.booking-slot-modes button[aria-pressed="true"]{background:#284b3d;color:#fff;}
+.booking-slot-subhead{display:flex;align-items:baseline;gap:4px 16px;flex-wrap:wrap;}
+.booking-slot-subhead a{font-size:14px;color:#284b3d;text-underline-offset:3px;}
+.booking-slot-notice:not(:empty){margin:8px 0;}
 .slot-days { }
 .day-group { border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
 .day-header {
@@ -293,6 +300,7 @@ input.invalid,select.invalid,textarea.invalid{border-color:#C04040;}
 .mini-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); background: var(--ivory); }
 .mini-cal-dow { text-align: center; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); padding: 8px 0 4px; }
 .mini-cal-day { text-align: center; font-size: 13px; padding: 6px 2px; cursor: default; border-radius: 6px; margin: 2px; }
+button.mini-cal-day { border:0; font-family:inherit; }
 .mini-cal-day.available { cursor: pointer; font-weight: 600; color: var(--brass); background: var(--stone); }
 .mini-cal-day.available:hover { background: var(--champagne-soft); }
 .mini-cal-day.selected-day { background: var(--brass); color: var(--ivory) !important; }
@@ -540,7 +548,21 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
  <div hidden><div id="returningEmailCodeFields"><input id="rpVerifyEmail"></div><div id="returningLegacyPhoneField"><input id="rpLast4"></div><div id="returningCodeField"><input id="rpCode"></div><button id="btnConfirmCode"></button></div>
  </div>
 </section>
-<section class="booking-section" id="panel3" hidden><h2>Choose your appointment time</h2><p class="form-note">All times are Eastern.</p><div id="slotContainer"><p class="no-slots">Choose your visit type and mode to see available times.</p></div></section>
+<section class="booking-section" id="panel3" hidden>
+ <div class="booking-slot-heading">
+  <h2>Choose a date and time</h2>
+  <div class="booking-slot-modes" id="bookingSlotModes" role="group" aria-label="Visit mode" hidden>
+   <button type="button" data-mode="In Person" aria-pressed="false" onclick="fd331SelectMode(this)">In person</button>
+   <button type="button" data-mode="Virtual" aria-pressed="false" onclick="fd331SelectMode(this)">Video visit</button>
+  </div>
+ </div>
+ <div class="booking-slot-subhead">
+  <p class="form-note" id="bookingSlotTimeZone">All times are Eastern.</p>
+  <a id="bookingFollowUpLink" href="/booking?visit=returning" hidden>Book a follow-up</a>
+ </div>
+ <p class="form-note booking-slot-notice" id="bookingSlotNotice" role="status"></p>
+ <div id="slotContainer"><p class="no-slots">Choose your visit type and mode to see available times.</p></div>
+</section>
 </div>
 </fieldset>
 <div class="booking-finish" id="bookingFinish" hidden><div><p id="bookingSelection" aria-live="polite">Choose your visit details above.</p><p class="form-note">After booking, complete your registration and consent.</p></div><button type="button" class="btn btn-ink" id="btnSubmit" onclick="fd331Submit()" disabled>Book appointment</button></div>
@@ -1068,11 +1090,23 @@ var slotGroupsByDate = {};
 var slotDateOrder = [];
 var activeSlotDateIndex = 0;
 var activeSlotContainerId = 'slotContainer';
+var linkedBookingSlot = null;
 
 function renderSlots(slots, containerId) {
   var container = document.getElementById(containerId || 'slotContainer');
   allSlots = slots || [];
   activeSlotContainerId = containerId || 'slotContainer';
+  var linkedSlot = null;
+  if (linkedBookingSlot !== null) {
+    var expectedMode = state.visitMode === 'Virtual' ? 'VIRTUAL' : 'IN_PERSON';
+    if (state.patientType === 'new' && linkedBookingSlot > Date.now()) {
+      linkedSlot = allSlots.find(function(slot) {
+        return slot.visitMode === expectedMode && Date.parse(slot.iso) === linkedBookingSlot;
+      });
+    }
+    linkedBookingSlot = null;
+    document.getElementById('bookingSlotNotice').textContent = linkedSlot ? '' : 'That time is no longer available. Please choose another time.';
+  }
 
   if (!allSlots.length) {
     container.innerHTML = '<p class="no-slots">No online appointments are currently available. Please call us at <a href="tel:+12125108665">(212) 510-8665</a>.</p>';
@@ -1091,8 +1125,13 @@ function renderSlots(slots, containerId) {
     slotGroupsByDate[s.dateLabel].push(s);
   });
 
-  container.innerHTML = '<div class="slot-layout"><div class="slot-days" id="activeSlotDay">' +
-    renderActiveSlotDay_() + '</div>' + buildMiniCal(slotDateOrder) + '</div>';
+  if (linkedSlot) {
+    activeSlotDateIndex = slotDateOrder.indexOf(linkedSlot.dateLabel);
+    state.selectedSlot = { iso: linkedSlot.iso, label: linkedSlot.dateLabel + ' at ' + linkedSlot.timeLabel };
+  }
+  container.innerHTML = '<div class="slot-layout">' + buildMiniCal(slotDateOrder) +
+    '<div class="slot-days" id="activeSlotDay">' + renderActiveSlotDay_() + '</div></div>';
+  if (linkedSlot) renderBookingCards();
 }
 
 function renderActiveSlotDay_() {
@@ -1100,7 +1139,8 @@ function renderActiveSlotDay_() {
   var slots = slotGroupsByDate[date] || [];
   var html = '<div class="day-group"><div class="day-header"><span>' + date + '</span></div><div class="day-slots">';
   slots.forEach(function(s) {
-    html += '<button class="slot-btn" data-iso="' + s.iso + '" data-label="' + s.dateLabel + ' at ' + s.timeLabel + '" onclick="selectSlot(this)">' + s.timeLabel + '</button>';
+    var selected = state.selectedSlot && state.selectedSlot.iso === s.iso;
+    html += '<button type="button" class="slot-btn' + (selected ? ' selected' : '') + '" aria-pressed="' + Boolean(selected) + '" data-iso="' + s.iso + '" data-label="' + s.dateLabel + ' at ' + s.timeLabel + '" onclick="selectSlot(this)">' + s.timeLabel + '</button>';
   });
   return html + '</div></div>';
 }
@@ -1118,7 +1158,9 @@ function jumpToDay(id) {
   var dayEl = document.querySelector('#' + activeSlotContainerId + ' #activeSlotDay');
   if (dayEl) dayEl.innerHTML = renderActiveSlotDay_();
   document.querySelectorAll('#' + activeSlotContainerId + ' .mini-cal-day').forEach(function(el) {
-    el.classList.toggle('selected-day', el.getAttribute('data-dayid') === id);
+    var selected = el.getAttribute('data-dayid') === id;
+    el.classList.toggle('selected-day', selected);
+    if (el.hasAttribute('aria-pressed')) el.setAttribute('aria-pressed', String(selected));
   });
 }
 
@@ -1126,14 +1168,22 @@ function jumpToDay(id) {
 var calViewYear = null;
 var calViewMonth = null;
 var calAvailableLabels = [];
+var calDateFormat = new Intl.DateTimeFormat('en-US', {timeZone:'America/New_York', year:'numeric', month:'numeric', day:'numeric'});
+
+function calendarDate(value) {
+  var date = {};
+  calDateFormat.formatToParts(value).forEach(function(part) { date[part.type] = Number(part.value); });
+  return date;
+}
 
 function buildMiniCal(availableDateLabels) {
   calAvailableLabels = availableDateLabels;
-  var now = new Date();
+  var now = calendarDate(Date.now());
   if (calViewYear === null) {
-    var firstIso = allSlots[0] && String(allSlots[0].iso || '').match(/^(\d{4})-(\d{2})-/);
-    calViewYear = firstIso ? parseInt(firstIso[1], 10) : now.getFullYear();
-    calViewMonth = firstIso ? parseInt(firstIso[2], 10) - 1 : now.getMonth();
+    var firstSlot = slotGroupsByDate[slotDateOrder[activeSlotDateIndex]][0];
+    var firstDate = calendarDate(Date.parse(firstSlot.iso));
+    calViewYear = firstDate.year;
+    calViewMonth = firstDate.month - 1;
   }
   return renderMiniCal(now);
 }
@@ -1143,7 +1193,7 @@ function navCal(dir) {
   if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
   if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
   var calEl = document.querySelector('.mini-cal');
-  if (calEl) calEl.outerHTML = renderMiniCal(new Date());
+  if (calEl) calEl.outerHTML = renderMiniCal(calendarDate(Date.now()));
 }
 
 function renderMiniCal(now) {
@@ -1154,9 +1204,9 @@ function renderMiniCal(now) {
   var availMap = {};
   calAvailableLabels.forEach(function(label, idx) {
     var firstSlot = (slotGroupsByDate[label] || [])[0];
-    var isoDate = firstSlot && String(firstSlot.iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (isoDate && parseInt(isoDate[1], 10) === year && parseInt(isoDate[2], 10) === month + 1) {
-      availMap[parseInt(isoDate[3], 10)] = 'day-' + idx;
+    var date = calendarDate(Date.parse(firstSlot.iso));
+    if (date.year === year && date.month === month + 1) {
+      availMap[date.day] = 'day-' + idx;
     }
   });
 
@@ -1166,7 +1216,7 @@ function renderMiniCal(now) {
   var firstDow = new Date(year, month, 1).getDay();
 
   // Disable prev button if we're already at current month
-  var isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
+  var isCurrentMonth = (year === now.year && month === now.month - 1);
 
   var html = '<div class="mini-cal">';
   html += '<div class="mini-cal-header">';
@@ -1182,29 +1232,35 @@ function renderMiniCal(now) {
     html += '<div class="mini-cal-day empty"></div>';
   }
   for (var d = 1; d <= daysInMonth; d++) {
-    var isToday = (d === now.getDate() && isCurrentMonth);
-    var isPast = isCurrentMonth && (d < now.getDate());
+    var isToday = (d === now.day && isCurrentMonth);
+    var isPast = isCurrentMonth && (d < now.day);
     var dayId = availMap[d];
     var cls = 'mini-cal-day';
-    var onclick = '';
+    if (isToday) cls += ' today';
     if (dayId) {
       cls += ' available';
-      if (dayId === 'day-' + activeSlotDateIndex) cls += ' selected-day';
-      onclick = ' onclick="jumpToDay(\'' + dayId + '\')"';
+      var selected = dayId === 'day-' + activeSlotDateIndex;
+      if (selected) cls += ' selected-day';
+      html += '<button type="button" class="' + cls + '" aria-label="' + monthName + ' ' + d + '" aria-pressed="' + selected + '" data-dayid="' + dayId + '" onclick="jumpToDay(\'' + dayId + '\')">' + d + '</button>';
+    } else {
+      if (isPast) cls += ' past';
+      html += '<div class="' + cls + '">' + d + '</div>';
     }
-    else if (isPast) { cls += ' past'; }
-    if (isToday) { cls += ' today'; }
-    html += '<div class="' + cls + '" data-dayid="' + (dayId || '') + '"' + onclick + '>' + d + '</div>';
   }
   html += '</div></div>';
   return html;
 }
 
 function selectSlot(btn) {
-  document.querySelectorAll('.slot-btn').forEach(function(b) { b.classList.remove('selected'); });
-  btn.classList.add('selected');
+  document.querySelectorAll('.slot-btn').forEach(function(b) {
+    b.classList.toggle('selected', b === btn);
+    b.setAttribute('aria-pressed', String(b === btn));
+  });
   state.selectedSlot = { iso: btn.dataset.iso, label: btn.dataset.label };
+  fd332.edit = '';
+  document.getElementById('bookingSlotNotice').textContent = '';
   renderBookingCards();
+  if (state.patientType === 'new') document.getElementById('npFirst').focus();
   state.bookingPayload = null;
   document.getElementById('btnStep3Next').disabled = false;
   document.getElementById('btnReturnReview').disabled = false;
@@ -1552,7 +1608,7 @@ async function routeReturningCard272(token) {
 }
 
 </script>
-<script src="booking-single-page.js?v=339"></script>
+<script src="booking-single-page.js?v=340"></script>
 <script src="/booking-agent.js?v=1"></script>
 </body>
 </html>

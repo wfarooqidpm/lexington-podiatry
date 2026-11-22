@@ -27,7 +27,7 @@ function fd331Render(){
  fd331El('cardNew').setAttribute('aria-pressed',String(state.patientType==='new'));
  fd331El('cardReturning').setAttribute('aria-pressed',String(returning));
  fd331El('cardNew').classList.toggle('selected',state.patientType==='new');fd331El('cardReturning').classList.toggle('selected',returning);
- document.querySelectorAll('#newModeGrid .mode-card').forEach(function(b){var selected=b.getAttribute('data-mode')===state.visitMode;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});
+ document.querySelectorAll('#newModeGrid .mode-card, #bookingSlotModes button').forEach(function(b){var selected=b.getAttribute('data-mode')===state.visitMode;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});
  var ready=!!state.selectedSlot&&!!state.visitMode&&(returning?verified:state.patientType==='new'&&fd331ValidNew());
  fd331El('btnSubmit').disabled=state.bookingBusy||(!state.bookingCommitted&&!ready);
  fd331El('bookingSelection').textContent=state.patientType?((fd331Pickup()?'Orthotics pickup':returning?'Follow-up':'First visit')+' · '+(state.visitMode||'Choose visit mode')+(state.selectedSlot?' · '+state.selectedSlot.label:'')):'Choose your visit details above.';
@@ -43,13 +43,14 @@ function fd331Slots(){
 }
 function fd331SelectType(button){
  if(state.bookingBusy||state.bookingCommitted||fd331Pickup())return;
- var type=button.getAttribute('data-type');if(type!==state.patientType){fd331CancelVerification();state.selectedSlot=null;state.bookingPayload=null;}
+ var type=button.getAttribute('data-type');if(type!==state.patientType){fd331CancelVerification();linkedBookingSlot=null;state.selectedSlot=null;state.bookingPayload=null;fd331El('bookingSlotNotice').textContent='';}
  state.patientType=type;fd332.edit=state.visitMode?'':'mode';fd331Slots();
 }
 function fd331SelectMode(button){
  if(state.bookingBusy||state.bookingCommitted||fd331Pickup())return;
  fd332.edit='';var mode=button.getAttribute('data-mode');
  if(state.visitMode===mode){fd331Render();return;}
+ if(state.visitMode){linkedBookingSlot=null;fd331El('bookingSlotNotice').textContent='';}
  state.visitMode=mode;state.selectedSlot=null;state.bookingPayload=null;fd331Slots();
 }
 function fd331VerificationExpired(message){fd331CancelVerification();fd331El('verifyResult').textContent=message||'Your confirmation expired. Please request a new email.';fd331Slots();}
@@ -152,22 +153,28 @@ function fd332Flow(){
  var ready=!!type&&!!mode&&(type==='returning'?fd331Verified():fd331ValidNew());
  var askType=!type||fd332.edit==='type';
  var askMode=!askType&&(!mode||fd332.edit==='mode');
- var details=!askType&&!askMode&&(!ready||fd332.edit==='info'||(type==='new'&&!state.selectedSlot&&fd332.edit!=='time'));
+ var showBooking=!askType&&!askMode&&!done;
+ var details=type==='new'?!!state.selectedSlot&&fd332.edit!=='time':!ready||fd332.edit==='info';
+ var showTimes=type==='new'?!state.selectedSlot||fd332.edit==='time':ready;
  fd331El('visitTypeQuestion').hidden=!askType;
  fd331El('visitModeQuestion').hidden=!askMode;
  fd331El('bookingIdentityIntro').hidden=true;
- fd331El('identitySection').hidden=!details||done;
- fd331El('panel3').hidden=!ready||askType||askMode||done;
- fd331El('bookingFinish').hidden=done||!ready||!state.selectedSlot||askType||askMode;
+ fd331El('identitySection').hidden=!showBooking||!details;
+ fd331El('panel3').hidden=!showBooking||!showTimes;
+ fd331El('bookingSlotModes').hidden=type!=='new';
+ fd331El('bookingFollowUpLink').hidden=type!=='new';
+ fd331El('bookingSlotTimeZone').textContent=type==='new'?'First-visit times · Eastern time':'All times are Eastern.';
+ fd331El('bookingFinish').hidden=!showBooking||!ready||!state.selectedSlot||fd332.edit==='time';
  fd331El('bookingPath').hidden=!type||done;
  fd331El('pathTypeText').textContent=fd331Pickup()?'Orthotics pickup':type==='new'?'First visit':'Returning patient';
  fd331El('pathModeText').textContent=mode||(askType?'Visit mode':'Choose visit mode');
  fd331El('pathIdentityText').textContent=ready?(type==='returning'?'Identity confirmed':fd331El('npFirst').value.trim()+' '+fd331El('npLast').value.trim()):(type==='returning'?'Confirm identity':'Your details');
  fd331El('pathTimeText').textContent=state.selectedSlot?state.selectedSlot.label:'Choose a time';
  ['pathDown','pathBack','pathIdentity','pathTime'].forEach(function(id){fd331El(id).hidden=!mode;});
- ['pathType','pathMode','pathIdentity'].forEach(function(id){fd331El(id).disabled=fd331Pickup();});
- fd331El('pathTime').disabled=!ready;
- ['pathType','pathMode','pathIdentity','pathTime'].forEach(function(id){var current=id===(askType?'pathType':askMode?'pathMode':!ready||fd332.edit==='info'?'pathIdentity':'pathTime');fd331El(id).classList.toggle('current',current);fd331El(id).setAttribute('aria-current',current?'step':'false');});
+ ['pathType','pathMode'].forEach(function(id){fd331El(id).disabled=fd331Pickup();});
+ fd331El('pathIdentity').disabled=fd331Pickup()||(type==='new'&&!state.selectedSlot);
+ fd331El('pathTime').disabled=type==='new'?!mode:!ready;
+ ['pathType','pathMode','pathIdentity','pathTime'].forEach(function(id){var current=id===(askType?'pathType':askMode?'pathMode':details?'pathIdentity':'pathTime');fd331El(id).classList.toggle('current',current);fd331El(id).setAttribute('aria-current',current?'step':'false');});
  fd331El('bookingConnectionStatus').hidden=askType||askMode;
 }
 // Compatibility hooks used by the shared slot renderer and booking response handler.
@@ -180,16 +187,18 @@ function fd331Initialize(){
 // Shared booking links preselect public choices using the same controls as a patient.
 function applyBookingLinkPreferences(search){
  const params=new URLSearchParams(search);
- const visit=params.get('visit');
+ const visit=params.get('visit')??'new';
  if(visit!=='new'&&visit!=='returning')return;
  fd331SelectType(fd331El(visit==='new'?'cardNew':'cardReturning'));
- const mode=params.get('mode');
+ const mode=params.get('mode')??(visit==='new'?'in-person':null);
  if(mode!=='in-person'&&mode!=='video')return;
+ const slot=params.get('slot');
+ if(visit==='new' && slot && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(slot)) linkedBookingSlot=Date.parse(slot)||null;
  const option=document.querySelector(mode==='in-person'?'#newModeGrid [data-mode="In Person"]':'#newModeGrid [data-mode="Virtual"]');
  if(option)fd331SelectMode(option);
 }
 
 if(!fd331Approval()){
  fd331Initialize();
- if(location.search)applyBookingLinkPreferences(location.search);
+ applyBookingLinkPreferences(location.search||'');
 }
