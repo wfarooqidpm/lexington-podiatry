@@ -177,4 +177,19 @@ function fd331Initialize(){
  initialiseInternationalPhone_();loadBookingConfig();fd331Render();
 }
 
-if(!fd331Approval())fd331Initialize();
+// Shared booking links preselect public choices using the same controls as a patient.
+function applyBookingLinkPreferences(search){
+ const params=new URLSearchParams(search);
+ const visit=params.get('visit');
+ if(visit!=='new'&&visit!=='returning')return;
+ fd331SelectType(fd331El(visit==='new'?'cardNew':'cardReturning'));
+ const mode=params.get('mode');
+ if(mode!=='in-person'&&mode!=='video')return;
+ const option=document.querySelector(mode==='in-person'?'#newModeGrid [data-mode="In Person"]':'#newModeGrid [data-mode="Virtual"]');
+ if(option)fd331SelectMode(option);
+}
+
+if(!fd331Approval()){
+ fd331Initialize();
+ if(location.search)applyBookingLinkPreferences(location.search);
+}
