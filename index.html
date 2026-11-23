@@ -135,26 +135,7 @@ nav.links .btn-ink:hover{color:var(--ivory);}
 .hero .lede{
   font-size:19px;color:var(--ink-soft);max-width:32em;margin-bottom:38px;
 }
-.home-booking{
-  background:#FFFDFA;border:1px solid var(--line);border-radius:16px;
-  margin-bottom:28px;padding:16px 18px;max-width:500px;
-}
-.home-booking-header,.home-booking-links{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;}
-.home-booking-header{justify-content:space-between;}
-.home-booking h2{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.2;}
-.home-booking-modes{display:flex;gap:3px;padding:3px;border:1px solid var(--line);border-radius:9px;}
-.home-booking-modes[hidden],.home-booking-status[hidden],.home-booking-times[hidden]{display:none;}
-.home-booking-modes button,.home-booking-times a{
-  font:600 15px var(--sans);color:#284b3d;min-height:44px;border-radius:7px;
-  border:1px solid transparent;background:transparent;padding:5px 9px;cursor:pointer;
-}
-.home-booking-modes button[aria-pressed="true"]{background:#284b3d;color:#fff;}
-.home-booking-status{font-size:15px;color:var(--ink-soft);margin:8px 0;}
-.home-booking-times{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 8px;}
-.home-booking-times a{display:inline-flex;align-items:center;justify-content:center;border-color:#b9c9bf;text-decoration:none;}
-.home-booking-times a:hover{background:#e8efea;border-color:#284b3d;}
-.home-booking-links{font-size:15px;font-weight:600;}
-.home-booking-links a{display:inline-flex;align-items:center;min-height:44px;text-underline-offset:3px;}
+.hero .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;}
 .trust{
   display:flex;gap:36px;flex-wrap:wrap;
   border-top:1px solid var(--line-soft);padding:24px 0 64px;
@@ -691,7 +672,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
       <a href="#about">About</a>
       <a href="#reviews">Reviews</a>
       <a href="#visit">Visit</a>
-      <a class="btn btn-ink" href="#homeBooking">Book online</a>
+      <a class="btn btn-ink" href="/booking">Book online</a>
     </nav>
   </div>
 </header>
@@ -704,21 +685,9 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
       <p class="eyebrow rise d1">Foot &amp; ankle specialist &#183; Midtown Manhattan</p>
       <h1 class="rise d2">Expert foot care, <em>steps</em> from Grand&nbsp;Central.</h1>
       <p class="lede rise d3">Dr. Wiqar Farooqi is a surgical podiatrist specializing in minimally invasive correction of bunions, hammertoes, and heel pain. Smaller incisions, less downtime, and back on your feet sooner.</p>
-      <div class="home-booking rise d4" id="homeBooking" role="region" aria-labelledby="homeBookingHeading">
-        <div class="home-booking-header">
-          <h2 id="homeBookingHeading">Book a first visit</h2>
-          <div class="home-booking-modes" role="group" aria-label="Visit mode" hidden>
-            <button type="button" data-mode="in-person" aria-pressed="true">In person</button>
-            <button type="button" data-mode="video" aria-pressed="false">Video visit</button>
-          </div>
-        </div>
-        <p class="home-booking-status" id="homeBookingStatus" role="status" hidden></p>
-        <div class="home-booking-times" id="homeBookingTimes" hidden></div>
-        <div class="home-booking-links">
-          <a id="homeBookingAll" href="/booking?visit=new&amp;mode=in-person">See all times</a>
-          <a href="/booking?visit=returning">Book a follow-up</a>
-          <a href="tel:+12125108665">Call the office</a>
-        </div>
+      <div class="cta-row rise d4">
+        <a class="btn btn-ink" href="/booking">Book an appointment</a>
+        <a class="btn btn-ghost" href="tel:+12125108665">Call the office</a>
       </div>
       <div class="trust rise d5">
         <div><span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><strong>Rated 5 stars</strong>on Google &amp; Zocdoc</div>
@@ -798,7 +767,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
         </div>
       </a>
       <a class="cond cond-routine" href="/routine-foot-care.html"><div class="cond-art" style="color:var(--card-accent)"><svg viewBox="0 0 200 200" width="180" height="180" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M88 69c-17 15-15 36-30 60-12 19-7 38 12 42 19 4 30-13 40-31 9-17 24-31 22-49-2-18-27-31-44-22Z" fill="#FAF7F0"/><ellipse cx="119" cy="46" rx="16" ry="21" transform="rotate(25 119 46)" fill="#FAF7F0"/><ellipse cx="94" cy="40" rx="10" ry="14"/><ellipse cx="75" cy="48" rx="8" ry="11"/><ellipse cx="61" cy="61" rx="7" ry="9"/><ellipse cx="53" cy="76" rx="6" ry="8"/><path d="M149 112v28m-14-14h28M79 139c-4 8-6 13-3 18"/><circle cx="149" cy="126" r="26" fill="#FAF7F0"/><path d="m138 126 7 7 16-17"/></svg></div><div class="cond-copy"><h3>Routine foot care</h3><p>Regular nail trimming and callus care, with no judgment. For seniors, anyone who finds foot care difficult, or anyone who would like a helping hand.</p><span class="cond-action">Explore ongoing care <span class="go" aria-hidden="true">&#8599;</span></span></div></a>
-      <a class="cond cond-unsure" href="https://www.lexingtonpodiatry.nyc/booking">
+      <a class="cond cond-unsure" href="/booking">
         <div class="cond-art"><svg class="unsure-figure" viewBox="0 0 240 200" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 <!-- An original instruction-manual figure puzzling over an open booklet. -->
 <path d="M81 65c-1-12-11-29-5-40 4-9 15-12 26-7 10 4 18 12 22 21l-10 2-4 22c25 10 43 30 46 48 2 13-9 23-21 26l-7 28 12 17H65l5-67c-20-8-38-18-36-31 2-13 25-24 47-30" fill="#FAF7F0"/>
@@ -828,7 +797,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
       <h2>Minimally invasive surgery, done <em>right.</em></h2>
       <p>Traditional bunion surgery means a long incision, a visible scar, and weeks of painful recovery. Dr. Farooqi corrects bunions, hammertoes, and heel spurs through incisions just millimeters long, guided by live imaging.</p>
       <p>Dr. Farooqi's foundation is in traditional surgery. As techniques have evolved, so has his approach. He stays current with advances in foot and ankle care, incorporating modern minimally invasive techniques when appropriate and drawing on his surgical experience to choose the right approach for each patient.</p>
-      <a class="btn btn-brass" href="https://www.lexingtonpodiatry.nyc/booking">Ask about MIS at your consult</a>
+      <a class="btn btn-brass" href="/booking">Ask about MIS at your consult</a>
     </div>
     <div class="reveal">
       <div class="scale-card">
@@ -993,7 +962,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
       <p class="addr">353 Lexington Avenue, Rm 1502<br>New York, NY 10016<br><a href="https://www.google.com/maps/search/?api=1&query=Lexington+Podiatry+353+Lexington+Ave+New+York+NY+10016" target="_blank" rel="noopener">Open in Google Maps &#8599;</a></p>
       <p class="direct">At the corner of Lexington &amp; 40th Street. From Grand Central, exit at 42nd &amp; Lexington and walk two blocks south. Door to door in under five minutes. <a href="/podiatrist-near-grand-central">Office directions and booking</a>.</p>
       <div class="cta-row">
-        <a class="btn btn-ink" href="#homeBooking">Book online</a>
+        <a class="btn btn-ink" href="/booking">Book online</a>
         <a class="site-phone btn btn-ghost" href="tel:+12125108665"><svg class="phone-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M15.05 5A5 5 0 0 1 19 8.95"/><path d="M15.05 1A9 9 0 0 1 23 8.94"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.56 2.81.69A2 2 0 0 1 22 16.92Z"/></svg>Call (212) 510-8665</a>
       </div>
     </div>
@@ -1020,7 +989,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
     <h2>Your feet carry you through this city. <em>Return the favor.</em></h2>
     <p>Same-week appointments available. Most visits are covered by insurance, and booking online takes about a minute.</p>
     <div class="cta-row">
-      <a class="btn btn-brass" href="#homeBooking">Book an appointment</a>
+      <a class="btn btn-brass" href="/booking">Book an appointment</a>
       <a class="site-phone btn btn-ghost" href="tel:+12125108665"><svg class="phone-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M15.05 5A5 5 0 0 1 19 8.95"/><path d="M15.05 1A9 9 0 0 1 23 8.94"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.56 2.81.69A2 2 0 0 1 22 16.92Z"/></svg>Call the office</a>
     </div>
   </div>
@@ -1042,11 +1011,13 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
 </footer>
 
 <div class="mobile-bar">
-  <a class="btn btn-ink" href="#homeBooking">Book online</a>
+  <a class="btn btn-ink" href="/booking">Book online</a>
   <a class="site-phone btn btn-ghost" href="tel:+12125108665"><svg class="phone-icon" focusable="false" aria-hidden="true" viewBox="0 0 24 24"><path d="M15.05 5A5 5 0 0 1 19 8.95"/><path d="M15.05 1A9 9 0 0 1 23 8.94"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.69 2.8a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.56 2.81.69A2 2 0 0 1 22 16.92Z"/></svg>Call us</a>
 </div>
 
 <script>
+// Send old homepage-widget bookmarks directly to the appointment page.
+if (location.hash === '#homeBooking') location.replace('/booking' + location.search);
 function toggleMenu(btn){
   var nav=document.getElementById('nav-links');
   var open=nav.classList.toggle('open');
@@ -1106,6 +1077,5 @@ if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'Intersecti
 })();
 </script>
 
-<script src="/home-booking.js?v=1" defer></script>
 </body>
 </html>
