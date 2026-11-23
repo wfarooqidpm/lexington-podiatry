@@ -509,7 +509,7 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
 </div>
 </nav>
 <div class="booking-choices" id="panel1">
- <div id="visitTypeQuestion"><h2 class="booking-label">Have you visited us before?</h2><div class="type-grid">
+ <div id="visitTypeQuestion" hidden><h2 class="booking-label">Have you visited us before?</h2><div class="type-grid">
  <button type="button" class="type-card" id="cardNew" data-type="new" aria-pressed="false" onclick="fd331SelectType(this)"><svg class="choice-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="12" cy="10" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M3 28v-3a9 9 0 0 1 18 0v3M25 6v8m-4-4h8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span class="tc-title">This is my first visit</span><span class="tc-time">I’m new to Lexington Podiatry</span><span id="newDurationLabel" hidden>30 min appointment</span></button>
  <button type="button" class="type-card" id="cardReturning" data-type="returning" aria-pressed="false" onclick="fd331SelectType(this)"><svg class="choice-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M7 9a11 11 0 1 1-1 13M7 3v7H1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 9v8l5 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span class="tc-title">I’m a returning patient</span><span class="tc-time">I’ve seen Dr. Farooqi before</span><span id="returningDurationLabel" hidden>15 min appointment</span></button>
  </div></div>
@@ -554,13 +554,21 @@ footer .wrap,.booking-help{display:none!important}footer{padding:15px;background
   <a id="bookingFollowUpLink" href="/booking?visit=returning" hidden>Book a follow-up</a>
  </div>
  <p class="form-note booking-slot-notice" id="bookingSlotNotice" role="status"></p>
- <div id="slotContainer"><p class="no-slots">Choose your visit type and mode to see available times.</p></div>
+ <div id="slotContainer"></div>
+</section>
+<section class="booking-section" id="bookingFollowUpReason" hidden>
+  <h2>Confirm your appointment</h2>
+  <p id="bookingFollowUpTime"></p>
+  <div class="form-group">
+    <label for="bookingReason">Follow-up reason (optional)</label>
+    <input id="bookingReason" maxlength="240">
+  </div>
 </section>
 </div>
 </fieldset>
-<div class="booking-finish" id="bookingFinish" hidden><div><p id="bookingSelection" aria-live="polite">Choose your visit details above.</p><p class="form-note">After booking, complete your registration and consent.</p></div><button type="button" class="btn btn-ink" id="btnSubmit" onclick="fd331Submit()" disabled>Book appointment</button></div>
+<div class="booking-finish" id="bookingFinish" hidden><div><p id="bookingSelection" aria-live="polite">Choose your visit details above.</p><p class="form-note" id="bookingRegistrationNote">After booking, complete your registration and consent.</p></div><button type="button" class="btn btn-ink" id="bookingContinue" hidden>Continue</button><button type="button" class="btn btn-ink" id="btnSubmit" onclick="fd331Submit()" disabled>Book appointment</button></div>
 <p id="bookingMessage" role="status" aria-live="polite"></p><p id="bookingConnectionStatus" role="status" class="form-note" hidden>Connecting to secure scheduling…</p>
-<div id="panel5" hidden><div class="confirm-box"><div class="cb-icon">✓</div><h2>Appointment booked</h2><p class="cb-detail" id="bookingCompletionMessage">Your appointment is on the schedule.</p><div class="cb-slot" id="confirmedSlot"></div><p id="bookingCardRouteStatus" role="status"></p><a class="btn btn-ink" id="bookingCardRouteLink" hidden>View your booking card</a><button class="btn btn-ink" id="bookingCardRouteRetry" type="button" hidden>Check for my saved card</button></div></div>
+<div id="panel5" hidden><div class="confirm-box"><div class="cb-icon">✓</div><h2>Appointment booked</h2><p class="cb-detail" id="bookingCompletionMessage">Your appointment is on the schedule.</p><div class="cb-slot" id="confirmedSlot"></div><p id="confirmedVisitMode" hidden></p><p id="confirmedInsurance" hidden></p><p id="bookingCardRouteStatus" role="status"></p><a class="btn btn-ink" id="bookingCardRouteLink" hidden>View your booking card</a><button class="btn btn-ink" id="bookingCardRouteRetry" type="button" hidden>Check for my saved card</button></div></div>
 <div hidden><button id="btnStep3Next"></button><button id="btnReturnReview"></button><div id="patientSummaryCard"></div><div id="patientSummaryName"></div><div id="patientSummaryType"></div><div id="patientSummaryMode"></div><div id="returningModeGrid"></div><div id="returningSlotContainer"></div></div>
 <p class="booking-help">Need help? <a href="tel:+12125108665">(212) 510-8665</a> · 353 Lexington Ave, Rm 1502</p>
 </div></div></main>
@@ -1587,7 +1595,8 @@ async function routeReturningCard272(token) {
 }
 
 </script>
-<script src="booking-single-page.js?v=341"></script>
-<script src="/booking-agent.js?v=1"></script>
+<script src="/booking-podbridge.js?v=1"></script>
+<script src="/booking-single-page.js?v=342"></script>
+<script src="/booking-agent.js?v=2"></script>
 </body>
 </html>

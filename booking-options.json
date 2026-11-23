@@ -18,30 +18,30 @@
   "appointmentsUrl": "https://lexingtonpodiatry.nyc/booking",
   "bookingUrl": "https://lexingtonpodiatry.nyc/booking",
   "openApiUrl": "https://lexingtonpodiatry.nyc/booking-api.json",
-  "bookingCompletion": "The patient completes and confirms the appointment on the practice booking page. Returning patients verify through their registered email before viewing times.",
+  "bookingCompletion": "Choose a time and enter your details on the practice booking page. The practice checks your information to find the right next step.",
   "visitOptions": [
     {
       "patientType": "new",
       "mode": "in-person",
-      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?visit=new&mode=in-person",
+      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?mode=in-person",
       "publicAvailability": true
     },
     {
       "patientType": "new",
       "mode": "video",
-      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?visit=new&mode=video",
+      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?mode=video",
       "publicAvailability": true
     },
     {
       "patientType": "returning",
       "mode": "in-person",
-      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?visit=returning&mode=in-person",
+      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?mode=in-person",
       "publicAvailability": false
     },
     {
       "patientType": "returning",
       "mode": "video",
-      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?visit=returning&mode=video",
+      "bookingUrl": "https://lexingtonpodiatry.nyc/booking?mode=video",
       "publicAvailability": false
     }
   ],

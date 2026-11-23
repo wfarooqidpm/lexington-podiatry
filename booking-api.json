@@ -124,7 +124,7 @@
             "name": "patientType",
             "in": "query",
             "required": true,
-            "description": "Public slot lookup applies to first visits. Follow-up times are available after email verification on the practice booking page.",
+            "description": "This availability feed covers first-visit-length appointments. Patients select a time on the practice booking page before the practice determines visit type.",
             "schema": {
               "type": "string",
               "enum": [

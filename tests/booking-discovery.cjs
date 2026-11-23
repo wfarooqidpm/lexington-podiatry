@@ -6,35 +6,13 @@ const vm = require('node:vm');
 
 const read = file => readFileSync(path.join(__dirname, '..', file), 'utf8');
 const catalog = JSON.parse(read('booking-options.json'));
-const controller = read('booking-single-page.js');
-const handoff = controller.slice(controller.indexOf('function applyBookingLinkPreferences'));
-
-test('catalog links use the real booking controls, while email links keep their own flow', () => {
-  const resolve = (search, continuation = false) => {
-    const effects = [];
-    vm.runInNewContext(handoff, {
-      URLSearchParams,
-      location: { search },
-      document: { querySelector: selector => selector },
-      fd331El: id => id,
-      fd331Approval: () => continuation,
-      fd331Initialize: () => effects.push('initialized'),
-      fd331SelectType: type => effects.push(type),
-      fd331SelectMode: selector => effects.push(selector),
-    });
-    return effects;
-  };
-  for (const { bookingUrl, patientType, mode } of catalog.visitOptions) {
-    const type = patientType === 'new' ? 'cardNew' : 'cardReturning';
-    const value = mode === 'video' ? 'Virtual' : 'In Person';
-    assert.deepEqual(resolve(new URL(bookingUrl).search), ['initialized', type, `#newModeGrid [data-mode="${value}"]`]);
-    assert.deepEqual(resolve(new URL(bookingUrl).search, true), []);
+test('catalog links open the unified page and pass only visit mode', () => {
+  for (const { bookingUrl, mode } of catalog.visitOptions) {
+    const url = new URL(bookingUrl);
+    assert.equal(url.pathname, '/booking');
+    assert.deepEqual([...url.searchParams], [['mode', mode]]);
   }
-  const firstVisitDefault = ['initialized', 'cardNew', '#newModeGrid [data-mode="In Person"]'];
-  assert.deepEqual(resolve(''), firstVisitDefault);
-  assert.deepEqual(resolve('?rwg_token=example'), firstVisitDefault);
-  assert.deepEqual(resolve('?visit=orthotics&mode=video'), ['initialized']);
-  assert.deepEqual(resolve('?visit=returning&mode=invalid'), ['initialized', 'cardReturning']);
+  assert.doesNotMatch(catalog.bookingCompletion, /verify|email/i);
 });
 
 test('browser agent tools request only public first-visit slots and return approved fields', async () => {
