@@ -90,3 +90,17 @@ test('booking holds the service directory and old appointment links lead there',
   assert.ok(!read('sitemap.xml').includes('/appointments/'));
   assert.equal(catalog.appointmentsUrl, catalog.bookingUrl);
 });
+
+test('every homepage booking call to action goes directly to the booking page', () => {
+  const home = read('index.html');
+  const bookingLinks = [...home.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>\s*(?:Book online|Book an appointment)\s*<\/a>/g)];
+  assert.equal(bookingLinks.length, 5);
+  assert.ok(bookingLinks.every(([, href]) => href === '/booking'));
+  assert.doesNotMatch(home, /href="#homeBooking"|src="[^"]*home-booking\.js|class="home-booking\b/);
+
+  const legacyRedirect = home.match(/if \(location\.hash === '#homeBooking'\)[^\n]+/)?.[0];
+  const destinations = [];
+  vm.runInNewContext(legacyRedirect, {location:{hash:'#homeBooking',search:'?utm_source=referral',
+    replace: path => destinations.push(path)}});
+  assert.deepEqual(destinations, ['/booking?utm_source=referral']);
+});
