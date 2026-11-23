@@ -16,7 +16,7 @@
 
   tools.registerTool({
     name: 'get_booking_options',
-    description: 'Find Lexington Podiatry’s clinician, location, foot and ankle services, and direct links for first visits and follow-ups.',
+    description: 'Find Lexington Podiatry’s clinician, location, foot and ankle services, and direct links to its booking page.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     async execute(_input, { signal } = {}) {
       const response = await fetch(catalogUrl, { signal });
@@ -39,7 +39,7 @@
       const visitMode = modes.get(mode);
       if (!visitMode) throw new Error('Choose in-person or video.');
       const bookingUrl = new URL('/booking', location.origin);
-      bookingUrl.search = new URLSearchParams({ visit: 'new', mode });
+      bookingUrl.search = new URLSearchParams({ mode });
       const result = { bookingUrl: bookingUrl.href, timeZone: 'America/New_York', nextStep: completeOnWebsite };
 
       let reply;

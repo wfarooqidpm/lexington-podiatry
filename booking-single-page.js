@@ -206,21 +206,5 @@ function fd331Initialize(){
  initialiseInternationalPhone_();loadBookingConfig();fd331Render();
 }
 
-// Shared booking links preselect public choices using the same controls as a patient.
-function applyBookingLinkPreferences(search){
- const params=new URLSearchParams(search);
- const visit=params.get('visit')??'new';
- if(visit!=='new'&&visit!=='returning')return;
- fd331SelectType(fd331El(visit==='new'?'cardNew':'cardReturning'));
- const mode=params.get('mode')??(visit==='new'?'in-person':null);
- if(mode!=='in-person'&&mode!=='video')return;
- const slot=params.get('slot');
- if(visit==='new' && slot && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(slot)) linkedBookingSlot=Date.parse(slot)||null;
- const option=document.querySelector(mode==='in-person'?'#newModeGrid [data-mode="In Person"]':'#newModeGrid [data-mode="Virtual"]');
- if(option)fd331SelectMode(option);
-}
-
-if(!fd331Approval()){
- fd331Initialize();
- applyBookingLinkPreferences(location.search||'');
-}
+// Existing signed links retain their approved continuation.
+if (!fd331Approval()) startPodBridgeBooking();
