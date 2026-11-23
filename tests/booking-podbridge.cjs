@@ -13,7 +13,7 @@ const token = 'b'.repeat(64);
 const verified = {status:'confirmed', appointment:{start, visitMode:'In Person', insuranceCarrier:'Example Health'}};
 const turn = () => new Promise(setImmediate);
 
-function harness(route, {query = '', storage = new Map()} = {}) {
+function harness(route, {query = '', storage = new Map(), origin = 'https://staging.example.test'} = {}) {
   const elements = new Map();
   const calls = [];
   const navigations = [];
@@ -32,18 +32,18 @@ function harness(route, {query = '', storage = new Map()} = {}) {
   el('bookingSlotModes').querySelectorAll = () => modes;
   const c = vm.createContext({
     Date, Intl, URLSearchParams, AbortController,
-    location:{hash:'', search:query, assign:url => navigations.push(url)}, window:{},
+    location:{hash:'', origin, search:query, assign:url => navigations.push(url)}, window:{},
     document:{getElementById:el},
     crypto:{getRandomValues:crypto.getRandomValues.bind(crypto)},
     clearTimeout(){}, setTimeout(callback, ms){if (ms !== 30_000) queueMicrotask(callback);},
     sessionStorage:{getItem:key => storage.get(key) ?? null, setItem:(key, value) => storage.set(key, value),
       removeItem:key => storage.delete(key)},
     async fetch(path, options) {
-      assert.equal(options.credentials, 'same-origin');
+      assert.equal(options.credentials, 'include');
       assert.equal(options.redirect, 'error');
       const body = options.body && JSON.parse(options.body);
       calls.push({path, body});
-      const result = path.startsWith('/api/booking/slots?') ? {status:'ok', slots:[{start}]} : await route(path, body);
+      const result = new URL(path, origin).pathname === '/api/booking/slots' ? {status:'ok', slots:[{start}]} : await route(path, body);
       return {ok:true, json:async () => result};
     },
     state:{}, allSlots:[], calViewYear:null, calViewMonth:null, selectSlot:null, renderBookingCards:null,
@@ -126,4 +126,11 @@ test('after a lost booking response a refresh checks status without issuing anot
   release(new Error('Lost response'));
   await submission;
   assert.equal(page.calls.filter(call => call.path.endsWith('/submit')).length, 1);
+});
+
+test('the public page uses the practice booking API subdomain and includes its session', async () => {
+  const page = harness(async () => ({status:'returning'}), {origin:'https://lexingtonpodiatry.nyc'});
+  await page.enterDetails();
+  assert.equal(page.calls[0].path, 'https://booking-api.lexingtonpodiatry.nyc/api/booking/slots?visitMode=In+Person');
+  assert.equal(page.calls[1].path, 'https://booking-api.lexingtonpodiatry.nyc/api/booking/match');
 });

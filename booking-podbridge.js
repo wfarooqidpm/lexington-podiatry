@@ -1,8 +1,11 @@
-// The public page talks only to the practice's same-origin booking gateway.
-// That gateway owns the session, selected slot, and private PodBridge access.
+// The practice's booking API owns the session, selected slot and private PodBridge access.
+// A dedicated same-site host leaves the public GitHub Pages domain in place.
 function startPodBridgeBooking() {
   const el = id => document.getElementById(id);
   const storageKey = 'lexington.podbridge.booking';
+  const api = location.origin === 'https://lexingtonpodiatry.nyc'
+    ? 'https://booking-api.lexingtonpodiatry.nyc/api/booking/'
+    : '/api/booking/';
   const idPattern = /^WEB-[a-f0-9]{32}$/;
   const fields = {firstName:'npFirst', lastName:'npLast', dob:'npDob', phone:'npPhone', email:'npEmail'};
   const dateLabel = new Intl.DateTimeFormat('en-US', {
@@ -22,12 +25,12 @@ function startPodBridgeBooking() {
   async function request(path, body) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30_000);
-    const options = {credentials:'same-origin', redirect:'error', cache:'no-store', signal:controller.signal};
+    const options = {credentials:'include', redirect:'error', cache:'no-store', signal:controller.signal};
     if (body) Object.assign(options, {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body),
     });
     try {
-      const response = await fetch('/api/booking/' + path, options);
+      const response = await fetch(api + path, options);
       if (!response.ok) throw new Error('Scheduling is unavailable');
       return await response.json();
     } finally {
