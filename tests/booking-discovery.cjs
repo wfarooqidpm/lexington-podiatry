@@ -77,12 +77,14 @@ test('browser agent tools request only public first-visit slots and return appro
   assert.equal(registered.size, 0);
 });
 
-test('booking holds the service directory and old appointment links lead there', () => {
+test('booking shows the calendar illustration and old appointment links lead there', () => {
   const booking = read('booking.html');
-  const directory = booking.match(/<section class="booking-services"[^>]*>([\s\S]*?)<\/section>/)?.[1];
-  assert.ok(directory, 'The service links belong on the booking page');
+  assert.match(booking, /<img class="booking-calendar-art" src="\/calendar-sparkles\.webp" alt=""/);
+  const calendar = readFileSync(path.join(__dirname, '..', 'calendar-sparkles.webp'));
+  assert.equal(calendar.toString('ascii', 8, 12), 'WEBP');
+  assert.doesNotMatch(booking, /booking-services|>Foot and ankle services<|booking-flourish/);
   for (const service of catalog.services) {
-    assert.ok(directory.includes(`href="${new URL(service.url).pathname}"`));
+    assert.ok(read(new URL(service.url).pathname.slice(1)));
   }
   const oldRoute = read('appointments/index.html');
   assert.ok(oldRoute.includes('<meta http-equiv="refresh" content="0;url=/booking">'));
