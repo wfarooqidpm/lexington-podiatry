@@ -12,9 +12,9 @@
 
 <style>
 :root{
-  --ivory:#FBFAF6;--stone:#F3F0EA;--paper:#FFFFFF;--ink:#2B2D33;--ink-soft:#5B616B;
-  --brass:#2F4A63;--brass-deep:#243B50;--champagne:#9CC3CB;--champagne-soft:#DCE9EC;
-  --walnut:#2F4A63;--line:rgba(43,45,51,.14);--line-soft:rgba(43,45,51,.08);
+  --ivory:#FAF7F0;--stone:#F1EADD;--paper:#FFFFFF;--ink:#261E17;--ink-soft:#635649;
+  --brass:#80591F;--brass-deep:#634416;--champagne:#DDC488;--champagne-soft:#EBDDB8;
+  --walnut:#2B2118;--line:rgba(54,38,24,.14);--line-soft:rgba(54,38,24,.08);
   --good:#245f45;--good-bg:#eef6f0;--warn:#8a5616;--warn-bg:#fff7e8;
   --bad:#8b2020;--bad-bg:#fdf0f0;
   --serif:"Jost","Futura","Century Gothic",-apple-system,"Helvetica Neue",Arial,sans-serif;--sans:"Inter",-apple-system,"Helvetica Neue",Arial,sans-serif;
@@ -28,7 +28,7 @@ a{color:inherit}.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
 .topbar{background:var(--walnut);color:var(--champagne-soft);font-size:13px}
 .topbar .wrap{min-height:39px;display:flex;justify-content:space-between;align-items:center;gap:18px;padding-top:7px;padding-bottom:7px}
 .topbar a{color:var(--champagne);text-decoration:none;font-weight:600}
-.nav{background:rgba(251,250,246,.95);border-bottom:1px solid var(--line-soft)}
+.nav{background:rgba(250,247,240,.95);border-bottom:1px solid var(--line-soft)}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:17px;padding-bottom:17px}
 .brand{text-decoration:none;display:flex;align-items:center;gap:12px}
 .brand .lockup{height:60px;width:auto;display:block}
@@ -67,20 +67,20 @@ textarea{min-height:105px;resize:vertical}input:focus,select:focus,textarea:focu
 .note{font-size:13px;color:var(--ink-soft);margin-top:6px}
 .prefill{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--good);font-weight:700;margin-left:6px}
 .choice-list{display:grid;gap:10px}
-.payment-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}.payment-choice .choice{min-height:86px}.payment-choice .choice strong{font-size:16px}.selfpay-callout{border:1px solid var(--champagne);background:#EAF0F1;border-radius:14px;padding:16px;margin-top:14px}.selfpay-callout .price{font-family:var(--serif);font-size:32px;color:var(--brass-deep);margin:4px 0}@media(max-width:680px){.payment-choice{grid-template-columns:1fr}}
+.payment-choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}.payment-choice .choice{min-height:86px}.payment-choice .choice strong{font-size:16px}.selfpay-callout{border:1px solid var(--champagne);background:#F3E7D8;border-radius:14px;padding:16px;margin-top:14px}.selfpay-callout .price{font-family:var(--serif);font-size:32px;color:var(--brass-deep);margin:4px 0}@media(max-width:680px){.payment-choice{grid-template-columns:1fr}}
 .choice{border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;display:flex;align-items:flex-start;gap:11px;background:var(--ivory);cursor:pointer}
 .choice:has(input:checked){border-color:var(--brass);background:var(--stone)}
 .choice input{margin-top:5px;accent-color:var(--brass)}.choice strong{display:block;font-size:15px}.choice span{display:block;font-size:13px;color:var(--ink-soft);margin-top:2px}
 .check-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 14px}.check{display:flex;align-items:flex-start;gap:8px;font-size:14px}.check input{margin-top:5px;accent-color:var(--brass)}
 .callout{border-radius:14px;padding:18px 20px;margin-bottom:18px;border:1px solid var(--line)}
-.callout.gold{background:#EAF0F1;border-color:var(--champagne)}.callout.good{background:var(--good-bg);border-color:#bbd7c4}.callout.warn{background:var(--warn-bg);border-color:#e5c78e}.callout strong{display:block;margin-bottom:4px}
+.callout.gold{background:#F3E7D8;border-color:var(--champagne)}.callout.good{background:var(--good-bg);border-color:#bbd7c4}.callout.warn{background:var(--warn-bg);border-color:#e5c78e}.callout strong{display:block;margin-bottom:4px}
 .policy-card{border:1.5px solid var(--line);border-radius:15px;background:var(--paper);padding:22px;margin-bottom:16px}
 .policy-card.featured{border-color:var(--brass);box-shadow:inset 4px 0 0 var(--brass)}
 .policy-card h3{font-family:var(--serif);font-size:23px;font-weight:400;margin:0 0 8px}
 .policy-card p{margin:0 0 13px;color:var(--ink-soft)}.policy-card .money{font-family:var(--serif);font-size:34px;color:var(--brass);line-height:1;margin:7px 0 10px}
 .ack{display:flex;align-items:flex-start;gap:10px;padding-top:11px;border-top:1px solid var(--line-soft);font-weight:600;font-size:14px}.ack input{margin-top:5px;accent-color:var(--brass)}
 details{border-top:1px solid var(--line-soft);padding-top:11px;margin-top:12px}summary{cursor:pointer;font-weight:600;color:var(--brass-deep);font-size:14px}details p{font-size:14px;margin-top:10px}
-.financial-box{border:1.5px solid var(--champagne);border-radius:16px;background:#EAF0F1;padding:24px;margin-bottom:20px}
+.financial-box{border:1.5px solid var(--champagne);border-radius:16px;background:#F3E7D8;padding:24px;margin-bottom:20px}
 .financial-box .amount{font-family:var(--serif);font-size:42px;line-height:1.1;color:var(--brass-deep);margin:8px 0}
 .financial-box .confidence{display:inline-block;border:1px solid var(--champagne);border-radius:999px;padding:5px 8px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
 .nav-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:30px}
@@ -97,10 +97,10 @@ details{border-top:1px solid var(--line-soft);padding-top:11px;margin-top:12px}s
 .frontdoor-side-intro p{font-size:13px;line-height:1.5;color:var(--ink-soft);margin:9px 0 0}
 .status-side-card{position:relative}
 .status-mark{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;margin-bottom:12px}
-.medical-side{background:#eaf3f7;border-color:#9fc4d2}
-.medical-side h3{color:#25596b}
-.medical-side .status-mark{background:#4f8ca2;color:white}
-.medical-side .status-line{color:#355c69;font-size:13px;line-height:1.5;margin-top:5px}
+.medical-side{background:#F6EEE0;border-color:#D2B68C}
+.medical-side h3{color:#5F411B}
+.medical-side .status-mark{background:#906B33;color:white}
+.medical-side .status-line{color:#65451C;font-size:13px;line-height:1.5;margin-top:5px}
 .policy-side{background:#f9eaea;border-color:#d9a5a5}
 .policy-side h3{color:#7b3434}
 .policy-side .status-mark{background:#a84f4f;color:white}
@@ -281,8 +281,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .four-sections #section-personal .req,.four-sections #section-insurance .req,.four-sections #section-additional .req{display:none}.four-sections #discoveryOffer .note{display:none}
 .registration-received{display:none;text-align:center;border:1px solid #b8d5c2;background:var(--good-bg);padding:30px 22px;border-radius:18px;margin:0 0 22px}
 .registration-received.show{display:block}.closed-door{font-size:46px;line-height:1;margin-bottom:10px}.registration-received h2{font-family:var(--serif);font-size:31px;font-weight:400;margin:0 0 7px}.registration-received p{max-width:580px;margin:0 auto;color:#3d5f4c}
-.intake-layer.optional-card{border-color:#9fc4d2;background:#f5fafc}.intake-layer.optional-card>summary{color:#25596b}.intake-layer.optional-card .section-number{border-radius:999px;width:auto;padding:0 10px;border-color:#9fc4d2;color:#25596b}
-.medical-card-view{display:none}.medical-card-view.show{display:block;border:1px solid #9fc4d2;background:#eaf3f7;border-radius:15px;padding:22px}.medical-card-view h3{font-family:var(--serif);font-size:25px;font-weight:400;color:#25596b;margin:0}.medical-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}.medical-card-item{background:rgba(255,255,255,.7);border:1px solid rgba(79,140,162,.28);border-radius:11px;padding:13px}.medical-card-item strong{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#4f6d78;margin-bottom:4px}.medical-card-item span{font-size:14px;color:#253f48;white-space:pre-line}.medical-card-view .btn{background:#25596b;color:white}.optional-skip{font-size:13px;color:var(--ink-soft);margin-top:9px}.default-choice{border:1px solid #b9d6c3;background:#eef6f0;border-radius:11px;padding:12px 13px;margin-bottom:14px;font-weight:700}.default-choice input{accent-color:var(--good)}
+.intake-layer.optional-card{border-color:#D2B68C;background:#f5fafc}.intake-layer.optional-card>summary{color:#5F411B}.intake-layer.optional-card .section-number{border-radius:999px;width:auto;padding:0 10px;border-color:#D2B68C;color:#5F411B}
+.medical-card-view{display:none}.medical-card-view.show{display:block;border:1px solid #D2B68C;background:#F6EEE0;border-radius:15px;padding:22px}.medical-card-view h3{font-family:var(--serif);font-size:25px;font-weight:400;color:#5F411B;margin:0}.medical-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}.medical-card-item{background:rgba(255,255,255,.7);border:1px solid rgba(168,124,36,.28);border-radius:11px;padding:13px}.medical-card-item strong{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#78531E;margin-bottom:4px}.medical-card-item span{font-size:14px;color:#4F3617;white-space:pre-line}.medical-card-view .btn{background:#5F411B;color:white}.optional-skip{font-size:13px;color:var(--ink-soft);margin-top:9px}.default-choice{border:1px solid #b9d6c3;background:#eef6f0;border-radius:11px;padding:12px 13px;margin-bottom:14px;font-weight:700}.default-choice input{accent-color:var(--good)}
 .prefill{display:none!important}#section-insurance .panel[data-panel="5"]{display:none!important}
 .insurance-methods{display:grid;gap:10px;margin-top:16px}.insurance-loaded-card{border:1px solid #b8d5c2;background:#eef8f2;border-radius:15px;padding:20px;margin-bottom:16px}.insurance-loaded-card.hidden{display:none}.insurance-loaded-head{display:flex;gap:11px;align-items:flex-start}.insurance-loaded-check{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#247653;color:#fff;font-weight:900;flex:none}.insurance-loaded-card h3{font-family:var(--serif);font-size:22px;font-weight:400;color:#245a37;margin:1px 0 2px}.insurance-loaded-meta{font-size:13px;color:#456050}.coverage-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}.coverage-benefit{background:#fff;border:1px solid #cfe0d4;border-radius:10px;padding:11px}.coverage-benefit strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#58735f}.coverage-benefit span{display:block;margin-top:3px;font-weight:700;color:#244b35}.deductible-alert{margin-top:12px;border:1px solid #e3c16f;background:#fff6dc;color:#76510c;border-radius:10px;padding:11px 13px;font-size:13px;font-weight:700}.selfpay-callout{background:#eef8f2;border-color:#b8d5c2}.selfpay-callout .price{color:#245a37}.staff-help-alert{border:1px solid #e3c16f!important;background:#fff6dc!important;color:#76510c}.insurance-manual-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
 @media(max-width:680px){.medical-card-grid{grid-template-columns:1fr}.registration-received{padding:25px 17px}}
@@ -291,7 +291,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 #dob{min-width:0;max-width:100%;text-align:left;-webkit-appearance:none;appearance:none;display:block}
 #dob::-webkit-date-and-time-value{text-align:left;min-height:1.5em}
 #dob::-webkit-datetime-edit{padding:0;display:inline-flex}
-#secondaryCardView{background:#f1f5f8;border-color:#b9cbd7}
+#secondaryCardView{background:#f1f5f8;border-color:#DAC39F}
 
 .compact-contract #section-contract .policy-card{padding:16px 18px;margin-bottom:12px;border:1px solid var(--line);box-shadow:none}
 .compact-contract #section-contract .policy-card h3{font-size:22px;margin-bottom:10px}
@@ -301,8 +301,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .signature-preview{margin-top:20px}#typedSignaturePreview{font-family:'Brush Script MT','Segoe Script',cursive;font-size:36px;padding:20px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
 #drawSignatureCanvas{display:block;width:100%;height:160px;background:white;border:1px solid var(--line);border-radius:10px;touch-action:none;margin:10px 0}
 
-.id-reminder{background:#e5f4fc!important;border:1px solid #70b7d9!important;border-left:5px solid #2581ab!important;color:#174c68!important;font-size:18px!important;line-height:1.5;font-weight:600;padding:20px!important;border-radius:12px}
-.medical-summary-ready #newPatientLayout{display:none!important}.medical-summary-ready .hero{display:none}.finished-heading h2{font-family:var(--serif);font-weight:400;font-size:36px;margin:8px 0}.finished-heading{margin-bottom:26px}.finished-insurance-grid,.finished-medical-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.finished-card{border:1px solid var(--line);border-radius:20px;padding:26px;margin-bottom:20px;background:var(--paper)}.finished-card h3{font-family:var(--serif);font-size:24px;line-height:1.3;font-weight:400;margin:8px 0}.finished-card p{margin:8px 0;white-space:pre-line}.finished-primary{background:#edf7ef;border-color:#b0d5bb}.finished-secondary{background:#f0f3fa;border-color:#bdc9df}.finished-pharmacy{background:#eff8f7;border-color:#b1d5cf}.finished-health{background:#f6faff;border-color:#bdd2e4}.finished-detail strong{font-size:13px;color:#385e78}.finished-active{color:#216644;font-weight:700}.finished-appointment{background:var(--walnut);color:var(--ivory);padding:36px}.finished-appointment .eyebrow{color:var(--champagne)}.finished-appointment h2{font-family:var(--serif);font-size:34px;line-height:1.25;font-weight:400}.finished-appointment h3{color:var(--champagne-soft)}
+.id-reminder{background:#F6EDDF!important;border:1px solid #BD9D6E!important;border-left:5px solid #7C561F!important;color:#553A18!important;font-size:18px!important;line-height:1.5;font-weight:600;padding:20px!important;border-radius:12px}
+.medical-summary-ready #newPatientLayout{display:none!important}.medical-summary-ready .hero{display:none}.finished-heading h2{font-family:var(--serif);font-weight:400;font-size:36px;margin:8px 0}.finished-heading{margin-bottom:26px}.finished-insurance-grid,.finished-medical-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.finished-card{border:1px solid var(--line);border-radius:20px;padding:26px;margin-bottom:20px;background:var(--paper)}.finished-card h3{font-family:var(--serif);font-size:24px;line-height:1.3;font-weight:400;margin:8px 0}.finished-card p{margin:8px 0;white-space:pre-line}.finished-primary{background:#edf7ef;border-color:#b0d5bb}.finished-secondary{background:#F8F0E4;border-color:#DBC4A0}.finished-pharmacy{background:#F9F2E7;border-color:#DCC6A3}.finished-health{background:#FCF7EF;border-color:#DFCAA9}.finished-detail strong{font-size:13px;color:#68481D}.finished-active{color:#216644;font-weight:700}.finished-appointment{background:var(--walnut);color:var(--ivory);padding:36px}.finished-appointment .eyebrow{color:var(--champagne)}.finished-appointment h2{font-family:var(--serif);font-size:34px;line-height:1.25;font-weight:400}.finished-appointment h3{color:var(--champagne-soft)}
 @media(max-width:680px){.finished-insurance-grid,.finished-medical-grid{grid-template-columns:1fr}.finished-card{padding:21px}.finished-heading h2{font-size:29px}.finished-appointment h2{font-size:28px}}
 
 /* Compact completed summary; all long content remains available on expansion. */
@@ -314,13 +314,13 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .snapshot-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#57665d}
 .snapshot-appointment{display:grid;grid-template-columns:1fr 1fr;gap:22px;background:var(--walnut);color:var(--ivory);border-radius:14px;padding:18px 20px}
 .snapshot-appointment .snapshot-label{color:var(--champagne)}.snapshot-appointment h3{font:400 22px/1.25 var(--serif);margin:5px 0}.snapshot-appointment p{font-size:12px;margin:6px 0 0;color:var(--champagne-soft)}.snapshot-reason>strong{font-size:18px;color:var(--champagne-soft)}
-.snapshot-id{background:#e5f4fc;color:#174c68;border-left:4px solid #2581ab;border-radius:7px;padding:8px 12px;font-weight:600;font-size:13px;margin:9px 0 12px}
-.snapshot-services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}.snapshot-tile{padding:14px;border:1px solid #bdd1c3;border-radius:12px;background:#eef7f0;min-width:0}.snapshot-tile:nth-child(2){background:#f1f3f9;border-color:#c5cce0}.snapshot-tile:nth-child(3){background:#edf7f7;border-color:#bad5d2}.snapshot-tile h3{font:400 18px/1.25 var(--serif);margin:5px 0;overflow-wrap:anywhere}.snapshot-active{font-size:11px;color:#216644;font-weight:700}
-.snapshot-health{background:#f6faff;border:1px solid #c5d5e1;border-radius:12px;padding:14px}.snapshot-medical{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 18px}
+.snapshot-id{background:#F6EDDF;color:#553A18;border-left:4px solid #7C561F;border-radius:7px;padding:8px 12px;font-weight:600;font-size:13px;margin:9px 0 12px}
+.snapshot-services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}.snapshot-tile{padding:14px;border:1px solid #bdd1c3;border-radius:12px;background:#eef7f0;min-width:0}.snapshot-tile:nth-child(2){background:#F8F0E4;border-color:#DEC8A7}.snapshot-tile:nth-child(3){background:#F8F1E5;border-color:#DEC9A7}.snapshot-tile h3{font:400 18px/1.25 var(--serif);margin:5px 0;overflow-wrap:anywhere}.snapshot-active{font-size:11px;color:#216644;font-weight:700}
+.snapshot-health{background:#FCF7EF;border:1px solid #E1CEAF;border-radius:12px;padding:14px}.snapshot-medical{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 18px}
 .snapshot-detail{border:0;margin:7px 0 0;padding:0;min-width:0}.snapshot-detail summary{font-size:13px;color:inherit;list-style:none;cursor:pointer;position:relative;padding-right:16px}.snapshot-detail summary:after{content:'+';position:absolute;right:0;top:0;color:var(--brass)}.snapshot-detail[open] summary:after{content:'−'}.snapshot-value{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}.snapshot-detail p{font-size:13px;white-space:pre-line;overflow-wrap:anywhere;margin:6px 0;padding:7px 0;border-top:1px solid var(--line)}
 @media(max-width:680px){.medical-summary-ready .wrap{padding-left:14px;padding-right:14px}.snapshot-heading h2{font-size:23px}.snapshot-appointment{grid-template-columns:1fr;gap:10px;padding:14px}.snapshot-appointment h3{font-size:20px}.snapshot-services{grid-template-columns:1fr 1fr;gap:8px}.snapshot-tile{padding:11px}.snapshot-tile:nth-child(3){grid-column:1/-1}.snapshot-tile h3{font-size:16px}.snapshot-medical{grid-template-columns:1fr 1fr;gap:8px 12px}.snapshot-id{font-size:12px}.snapshot-health{padding:11px}}
 
-#completedMedicalCard .snapshot-services{grid-template-columns:1fr 1fr}#completedMedicalCard .snapshot-tile{margin:0}#completedMedicalCard .snapshot-tile:nth-child(2){background:#edf7f7;border-color:#bad5d2}.snapshot-editor>summary{list-style:none;cursor:pointer;color:inherit}.snapshot-editor>summary::-webkit-details-marker{display:none}.snapshot-secondary{border-top:1px solid #c6d7cb;padding-top:8px;margin-top:8px}.snapshot-tile p{font-size:12px;margin:5px 0}.snapshot-edit-body{padding-top:12px}.snapshot-edit-label{display:block;font-size:12px;margin:8px 0 4px}.snapshot-edit-body input:not([type=checkbox]),.snapshot-edit-body select{width:100%;min-width:0}.snapshot-actions{display:flex;gap:8px;margin-top:10px}.snapshot-edit-body .btn{padding:7px 14px;font-size:13px}.reschedule-button{display:inline-flex;align-items:center;gap:9px;background:var(--champagne-soft);color:var(--walnut);border:0;border-radius:9px;padding:9px 14px;font:700 14px var(--sans);margin-top:12px;cursor:pointer}.reschedule-button:hover{background:var(--champagne)}#summarySchedule{grid-column:1/-1}.snapshot-appointment .snapshot-edit-body{background:var(--paper);color:var(--ink);padding:12px;border-radius:9px}.snapshot-appointment #summarySchedule .btn{background:var(--champagne-soft);margin-top:10px}
+#completedMedicalCard .snapshot-services{grid-template-columns:1fr 1fr}#completedMedicalCard .snapshot-tile{margin:0}#completedMedicalCard .snapshot-tile:nth-child(2){background:#F8F1E5;border-color:#DEC9A7}.snapshot-editor>summary{list-style:none;cursor:pointer;color:inherit}.snapshot-editor>summary::-webkit-details-marker{display:none}.snapshot-secondary{border-top:1px solid #c6d7cb;padding-top:8px;margin-top:8px}.snapshot-tile p{font-size:12px;margin:5px 0}.snapshot-edit-body{padding-top:12px}.snapshot-edit-label{display:block;font-size:12px;margin:8px 0 4px}.snapshot-edit-body input:not([type=checkbox]),.snapshot-edit-body select{width:100%;min-width:0}.snapshot-actions{display:flex;gap:8px;margin-top:10px}.snapshot-edit-body .btn{padding:7px 14px;font-size:13px}.reschedule-button{display:inline-flex;align-items:center;gap:9px;background:var(--champagne-soft);color:var(--walnut);border:0;border-radius:9px;padding:9px 14px;font:700 14px var(--sans);margin-top:12px;cursor:pointer}.reschedule-button:hover{background:var(--champagne)}#summarySchedule{grid-column:1/-1}.snapshot-appointment .snapshot-edit-body{background:var(--paper);color:var(--ink);padding:12px;border-radius:9px}.snapshot-appointment #summarySchedule .btn{background:var(--champagne-soft);margin-top:10px}
 @media(max-width:480px){#completedMedicalCard .snapshot-services{grid-template-columns:1fr}.snapshot-tile h3{font-size:17px}}
 .reschedule-button:disabled{opacity:.55;cursor:not-allowed}#rescheduleLockNotice a{color:var(--champagne-soft);text-decoration:underline}
 /* A single compact stack on both desktop and mobile. */
@@ -352,7 +352,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .summary-icon-row{display:flex;align-items:center;justify-content:space-between;gap:14px}.summary-icon-row>div{min-width:0;overflow-wrap:anywhere}
 .summary-symbol{flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;font-family:var(--sans);font-size:25px;font-weight:600;border:1.5px solid #84a28b;border-radius:50%;color:#356748;background:#e1eee4}
 .snapshot-secondary .summary-symbol{width:34px;height:34px;flex-basis:34px;font-size:22px}
-.pharmacy-symbol{font-size:29px;color:#286c69;border-color:#82b4ad;background:#def0ec}
+.pharmacy-symbol{font-size:29px;color:#6A491D;border-color:#BC9C6C;background:#F2E7D5}
 
 /* v264: uniform heading, embedded carrier artwork, and independent card spacing. */
 #completedMedicalCard .snapshot-heading h2.booking-card-title{font-size:14px;letter-spacing:.02em}
@@ -387,6 +387,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .hero h1 em{font-style:normal}
 .btn.primary{background:var(--brass);color:#fff}.btn.primary:hover{background:var(--brass-deep)}
 @media(max-width:560px){.glyph{height:42px}.brand{gap:10px}.brand-text b{font-size:13px;letter-spacing:.24em}.brand-text i{font-size:9.5px;letter-spacing:.22em}.secure-chip{font-size:10px;padding:6px 9px}}
+
+.topbar,footer{background:#2B2118;color:#D6CABA;border-color:rgba(250,247,240,.12)}.topbar span,.topbar div,footer span{color:#D6CABA}.topbar a{color:#DDC488}
 </style>
 </head>
 
