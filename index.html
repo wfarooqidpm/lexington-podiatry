@@ -14,17 +14,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#FBFAF6;
-  --card:#FFFFFF;
-  --stone:#F3F0EA;
-  --tint:#EAF0F1;
-  --ink:#2B2D33;
-  --ink-soft:#5B616B;
-  --slate:#2F4A63;
-  --slate-deep:#243B50;
+  --paper:#FAF7F0;
+  --card:#FFFDF9;
+  --stone:#F1EADD;
+  --tint:#F3E7D8;
+  --ink:#261E17;
+  --ink-soft:#635649;
+  --slate:#80591F;
+  --slate-deep:#634416;
   --teal:#2E7D8C;
-  --line:rgba(43,45,51,.14);
-  --line-soft:rgba(43,45,51,.08);
+  --line:rgba(54,38,24,.14);
+  --line-soft:rgba(54,38,24,.08);
   --display:"Jost","Futura","Century Gothic",-apple-system,"Helvetica Neue",Arial,sans-serif;
   --sans:"Inter",-apple-system,"Helvetica Neue",Arial,sans-serif;
   --r:18px;
@@ -62,7 +62,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:9
 .topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:44px;}
 .topbar a{color:var(--slate);text-decoration:none;font-weight:600;}
 .topbar a:hover{text-decoration:underline;}
-header.nav{position:sticky;top:0;z-index:50;background:rgba(251,250,246,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft);}
+header.nav{position:sticky;top:0;z-index:50;background:rgba(250,247,240,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-soft);}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;padding-top:12px;padding-bottom:12px;}
 .brand{display:flex;align-items:center;gap:14px;text-decoration:none;}
 .glyph{height:50px;width:auto;filter:brightness(0);opacity:.82;}
@@ -84,9 +84,9 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .hero .lede{font-size:19px;color:var(--ink-soft);max-width:32em;margin-bottom:34px;}
 .hero-note{margin-top:18px;font-size:14.5px;color:var(--ink-soft);}
 .hero-photo{position:relative;max-width:420px;width:100%;justify-self:end;}
-.hero-photo .frame{border-radius:28px;overflow:hidden;aspect-ratio:4/5;background:var(--stone);box-shadow:0 30px 60px -34px rgba(43,45,51,.45);}
+.hero-photo .frame{border-radius:28px;overflow:hidden;aspect-ratio:4/5;background:var(--stone);box-shadow:0 30px 60px -34px rgba(54,38,24,.45);}
 .hero-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;}
-.hero-card{position:absolute;left:-36px;bottom:34px;background:var(--card);padding:16px 24px 15px;border-radius:14px;box-shadow:0 18px 40px -20px rgba(43,45,51,.4);}
+.hero-card{position:absolute;left:-36px;bottom:34px;background:var(--card);padding:16px 24px 15px;border-radius:14px;box-shadow:0 18px 40px -20px rgba(54,38,24,.4);}
 .hero-card .name{font-family:var(--display);font-size:19px;line-height:1.3;}
 .hero-card .role{font-family:var(--display);font-size:11.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--slate);margin-top:3px;}
 
@@ -113,13 +113,13 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .thick{stroke-width:4.5;}
 .dash{stroke-dasharray:2.5 4;}
 .acf{fill:var(--teal);stroke:none;}
-.tf{fill:rgba(46,125,140,.16);stroke:none;}
+.tf{fill:rgba(176,96,60,.16);stroke:none;}
 .keep .ln{stroke-width:2.2;}.keep .dt{stroke-width:1.4;opacity:.45;}.keep .ac{stroke-width:2.4;}.keep .thin{stroke-width:1.5;opacity:.7;}.keep .thick{stroke-width:4.5;}.keep .dash{stroke-dasharray:3 5;}
 
 /* conditions */
 .cond-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;}
-.cond{display:flex;flex-direction:column;text-decoration:none;background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;box-shadow:0 10px 30px -24px rgba(43,45,51,.35);transition:box-shadow .22s ease,transform .22s ease,border-color .22s ease;}
-.cond:hover,.cond:focus-visible{border-color:var(--slate);box-shadow:0 22px 40px -24px rgba(43,45,51,.45);transform:translateY(-4px);}
+.cond{display:flex;flex-direction:column;text-decoration:none;background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);overflow:hidden;box-shadow:0 10px 30px -24px rgba(54,38,24,.35);transition:box-shadow .22s ease,transform .22s ease,border-color .22s ease;}
+.cond:hover,.cond:focus-visible{border-color:var(--slate);box-shadow:0 22px 40px -24px rgba(54,38,24,.45);transform:translateY(-4px);}
 .cond .art{height:200px;}
 .cond .art svg{height:180px;width:auto;}
 .cond .num{position:absolute;top:16px;left:20px;font-family:var(--display);font-size:12px;letter-spacing:.3em;color:var(--slate);}
@@ -145,7 +145,7 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .mis .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:76px;align-items:center;}
 .mis .copy p{color:var(--ink-soft);margin-top:20px;max-width:31em;}
 .mis .copy .btn{margin-top:32px;}
-.scale-card{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);padding:36px 40px 28px;box-shadow:0 10px 30px -24px rgba(43,45,51,.35);}
+.scale-card{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);padding:36px 40px 28px;box-shadow:0 10px 30px -24px rgba(54,38,24,.35);}
 .scale-row{padding:22px 0;}
 .scale-row + .scale-row{border-top:1px solid var(--line);}
 .scale-row .label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-family:var(--display);font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;font-weight:500;color:var(--ink-soft);margin-bottom:18px;}
@@ -171,7 +171,7 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 /* about */
 .about{background:var(--stone);}
 .about .wrap{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:76px;align-items:center;}
-.about-photo img{width:100%;aspect-ratio:3/2;height:auto;object-fit:cover;border-radius:var(--r);box-shadow:0 30px 60px -34px rgba(43,45,51,.45);}
+.about-photo img{width:100%;aspect-ratio:3/2;height:auto;object-fit:cover;border-radius:var(--r);box-shadow:0 30px 60px -34px rgba(54,38,24,.45);}
 .about .bio{color:var(--ink-soft);margin-top:20px;}
 .creds{margin-top:30px;border-top:1px solid var(--line);}
 .cred{display:flex;gap:24px;padding:15px 0;border-bottom:1px solid var(--line);font-size:15.5px;align-items:baseline;}
@@ -182,7 +182,7 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .agg{font-size:14.5px;color:var(--ink-soft);text-align:right;line-height:1.55;max-width:30em;}
 .agg .stars{color:var(--teal);font-size:14px;letter-spacing:4px;display:block;margin-bottom:2px;}
 .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
-.rev{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);padding:34px 30px 28px;display:flex;flex-direction:column;gap:20px;box-shadow:0 10px 30px -24px rgba(43,45,51,.35);}
+.rev{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);padding:34px 30px 28px;display:flex;flex-direction:column;gap:20px;box-shadow:0 10px 30px -24px rgba(54,38,24,.35);}
 .rev q{font-family:var(--display);font-size:20px;line-height:1.5;quotes:"\201C" "\201D";}
 .rev q::before,.rev q::after{color:var(--teal);}
 .rev .by{margin-top:auto;font-size:14px;color:var(--ink-soft);display:flex;justify-content:space-between;align-items:center;}
@@ -217,7 +217,7 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .addr a{color:var(--slate);font-weight:500;text-decoration-color:var(--teal);text-underline-offset:4px;}
 .direct{margin-top:18px;color:var(--ink-soft);font-size:16px;max-width:30em;}
 .visit .cta-row{margin-top:28px;}
-.map{background:var(--tint);border-radius:var(--r);overflow:hidden;border:1px solid var(--line-soft);box-shadow:0 10px 30px -24px rgba(43,45,51,.35);}
+.map{background:var(--tint);border-radius:var(--r);overflow:hidden;border:1px solid var(--line-soft);box-shadow:0 10px 30px -24px rgba(54,38,24,.35);}
 .map svg{display:block;width:100%;height:auto;font-family:var(--display);}
 .hours{margin-top:26px;background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);padding:10px 26px 20px;}
 .hours .h-head{font-family:var(--display);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--slate);padding:16px 0 8px;}
@@ -248,7 +248,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
 .mobile-bar{display:none;}
 @media (max-width:900px){
   body{padding-bottom:78px;}
-  .mobile-bar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(251,250,246,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:11px 16px calc(11px + env(safe-area-inset-bottom));gap:10px;}
+  .mobile-bar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(250,247,240,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:11px 16px calc(11px + env(safe-area-inset-bottom));gap:10px;}
   .mobile-bar .btn{flex:1;padding:12px 10px;}
 }
 
@@ -328,6 +328,22 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
 .plate-frame .art img.s{height:290px;}
 .plate-frame .art img.l{width:92%;align-self:center;}
 @media (max-width:640px){.plate-frame .art img.s{height:232px;}}
+
+/* ===== warm palette: walnut bands, bronze accents, blue kept for dividers ===== */
+:root{--accent:#A85A38;--gold:#A87C24;}
+.topbar,.mis,.reviews,.final,footer{--ink:#FAF7F0;--ink-soft:#D6CABA;--card:#3A2D21;--slate:#DDC488;--slate-deep:#EBD9AC;--teal:#79B3BD;--gold:#DDC488;--accent:#E0976F;--line:rgba(250,247,240,.18);--line-soft:rgba(250,247,240,.11);background:#2B2118;color:var(--ink);}
+.btn-ink,.btn-gold,.btn-brass,nav.links .btn{color:#FFFDF9;}
+:is(.topbar,.mis,.reviews,.final,footer) :is(.btn-ink,.btn-gold,.btn-brass){color:#2B2118;}
+.mis .scale-card,.reviews .rev{box-shadow:none;}
+.final .watermark{filter:brightness(0) invert(1);opacity:.04;}
+.final + footer,footer{border-top:1px solid rgba(250,247,240,.12);}
+footer .glyph{filter:none;opacity:1;}
+.fact .stars,.agg .stars{color:var(--gold);}
+.ac{stroke:var(--accent);}
+.acf,.svc-ico .af{fill:var(--accent);}
+.svc-ico .a{stroke:var(--accent);}
+.cut.keyhole{background:var(--accent);}
+.cond .art img.l.hammer{width:76%;margin-top:14px;}
 </style>
   <script type="application/ld+json">
   {
@@ -514,7 +530,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
         </div>
       </a>
       <a class="cond" href="/hammertoes.html">
-        <div class="art"><span class="num" aria-hidden="true">02</span><img class="plate l" src="/images/plate-hammertoe.png" alt="Shaded line drawing of the front of a foot, with a raised knuckle on the second toe" width="448" height="344" loading="lazy" decoding="async"></div>
+        <div class="art"><span class="num" aria-hidden="true">02</span><img class="plate l hammer" src="/images/plate-hammertoe.svg" alt="Shaded line drawing of the front of a foot, with the second toe bent upward at its middle joint" width="448" height="344" loading="lazy" decoding="async"></div>
         <div class="cond-copy">
         <h3>Hammertoes</h3>
         <p>A toe that bends up at the middle joint, rubbing in shoes and forming corns. Often eased with simple changes, or straightened through tiny incisions.</p>
@@ -759,33 +775,33 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
     </div>
     <div class="map">
       <svg viewBox="0 0 520 600" role="img" aria-label="Simple street map: Lexington Podiatry is on Lexington Avenue at 40th Street, two blocks south of Grand Central Terminal at 42nd Street">
-        <rect width="520" height="600" fill="#EAF0F1"/>
-        <g stroke="#FFFFFF" stroke-width="26" stroke-linecap="butt">
+        <rect width="520" height="600" fill="#F3E7D8"/>
+        <g stroke="#FFFDF9" stroke-width="26" stroke-linecap="butt">
           <path d="M0 170H520M0 330H520M0 490H520"/>
           <path d="M90 170V600M270 0V600M450 0V600"/>
         </g>
-        <g fill="#7A838F" font-size="12" font-weight="500" letter-spacing="2.5">
+        <g fill="#8A7B69" font-size="12" font-weight="500" letter-spacing="2.5">
           <text x="14" y="174.500">E 42ND ST</text>
           <text x="14" y="334.500">E 41ST ST</text>
           <text x="14" y="494.500">E 40TH ST</text>
           <text transform="translate(94.500 468) rotate(-90)">PARK AVE</text>
-          <text transform="translate(274.500 148) rotate(-90)" fill="#2F4A63">LEXINGTON AVE</text>
+          <text transform="translate(274.500 148) rotate(-90)" fill="#80591F">LEXINGTON AVE</text>
           <text transform="translate(454.500 468) rotate(-90)">3RD AVE</text>
         </g>
-        <rect x="36" y="26" width="208" height="118" rx="4" fill="#F7F9FA" stroke="#2B2D33" stroke-width="1.6"/>
-        <path d="M82 144V104a16 16 0 0 1 32 0v40M124 144V96a16 16 0 0 1 32 0v48M166 144V104a16 16 0 0 1 32 0v40" fill="none" stroke="#2B2D33" stroke-width="1.6" opacity=".7"/>
-        <text x="140" y="56" text-anchor="middle" fill="#2B2D33" font-size="15" font-weight="500" letter-spacing="3">GRAND CENTRAL</text>
-        <text x="140" y="76" text-anchor="middle" fill="#7A838F" font-size="12" letter-spacing="2">TERMINAL</text>
-        <rect x="300" y="26" width="120" height="118" rx="4" fill="#F7F9FA" stroke="#2B2D33" stroke-width="1.2" opacity=".7"/>
-        <path d="M360 62l-5 20h10zM351 82h18v16h-18zM345 98h30v46h-30z" fill="none" stroke="#2B2D33" stroke-width="1.4" stroke-linejoin="round" opacity=".7"/>
-        <text x="360" y="50" text-anchor="middle" fill="#7A838F" font-size="11" letter-spacing="2">CHRYSLER BLDG</text>
-        <path d="M270 172V468" stroke="#2E7D8C" stroke-width="3.5" stroke-dasharray="2 11" stroke-linecap="round" fill="none"/>
-        <circle cx="270" cy="170" r="7" fill="#FFFFFF" stroke="#2E7D8C" stroke-width="3"/>
-        <g transform="translate(292 318)"><rect width="138" height="30" rx="3" fill="#FFFFFF" stroke="#2E7D8C" stroke-width="1.2"/><text x="69" y="20" text-anchor="middle" fill="#2F4A63" font-size="12.5" font-weight="500" letter-spacing="1.5">2 BLOCKS SOUTH</text></g>
-        <circle cx="270" cy="490" r="26" fill="none" stroke="#2E7D8C" stroke-width="1.4" opacity=".5"/>
-        <path d="M270 494c-9-13-15-21-15-30a15 15 0 0 1 30 0c0 9-6 17-15 30z" fill="#2E7D8C"/>
-        <circle cx="270" cy="464" r="5.5" fill="#FFFFFF"/>
-        <g transform="translate(306 524)"><rect x="-10" y="-22" width="212" height="62" rx="8" fill="#FFFFFF" stroke="#2B2D33" stroke-opacity=".14"/><text x="0" y="0" fill="#2B2D33" font-size="16" font-weight="500">Lexington Podiatry</text><text x="0" y="22" fill="#5B616B" font-size="13.5">353 Lexington Ave, Rm 1502</text></g>
+        <rect x="36" y="26" width="208" height="118" rx="4" fill="#FBF6EE" stroke="#261E17" stroke-width="1.6"/>
+        <path d="M82 144V104a16 16 0 0 1 32 0v40M124 144V96a16 16 0 0 1 32 0v48M166 144V104a16 16 0 0 1 32 0v40" fill="none" stroke="#261E17" stroke-width="1.6" opacity=".7"/>
+        <text x="140" y="56" text-anchor="middle" fill="#261E17" font-size="15" font-weight="500" letter-spacing="3">GRAND CENTRAL</text>
+        <text x="140" y="76" text-anchor="middle" fill="#8A7B69" font-size="12" letter-spacing="2">TERMINAL</text>
+        <rect x="300" y="26" width="120" height="118" rx="4" fill="#FBF6EE" stroke="#261E17" stroke-width="1.2" opacity=".7"/>
+        <path d="M360 62l-5 20h10zM351 82h18v16h-18zM345 98h30v46h-30z" fill="none" stroke="#261E17" stroke-width="1.4" stroke-linejoin="round" opacity=".7"/>
+        <text x="360" y="50" text-anchor="middle" fill="#8A7B69" font-size="11" letter-spacing="2">CHRYSLER BLDG</text>
+        <path d="M270 172V468" stroke="#A85A38" stroke-width="3.5" stroke-dasharray="2 11" stroke-linecap="round" fill="none"/>
+        <circle cx="270" cy="170" r="7" fill="#FFFDF9" stroke="#A85A38" stroke-width="3"/>
+        <g transform="translate(292 318)"><rect width="138" height="30" rx="3" fill="#FFFDF9" stroke="#A85A38" stroke-width="1.2"/><text x="69" y="20" text-anchor="middle" fill="#80591F" font-size="12.5" font-weight="500" letter-spacing="1.5">2 BLOCKS SOUTH</text></g>
+        <circle cx="270" cy="490" r="26" fill="none" stroke="#A85A38" stroke-width="1.4" opacity=".5"/>
+        <path d="M270 494c-9-13-15-21-15-30a15 15 0 0 1 30 0c0 9-6 17-15 30z" fill="#A85A38"/>
+        <circle cx="270" cy="464" r="5.5" fill="#FFFDF9"/>
+        <g transform="translate(306 524)"><rect x="-10" y="-22" width="212" height="62" rx="8" fill="#FFFDF9" stroke="#261E17" stroke-opacity=".14"/><text x="0" y="0" fill="#261E17" font-size="16" font-weight="500">Lexington Podiatry</text><text x="0" y="22" fill="#635649" font-size="13.5">353 Lexington Ave, Rm 1502</text></g>
       </svg>
     </div>
   </div>
