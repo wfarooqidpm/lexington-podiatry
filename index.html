@@ -320,6 +320,7 @@ section{padding:104px 0;}
 .rev-head h2{font-family:var(--serif);font-weight:340;font-size:clamp(32px,3.4vw,42px);line-height:1.14;margin-top:18px;}
 .agg{font-size:14.5px;color:var(--ink-soft);text-align:right;line-height:1.5;}
 .agg .stars{color:var(--brass);font-size:16px;letter-spacing:3px;display:block;}
+.trust a,.agg a,.sec-head p a,.svc .n a,.appt-note a{color:inherit;text-decoration:underline;text-decoration-color:var(--brass);text-underline-offset:3px;}
 .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
 .rev{
   background:#fff;
@@ -544,11 +545,11 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
     "name": "Lexington Podiatry",
     "alternateName": "Wiqar Farooqi, DPM",
     "url": "https://lexingtonpodiatry.nyc/",
-    "image": "https://images.squarespace-cdn.com/content/v1/69d9152b0fe5752ce02da933/4313dae7-5076-4262-a066-b481586465ad/HiRes_Wiqar_Farooqi_053_2.jpeg",
+    "image": "https://lexingtonpodiatry.nyc/images/dr-farooqi.webp",
     "telephone": "+1-212-510-8665",
     "priceRange": "$$",
     "medicalSpecialty": "https://schema.org/Podiatric",
-    "description": "Lexington Podiatry is a Midtown Manhattan podiatry office providing comprehensive foot and ankle care. In Network insurance accepted including Aetna, Cigna, UnitedHealthcare, Anthem Blue Cross Blue Shield, 1199, and Medicare. Services include minimally invasive foot surgery, custom orthotics, shockwave therapy, SWIFT wart treatment, digital X-rays, nail care, injections, and sports medicine.",
+    "description": "Lexington Podiatry is a Midtown Manhattan podiatry office providing comprehensive foot and ankle care. In Network insurance accepted including Aetna, Cigna, Anthem Blue Cross Blue Shield, 1199, Medicare, and TRICARE. UnitedHealthcare PPO plans accepted out of network. Services include minimally invasive foot surgery, custom orthotics, shockwave therapy, SWIFT wart treatment, digital X-rays, nail care, injections, and sports medicine.",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "353 Lexington Ave Rm 1502",
@@ -589,8 +590,9 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
     ],
     "paymentAccepted": [
       "In Network - 1199", "In Network - Aetna", "In Network - Cigna",
-      "In Network - UnitedHealthcare", "In Network - Anthem Blue Cross Blue Shield",
-      "In Network - Medicare"
+      "In Network - Anthem Blue Cross Blue Shield",
+      "In Network - Medicare", "In Network - TRICARE",
+      "Out of Network - UnitedHealthcare PPO"
     ],
     "knowsAbout": [
       "In Network Podiatrist", "Foot and Ankle Care", "Bunions", "Hammertoes",
@@ -690,7 +692,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
         <a class="btn btn-ghost" href="tel:+12125108665">Call the office</a>
       </div>
       <div class="trust rise d5">
-        <div><span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><strong>Rated 5 stars</strong>on Google &amp; Zocdoc</div>
+        <div><span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span><strong>5.0 on Google &middot; 4.94 on Zocdoc</strong><a href="https://www.google.com/maps/search/?api=1&amp;query=Lexington+Podiatry+353+Lexington+Ave+New+York+NY+10016" rel="noopener">19 Google</a> and <a href="https://www.zocdoc.com/doctor/wiqar-farooqi-dpm-424522" rel="noopener">142 Zocdoc</a> reviews (Nov 2026)</div>
         <div><strong>Most major insurance</strong>Medicare, PPO plans &amp; more</div>
         <div><strong>Same-week visits</strong>Monday–Friday appointments</div>
       </div>
@@ -723,7 +725,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
     <div class="sec-head reveal">
       <p class="eyebrow">Conditions we treat</p>
       <h2>What's keeping you off your <em>feet?</em></h2>
-      <p>From a stubborn ingrown nail to surgical bunion correction, all diagnosed and treated in one Midtown office with digital X-ray on site.</p>
+      <p>From a stubborn ingrown nail to surgical bunion correction, all diagnosed and treated in one Midtown office with digital X-ray on site. Looking for support inside your shoes? See <a href="/orthotics.html">3D-printed custom orthotics</a>.</p>
     </div>
     <div class="cond-grid reveal">
       <a class="cond" href="bunions.html">
@@ -830,7 +832,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
     <div class="svc-list reveal">
       <div class="svc"><span class="n">Minimally invasive surgery</span><span class="d">Bunions, hammertoes, heel spurs</span></div>
       <div class="svc"><span class="n">Digital X-ray</span><span class="d">Instant, in-office imaging</span></div>
-      <div class="svc"><span class="n">3D-printed custom orthotics</span><span class="d">Scanned &amp; built for your foot</span></div>
+      <div class="svc"><span class="n"><a href="/orthotics.html">3D-printed custom orthotics</a></span><span class="d">Scanned &amp; built for your foot</span></div>
       <div class="svc"><span class="n">Shockwave therapy</span><span class="d">For chronic heel pain &amp; plantar fasciitis</span></div>
       <div class="svc"><span class="n">Wart treatment</span><span class="d">Topicals, debridement &amp; SWIFT</span></div>
       <div class="svc"><span class="n">Nail care</span><span class="d">Ingrown, fungal &amp; routine care</span></div>
@@ -866,7 +868,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
         <p class="eyebrow">Patient reviews</p>
         <h2>Don't take our <em>word</em> for it.</h2>
       </div>
-      <p class="agg"><span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>5.0 average across Google &amp; Zocdoc</p>
+      <p class="agg"><span class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>5.0 from 19 reviews on <a href="https://www.google.com/maps/search/?api=1&amp;query=Lexington+Podiatry+353+Lexington+Ave+New+York+NY+10016" rel="noopener">Google</a> and 4.94 from 142 reviews on <a href="https://www.zocdoc.com/doctor/wiqar-farooqi-dpm-424522" rel="noopener">Zocdoc</a>, as of November 2026</p>
     </div>
     <div class="rev-grid reveal">
       <article class="rev">
@@ -898,10 +900,11 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
         <span>Aetna</span>
         <span>Anthem BCBS</span>
         <span>Cigna</span>
-        <span>UnitedHealthcare</span>
         <span>1199SEIU</span>
+        <span>TRICARE</span>
         <span>Most PPO plans</span>
       </div>
+      <p class="cash"><strong>UnitedHealthcare PPO?</strong> We accept UnitedHealthcare PPO plans as an out-of-network provider.</p>
       <p class="cash"><strong>Deductible too high?</strong> Reasonable self-pay rates are available. Just ask when you book.</p>
     </div>
   </div>
@@ -974,7 +977,7 @@ a.site-phone{display:inline-flex;align-items:center;justify-content:center;gap:1
       <div class="hrow"><span class="d">Thursday<span class="tag">Evening hours</span></span><span class="t">11:00 AM &#8211; 7:00 PM</span></div>
       <div class="hrow"><span class="d">Friday</span><span class="t">9:00 AM &#8211; 3:00 PM</span></div>
       <div class="hrow"><span class="d">Sat &#8211; Sun</span><span class="t">Closed</span></div>
-      <p class="appt-note">Early appointments Tuesday and evenings Monday and Thursday, built for Midtown work schedules.</p>
+      <p class="appt-note">Early appointments Tuesday and evenings Monday and Thursday, built for Midtown work schedules. <a href="/hours.html">Hours &amp; after-work appointments</a></p>
     </div>
   </div>
 </section>
