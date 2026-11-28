@@ -281,3 +281,43 @@ html[data-theme="dark"] body .iti__dropdown-content{background:#2A2018;color:#F6
 html[data-theme="dark"] body :is(.iti__highlight,.iti__country:hover){background:#3A2D21;}
 html[data-theme="dark"] body .iti__selected-dial-code{color:#F6EFE4;}
 html[data-theme="dark"] body .booking-calendar-art{filter:brightness(.9);}
+
+/* Layered windows (2026-11-28): dark counterparts of the block at the end of booking-brand.css.
+   Page darkest, window a step lighter, step cards lighter again, inputs recessed. */
+html[data-theme="dark"] body{background:#120D0A}
+html[data-theme="dark"] body .booking-window{background:#1B140F;border:1px solid rgba(250,247,240,.13);border-radius:26px;box-shadow:0 34px 70px -36px rgba(0,0,0,.9)}
+html[data-theme="dark"] body .booking-window .booking-hero{background:radial-gradient(ellipse at 88% 30%,rgba(221,196,136,.16),transparent 55%),linear-gradient(135deg,#33261B,#241A13);border-bottom:1px solid rgba(250,247,240,.08)}
+html[data-theme="dark"] body .booking-window .booking-hero h1{color:#F6EFE4}
+html[data-theme="dark"] body .booking-window .booking-main{background:#1B140F}
+html[data-theme="dark"] body .booking-window :is(#visitModeQuestion,.booking-section,.booking-path,.booking-finish){background:#2A2018;border:1px solid rgba(250,247,240,.10);border-radius:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 16px 32px -20px rgba(0,0,0,.85)}
+html[data-theme="dark"] body .booking-window :is(#visitModeQuestion,.booking-section):before{color:#DDC488}
+html[data-theme="dark"] body .booking-window .path-bubble{background:#1B140F;border-color:rgba(250,247,240,.18);color:#CBBBA8}
+html[data-theme="dark"] body .booking-window .path-bubble.current{background:#3B2E1C;border-color:#C69753;color:#F5D78E}
+html[data-theme="dark"] body .booking-window .booking-subnote{color:#CBBBA8}
+html[data-theme="dark"] body .booking-window input{background:#1B140F;border:1px solid rgba(250,247,240,.2);color:#F6EFE4}
+html[data-theme="dark"] body .booking-window input:focus{background:#1F1711;border-color:#C69753}
+html[data-theme="dark"] body .booking-window .mode-card{--choice-tint:#3A2B1E;--choice-accent:#DDC488;background:var(--choice-tint);border:1.5px solid rgba(250,247,240,.08);color:#F6EFE4}
+html[data-theme="dark"] body .booking-window .mode-card[data-mode="Virtual"]{--choice-tint:#22302F;--choice-accent:#8CC6CF}
+html[data-theme="dark"] body .booking-window .mode-card:hover{background:var(--choice-tint);border-color:var(--choice-accent)}
+html[data-theme="dark"] body .booking-window .mode-card.selected{border-color:var(--choice-accent);box-shadow:0 0 0 1px var(--choice-accent)}
+html[data-theme="dark"] body .booking-window .mode-card:after{color:var(--choice-accent)}
+html[data-theme="dark"] body .booking-window .mode-card:hover:after{background:var(--choice-accent);color:#1B140F}
+html[data-theme="dark"] .choice-badge{background:#1B140F;box-shadow:0 2px 8px -2px rgba(0,0,0,.6)}
+html[data-theme="dark"] .booking-slot-modes{background:#1B140F;border-color:rgba(250,247,240,.16)}
+html[data-theme="dark"] body .booking-window .booking-slot-modes button{color:#DDC488}
+html[data-theme="dark"] body .booking-window .booking-slot-modes button[aria-pressed="true"]{background:#C69753;color:#1B140F}
+html[data-theme="dark"] .sex-group legend{color:#CBBBA8}
+html[data-theme="dark"] body .booking-window .sex-option span{background:#1B140F;border-color:rgba(250,247,240,.2);color:#F6EFE4}
+html[data-theme="dark"] body .booking-window .sex-option input:checked+span{background:#3B2E1C;border-color:#C69753;box-shadow:0 0 0 1px #C69753;color:#F5D78E}
+html[data-theme="dark"] body .booking-window .sex-option input:focus-visible+span{outline-color:#C69753}
+html[data-theme="dark"] .match-message{color:#F0A486}
+html[data-theme="dark"] body .booking-window .match-card{box-shadow:0 16px 32px -20px rgba(0,0,0,.85)}
+html[data-theme="dark"] body .booking-window .match-card.match-linked{background:#1B2B26;border-color:#3F7A6A}
+html[data-theme="dark"] .match-linked .match-icon{background:#4FA58F}
+html[data-theme="dark"] .match-linked h2{color:#9FD8C7}
+html[data-theme="dark"] body .booking-window .match-card.match-new{background:#33271A;border-color:#8A6A35}
+html[data-theme="dark"] .match-new .match-icon{background:#C69753}
+html[data-theme="dark"] .match-new h2{color:#F5D78E}
+html[data-theme="dark"] .match-icon svg{stroke:#1B140F}
+html[data-theme="dark"] .match-card p,html[data-theme="dark"] .match-edit{color:#CBBBA8}
+html[data-theme="dark"] body .booking-calendar-stage .booking-calendar-art{filter:brightness(.95) drop-shadow(0 10px 18px rgba(0,0,0,.5))}
