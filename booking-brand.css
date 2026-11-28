@@ -114,7 +114,6 @@ footer .brand{display:flex;align-items:center}
 .booking-window .booking-hero h1{color:var(--ink);font-weight:400;letter-spacing:-.005em}
 .booking-window .booking-hero h1 em{color:var(--brass);font-style:normal}
 .booking-welcome{color:var(--ink-soft)}
-.booking-calendar-art{filter:hue-rotate(150deg) saturate(.5)}
 .booking-window .booking-label,.booking-window .booking-section h2,.practice-detail h2,.booking-window .type-card .tc-title,.booking-window .mode-card{letter-spacing:-.005em}
 .booking-window .btn{border-radius:12px;font-family:var(--serif);font-weight:500;letter-spacing:.04em}
 .booking-window .btn-ink,.booking-window .booking-section #btnVerify{background:var(--brass);border-color:var(--brass);color:#fff}

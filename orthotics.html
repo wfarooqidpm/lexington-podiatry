@@ -100,13 +100,19 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .art{position:relative;background:var(--tint);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
 .art::before{content:"";position:absolute;left:50%;bottom:-70px;width:250px;height:250px;margin-left:-125px;border-radius:50%;background:rgba(255,255,255,.75);}
 .art svg{position:relative;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-.ln{stroke:var(--ink);stroke-width:2.2;fill:#fff;}
-.dt{stroke:var(--ink);stroke-width:1.4;opacity:.45;fill:none;}
-.ac{stroke:var(--teal);stroke-width:2.4;fill:none;}
-.thin{stroke-width:1.5;opacity:.7;}
+.ln{stroke:var(--ink);stroke-width:1.5;fill:#fff;}
+.dt{stroke:var(--ink);stroke-width:1.1;opacity:.5;fill:none;}
+.bn{stroke:var(--ink);stroke-width:1.2;fill:#fff;}
+.bo{stroke:var(--ink);fill:none;}
+.bi{stroke:#fff;fill:none;}
+.ink{fill:var(--ink);stroke:none;}
+.ac{stroke:var(--teal);stroke-width:1.8;fill:none;}
+.thin{stroke-width:1.2;}
 .thick{stroke-width:4.5;}
-.dash{stroke-dasharray:3 5;}
+.dash{stroke-dasharray:2.5 4;}
 .acf{fill:var(--teal);stroke:none;}
+.tf{fill:rgba(46,125,140,.16);stroke:none;}
+.keep .ln{stroke-width:2.2;}.keep .dt{stroke-width:1.4;opacity:.45;}.keep .ac{stroke-width:2.4;}.keep .thin{stroke-width:1.5;opacity:.7;}.keep .thick{stroke-width:4.5;}.keep .dash{stroke-dasharray:3 5;}
 
 /* conditions */
 .cond-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;}
@@ -364,6 +370,14 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
   .glance{padding:26px 22px;}
   .path-card{padding:28px 24px;}
 }
+/* plates */
+.art img.plate{position:relative;display:block;width:auto;height:auto;}
+.cond .art::before,.plate-frame .art::before{background:rgba(255,255,255,.5);}
+.cond .art img.s{height:244px;}
+.cond .art img.l{width:94%;align-self:center;}
+.plate-frame .art img.s{height:290px;}
+.plate-frame .art img.l{width:92%;align-self:center;}
+@media (max-width:640px){.plate-frame .art img.s{height:232px;}}
 </style>
   <script type="application/ld+json">
   {
@@ -540,7 +554,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
       <p class="reviewer rise d4">Reviewed by Wiqar Farooqi, DPM, foot and ankle surgeon. Last reviewed November 2026.</p>
     </div>
     <div class="rise d3">
-      <div class="plate-frame"><div class="art"><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a custom orthotic insole with contoured arch support"><path class="ln" d="M92 144C78 144 71 132 73 118C75 106 86 97 85 81C84 65 70 55 71 37C72 19 86 8 102 8C120 8 132 22 132 42C132 62 120 85 118 101C116 113 117 126 112 136C108 143 100 144 92 144Z"/><path class="ac" d="M79 62C93 68 110 68 127 60"/><path class="ac thin" d="M84 78C95 83 108 83 122 77M86 94C96 98 106 98 118 94"/><ellipse class="ac thin dash" cx="95" cy="122" rx="14" ry="13"/><path class="dt" d="M150 40H168M150 52H174M150 64H168M150 76H174M150 88H168"/></svg></div>
+      <div class="plate-frame"><div class="art"><img class="plate l" src="/images/plate-orthotic.png" alt="Illustration of a custom orthotic insole" width="400" height="267" decoding="async"></div>
         <span class="cap"><em>Custom orthotics</em></span>
       </div>
     </div>

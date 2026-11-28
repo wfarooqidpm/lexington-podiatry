@@ -100,13 +100,19 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .art{position:relative;background:var(--tint);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
 .art::before{content:"";position:absolute;left:50%;bottom:-70px;width:250px;height:250px;margin-left:-125px;border-radius:50%;background:rgba(255,255,255,.75);}
 .art svg{position:relative;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-.ln{stroke:var(--ink);stroke-width:2.2;fill:#fff;}
-.dt{stroke:var(--ink);stroke-width:1.4;opacity:.45;fill:none;}
-.ac{stroke:var(--teal);stroke-width:2.4;fill:none;}
-.thin{stroke-width:1.5;opacity:.7;}
+.ln{stroke:var(--ink);stroke-width:1.5;fill:#fff;}
+.dt{stroke:var(--ink);stroke-width:1.1;opacity:.5;fill:none;}
+.bn{stroke:var(--ink);stroke-width:1.2;fill:#fff;}
+.bo{stroke:var(--ink);fill:none;}
+.bi{stroke:#fff;fill:none;}
+.ink{fill:var(--ink);stroke:none;}
+.ac{stroke:var(--teal);stroke-width:1.8;fill:none;}
+.thin{stroke-width:1.2;}
 .thick{stroke-width:4.5;}
-.dash{stroke-dasharray:3 5;}
+.dash{stroke-dasharray:2.5 4;}
 .acf{fill:var(--teal);stroke:none;}
+.tf{fill:rgba(46,125,140,.16);stroke:none;}
+.keep .ln{stroke-width:2.2;}.keep .dt{stroke-width:1.4;opacity:.45;}.keep .ac{stroke-width:2.4;}.keep .thin{stroke-width:1.5;opacity:.7;}.keep .thick{stroke-width:4.5;}.keep .dash{stroke-dasharray:3 5;}
 
 /* conditions */
 .cond-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;}
@@ -364,6 +370,14 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
   .glance{padding:26px 22px;}
   .path-card{padding:28px 24px;}
 }
+/* plates */
+.art img.plate{position:relative;display:block;width:auto;height:auto;}
+.cond .art::before,.plate-frame .art::before{background:rgba(255,255,255,.5);}
+.cond .art img.s{height:244px;}
+.cond .art img.l{width:94%;align-self:center;}
+.plate-frame .art img.s{height:290px;}
+.plate-frame .art img.l{width:92%;align-self:center;}
+@media (max-width:640px){.plate-frame .art img.s{height:232px;}}
 </style>
   <script type="application/ld+json">
   {
@@ -511,7 +525,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
       </div>
     </div>
     <div class="rise d3">
-      <div class="plate-frame"><div class="art"><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of the sole of a foot with a spot on the ball of the foot targeted"><path class="ln" d="M92 142C78 142 71 130 73 116C75 104 88 96 87 82C86 70 70 62 71 47C72 34 85 27 100 29C116 31 129 42 129 58C129 74 119 86 117 100C115 112 117 124 112 134C108 141 100 142 92 142Z"/><ellipse class="ln" cx="80" cy="17" rx="9" ry="11"/><ellipse class="ln" cx="100" cy="12" rx="6" ry="8"/><ellipse class="ln" cx="115" cy="17" rx="5.5" ry="7"/><ellipse class="ln" cx="126" cy="26" rx="5" ry="6.5"/><ellipse class="ln" cx="134" cy="38" rx="4.5" ry="6"/><circle class="acf" cx="100" cy="58" r="3.2"/><circle class="ac" cx="100" cy="58" r="10"/><circle class="ac thin dash" cx="100" cy="58" r="19"/><path class="ac thin" d="M100 32V40M100 76V84M74 58H82M118 58H126"/></svg></div>
+      <div class="plate-frame"><div class="art"><img class="plate s" src="/images/plate-wart.png" alt="Line drawing of the sole of a foot with a wart marked" width="400" height="400" decoding="async"></div>
         <span class="cap"><em>Plantar wart</em></span>
       </div>
     </div>

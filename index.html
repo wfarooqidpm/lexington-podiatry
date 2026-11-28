@@ -102,13 +102,19 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .art{position:relative;background:var(--tint);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
 .art::before{content:"";position:absolute;left:50%;bottom:-70px;width:250px;height:250px;margin-left:-125px;border-radius:50%;background:rgba(255,255,255,.75);}
 .art svg{position:relative;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-.ln{stroke:var(--ink);stroke-width:2.2;fill:#fff;}
-.dt{stroke:var(--ink);stroke-width:1.4;opacity:.45;fill:none;}
-.ac{stroke:var(--teal);stroke-width:2.4;fill:none;}
-.thin{stroke-width:1.5;opacity:.7;}
+.ln{stroke:var(--ink);stroke-width:1.5;fill:#fff;}
+.dt{stroke:var(--ink);stroke-width:1.1;opacity:.5;fill:none;}
+.bn{stroke:var(--ink);stroke-width:1.2;fill:#fff;}
+.bo{stroke:var(--ink);fill:none;}
+.bi{stroke:#fff;fill:none;}
+.ink{fill:var(--ink);stroke:none;}
+.ac{stroke:var(--teal);stroke-width:1.8;fill:none;}
+.thin{stroke-width:1.2;}
 .thick{stroke-width:4.5;}
-.dash{stroke-dasharray:3 5;}
+.dash{stroke-dasharray:2.5 4;}
 .acf{fill:var(--teal);stroke:none;}
+.tf{fill:rgba(46,125,140,.16);stroke:none;}
+.keep .ln{stroke-width:2.2;}.keep .dt{stroke-width:1.4;opacity:.45;}.keep .ac{stroke-width:2.4;}.keep .thin{stroke-width:1.5;opacity:.7;}.keep .thick{stroke-width:4.5;}.keep .dash{stroke-dasharray:3 5;}
 
 /* conditions */
 .cond-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;}
@@ -298,6 +304,30 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
   .hrow .d .tag{display:block;margin-left:0;}
   .hours{padding:6px 18px 16px;}
 }
+/* 4-up */
+.cond-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;}
+.cond .art{height:252px;}
+.cond .art svg{height:238px;width:auto;max-width:94%;}
+.cond .art::before{width:250px;height:250px;margin-left:-125px;bottom:-40px;}
+.cond-copy{padding:22px 22px 22px;}
+.cond h3{font-size:21.5px;}
+.cond p{font-size:15px;}
+.cond-unsure .art{width:300px;min-width:300px;height:auto;min-height:200px;}
+.cond-unsure .art svg{height:182px;}
+.cond-unsure .cond-copy{padding:30px 40px;}
+.cond-unsure h3{font-size:24px;}
+.svc-ico{width:72px;height:72px;}
+.svc-ico svg{width:42px;height:42px;stroke-width:1.5;}
+@media (max-width:1020px){.cond-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:640px){.cond-grid{grid-template-columns:1fr;}.cond-unsure .art{width:auto;min-width:0;height:200px;}.cond-unsure .cond-copy{padding:26px;}.svc{grid-template-columns:72px 1fr;}}
+/* plates */
+.art img.plate{position:relative;display:block;width:auto;height:auto;}
+.cond .art::before,.plate-frame .art::before{background:rgba(255,255,255,.5);}
+.cond .art img.s{height:244px;}
+.cond .art img.l{width:94%;align-self:center;}
+.plate-frame .art img.s{height:290px;}
+.plate-frame .art img.l{width:92%;align-self:center;}
+@media (max-width:640px){.plate-frame .art img.s{height:232px;}}
 </style>
   <script type="application/ld+json">
   {
@@ -476,15 +506,23 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
     </div>
     <div class="cond-grid">
       <a class="cond" href="bunions.html">
-        <div class="art"><span class="num" aria-hidden="true">01</span><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a forefoot with a bunion at the big toe joint"><path class="ln" d="M72 152C70 132 66 122 60 112C54 102 49 92 58 78C60 60 70 40 80 32C86 27 96 30 96 40C96 52 90 62 88 74C90 56 96 44 102 42C108 41 110 48 108 56C107 64 106 70 106 76C108 62 112 52 118 51C123 51 125 57 123 64C122 70 121 76 121 80C123 70 127 62 132 62C137 62 138 68 136 74C135 79 134 84 134 88C136 80 140 75 144 76C149 77 149 84 147 89C145 94 144 98 144 104C146 120 140 136 138 152"/><ellipse class="dt" cx="86" cy="41" rx="5.5" ry="6.5" transform="rotate(22 86 41)"/><ellipse class="dt" cx="103" cy="49" rx="3" ry="3.5"/><ellipse class="dt" cx="118" cy="58" rx="2.8" ry="3.2"/><ellipse class="dt" cx="132" cy="69" rx="2.6" ry="3"/><ellipse class="dt" cx="144" cy="83" rx="2.4" ry="2.8"/><path class="ac" d="M44 80C37 90 37 102 44 112"/><path class="ac thin" d="M34 74C24 88 24 104 34 118"/><circle class="acf" cx="61" cy="95" r="3.2"/></svg></div>
+        <div class="art"><span class="num" aria-hidden="true">01</span><img class="plate s" src="/images/plate-bunion.png" alt="Line drawing of a foot from above with a bump at the big-toe joint" width="400" height="400" loading="lazy" decoding="async"></div>
         <div class="cond-copy">
-        <h3>Bunions &amp; hammertoes</h3>
-        <p>Painful deformities corrected through keyhole incisions, so most patients recover faster with less pain.</p>
+        <h3>Bunions</h3>
+        <p>A bony bump at the big-toe joint that slowly worsens. We start with conservative care and correct it through keyhole incisions when it's time.</p>
+        <span class="cond-action">Explore treatment <span class="go" aria-hidden="true">&rarr;</span></span>
+        </div>
+      </a>
+      <a class="cond" href="/hammertoes.html">
+        <div class="art"><span class="num" aria-hidden="true">02</span><img class="plate l" src="/images/plate-hammertoe.png" alt="Shaded line drawing of the front of a foot, with a raised knuckle on the second toe" width="448" height="344" loading="lazy" decoding="async"></div>
+        <div class="cond-copy">
+        <h3>Hammertoes</h3>
+        <p>A toe that bends up at the middle joint, rubbing in shoes and forming corns. Often eased with simple changes, or straightened through tiny incisions.</p>
         <span class="cond-action">Explore treatment <span class="go" aria-hidden="true">&rarr;</span></span>
         </div>
       </a>
       <a class="cond" href="heel-pain.html">
-        <div class="art"><span class="num" aria-hidden="true">02</span><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a foot in profile with the heel highlighted"><path class="ln" d="M58 8V78C58 92 46 100 46 116C46 128 54 134 66 134C82 134 90 127 104 127C122 127 132 134 150 134H164C172 134 176 128 172 122C168 117 158 114 148 110C130 103 108 96 98 82C90 72 86 60 86 44V8"/><circle class="ln" cx="73" cy="93" r="5"/><path class="ac" d="M36 100C30 114 34 132 48 142"/><path class="ac thin" d="M26 94C16 114 22 140 42 152"/><circle class="acf" cx="60" cy="122" r="3.2"/></svg></div>
+        <div class="art"><span class="num" aria-hidden="true">03</span><img class="plate l" src="/images/plate-heel.png" alt="Line drawing of a foot from the side with the heel marked" width="400" height="267" loading="lazy" decoding="async"></div>
         <div class="cond-copy">
         <h3>Heel pain &amp; plantar fasciitis</h3>
         <p>Shockwave therapy, injections, and 3D-printed custom orthotics for pain that won't quit.</p>
@@ -492,15 +530,23 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
         </div>
       </a>
       <a class="cond" href="nails.html">
-        <div class="art"><span class="num" aria-hidden="true">03</span><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a toe with the edge of the nail highlighted"><path class="ln" d="M68 152V72C68 42 84 24 100 24C116 24 132 42 132 72V152"/><path class="ln" d="M82 74C82 52 90 40 100 40C110 40 118 52 118 74V86C118 90 115 93 111 93H89C85 93 82 90 82 86Z"/><path class="dt" d="M90 84C96 79 104 79 110 84"/><path class="dt" d="M80 118H120M84 128H116"/><circle class="ac dash" cx="82" cy="66" r="15"/><path class="ac" d="M82 86V68C82 61 83 56 85 51"/></svg></div>
+        <div class="art"><span class="num" aria-hidden="true">04</span><img class="plate s" src="/images/plate-ingrown.png" alt="Line drawing of a big toe with one edge of the nail marked" width="400" height="400" loading="lazy" decoding="async"></div>
         <div class="cond-copy">
-        <h3>Ingrown &amp; fungal nails</h3>
-        <p>Fast, lasting relief and restored, healthy-looking nails, no matter how far gone they seem.</p>
+        <h3>Ingrown toenails</h3>
+        <p>Pain, redness or swelling at the edge of a nail. Relief at your visit, and a quick in-office procedure for edges that keep growing back in.</p>
+        <span class="cond-action">Explore treatment <span class="go" aria-hidden="true">&rarr;</span></span>
+        </div>
+      </a>
+      <a class="cond" href="nails.html">
+        <div class="art"><span class="num" aria-hidden="true">05</span><img class="plate s" src="/images/plate-fungal.png" alt="Line drawing of a big toe with the nail shaded as thickened and discolored" width="400" height="400" loading="lazy" decoding="async"></div>
+        <div class="cond-copy">
+        <h3>Fungal nails</h3>
+        <p>Thickened, discolored or crumbling nails. Honest fungal nail care, with realistic expectations.</p>
         <span class="cond-action">Explore treatment <span class="go" aria-hidden="true">&rarr;</span></span>
         </div>
       </a>
       <a class="cond" href="warts.html">
-        <div class="art"><span class="num" aria-hidden="true">04</span><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of the sole of a foot with a spot on the ball of the foot targeted"><path class="ln" d="M92 142C78 142 71 130 73 116C75 104 88 96 87 82C86 70 70 62 71 47C72 34 85 27 100 29C116 31 129 42 129 58C129 74 119 86 117 100C115 112 117 124 112 134C108 141 100 142 92 142Z"/><ellipse class="ln" cx="80" cy="17" rx="9" ry="11"/><ellipse class="ln" cx="100" cy="12" rx="6" ry="8"/><ellipse class="ln" cx="115" cy="17" rx="5.5" ry="7"/><ellipse class="ln" cx="126" cy="26" rx="5" ry="6.5"/><ellipse class="ln" cx="134" cy="38" rx="4.5" ry="6"/><circle class="acf" cx="100" cy="58" r="3.2"/><circle class="ac" cx="100" cy="58" r="10"/><circle class="ac thin dash" cx="100" cy="58" r="19"/><path class="ac thin" d="M100 32V40M100 76V84M74 58H82M118 58H126"/></svg></div>
+        <div class="art"><span class="num" aria-hidden="true">06</span><img class="plate s" src="/images/plate-wart.png" alt="Line drawing of the sole of a foot with a wart marked" width="400" height="400" loading="lazy" decoding="async"></div>
         <div class="cond-copy">
         <h3>Plantar warts</h3>
         <p>Topical treatments, expert debridement, SWIFT, and in-office deep debridement. We'll help you choose the right approach.</p>
@@ -508,7 +554,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
         </div>
       </a>
       <a class="cond" href="sports-injuries.html">
-        <div class="art"><span class="num" aria-hidden="true">05</span><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a foot and ankle wrapped in athletic tape"><g transform="translate(206 0) scale(-1 1)"><path class="ln" d="M58 8V78C58 92 46 100 46 116C46 128 54 134 66 134C82 134 90 127 104 127C122 127 132 134 150 134H164C172 134 176 128 172 122C168 117 158 114 148 110C130 103 108 96 98 82C90 72 86 60 86 44V8"/><circle class="ln" cx="73" cy="93" r="5"/><path class="ac" d="M58 50H86M58 61H87M58 72H90"/><path class="ac" d="M110 96L103 127M123 102L118 129M136 107L133 133"/><path class="ac thin" d="M60 80C74 100 92 112 104 127"/></g><path class="ac thin" d="M168 96H190M172 110H196M168 124H186"/></svg></div>
+        <div class="art"><span class="num" aria-hidden="true">07</span><img class="plate s" src="/images/plate-sports.png" alt="Line drawing of a foot and ankle from the front with the ankle marked" width="400" height="400" loading="lazy" decoding="async"></div>
         <div class="cond-copy">
         <h3>Sports injuries</h3>
         <p>Sprains, strains, and fractures, diagnosed on the spot with in-office digital X-ray, then taped, treated, and back in training.</p>
@@ -516,15 +562,15 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
         </div>
       </a>
       <a class="cond" href="/routine-foot-care.html">
-        <div class="art"><span class="num" aria-hidden="true">06</span><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a pair of well-kept feet"><g transform="translate(-34 12) scale(.86)"><path class="ln" d="M92 142C78 142 71 130 73 116C75 104 88 96 87 82C86 70 70 62 71 47C72 34 85 27 100 29C116 31 129 42 129 58C129 74 119 86 117 100C115 112 117 124 112 134C108 141 100 142 92 142Z"/><ellipse class="ln" cx="80" cy="17" rx="9" ry="11"/><ellipse class="ln" cx="100" cy="12" rx="6" ry="8"/><ellipse class="ln" cx="115" cy="17" rx="5.5" ry="7"/><ellipse class="ln" cx="126" cy="26" rx="5" ry="6.5"/><ellipse class="ln" cx="134" cy="38" rx="4.5" ry="6"/></g><g transform="translate(234 12) scale(-.86 .86)"><path class="ln" d="M92 142C78 142 71 130 73 116C75 104 88 96 87 82C86 70 70 62 71 47C72 34 85 27 100 29C116 31 129 42 129 58C129 74 119 86 117 100C115 112 117 124 112 134C108 141 100 142 92 142Z"/><ellipse class="ln" cx="80" cy="17" rx="9" ry="11"/><ellipse class="ln" cx="100" cy="12" rx="6" ry="8"/><ellipse class="ln" cx="115" cy="17" rx="5.5" ry="7"/><ellipse class="ln" cx="126" cy="26" rx="5" ry="6.5"/><ellipse class="ln" cx="134" cy="38" rx="4.5" ry="6"/></g><path class="acf" d="M100 6Q100 18 112 18Q100 18 100 30Q100 18 88 18Q100 18 100 6Z"/><path class="acf" d="M22 40Q22 48 30 48Q22 48 22 56Q22 48 14 48Q22 48 22 40Z"/><path class="acf" d="M180 34Q180 42 188 42Q180 42 180 50Q180 42 172 42Q180 42 180 34Z"/></svg></div>
+        <div class="art"><span class="num" aria-hidden="true">08</span><img class="plate s" src="/images/plate-routine.png" alt="Line drawing of a healthy foot and ankle from the front" width="400" height="400" loading="lazy" decoding="async"></div>
         <div class="cond-copy">
         <h3>Routine foot care</h3>
         <p>Regular nail trimming and callus care, with no judgment. For seniors, anyone who finds foot care difficult, or anyone who would like a helping hand.</p>
-        <span class="cond-action">Explore ongoing care <span class="go" aria-hidden="true">&rarr;</span></span>
+        <span class="cond-action">Explore care <span class="go" aria-hidden="true">&rarr;</span></span>
         </div>
       </a>
       <a class="cond cond-unsure" href="/booking">
-        <div class="art"><svg viewBox="0 0 200 150" aria-hidden="true" focusable="false"><circle class="ln" cx="94" cy="68" r="42"/><circle class="dt" cx="94" cy="68" r="34"/><path class="ln thick" d="M125 99L158 134"/><path class="ac thick" d="M81 58C81 42 107 42 107 58C107 69 94 68 94 80"/><circle class="acf" cx="94" cy="92" r="3.4"/><path class="ac thin" d="M150 30V42M144 36H156M30 104V114M25 109H35"/></svg></div>
+        <div class="art"><svg class="keep" viewBox="0 0 200 150" aria-hidden="true" focusable="false"><circle class="ln" cx="94" cy="68" r="42"/><circle class="dt" cx="94" cy="68" r="34"/><path class="ln thick" d="M125 99L158 134"/><path class="ac thick" d="M81 58C81 42 107 42 107 58C107 69 94 68 94 80"/><circle class="acf" cx="94" cy="92" r="3.4"/><path class="ac thin" d="M150 30V42M144 36H156M30 104V114M25 109H35"/></svg></div>
         <div class="cond-copy">
           <h3>Not sure?</h3>
           <p>You don't need to diagnose yourself. What looks like one problem can be a symptom of something else. Bring your questions (and what you've Googled). We'll help explain what's happening and make it make sense.</p>
@@ -534,7 +580,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
     </div>
     <div class="more-cond">
       <p class="eyebrow">More conditions we treat</p>
-      <div class="more-links"><a href="/hammertoes.html">Hammertoes</a><a href="/mortons-neuroma.html">Morton's neuroma</a><a href="/achilles-pain.html">Achilles pain</a><a href="/flat-feet.html">Flat feet</a><a href="/ankle-sprains.html">Ankle sprains</a><a href="/gout.html">Gout</a><a href="/diabetic-foot-care.html">Diabetic foot care</a><a href="/shockwave-therapy.html">Shockwave therapy</a><a href="/orthotics.html">Custom orthotics</a></div>
+      <div class="more-links"><a href="/mortons-neuroma.html">Morton's neuroma</a><a href="/achilles-pain.html">Achilles pain</a><a href="/flat-feet.html">Flat feet</a><a href="/ankle-sprains.html">Ankle sprains</a><a href="/gout.html">Gout</a><a href="/diabetic-foot-care.html">Diabetic foot care</a><a href="/shockwave-therapy.html">Shockwave therapy</a><a href="/orthotics.html">Custom orthotics</a></div>
     </div>
   </div>
 </section>
@@ -577,14 +623,14 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
       <p>A fully equipped Midtown practice, so you're never shuttled across town for imaging or therapy.</p>
     </div>
     <div class="svc-grid">
-      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M4 9h20" opacity=".55"/><path d="M4 6v6M24 6v6" opacity=".55"/><path class="a" d="M12 19h4" stroke-width="2.6"/><path class="a" d="M12 16.5v5M16 16.5v5" stroke-width="1.2"/></svg></span><span class="n">Minimally invasive surgery</span><span class="d">Bunions, hammertoes, heel spurs</span></div>
-      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 28 28"><rect x="5" y="3.5" width="18" height="21" rx="2"/><path class="a" d="M12 21c-1.6 0-2.2-1.4-2-3 .2-1.400 1.300-2.200 1.200-3.600-.1-1.300-1.200-2-1.100-3.400.1-1.300 1.300-2 2.700-1.800 1.600.2 2.800 1.300 2.800 2.900 0 1.600-1 2.800-1.200 4.200-.2 1.200 0 2.400-.5 3.400-.4.900-1.100 1.300-1.900 1.300z"/><circle class="af" cx="11" cy="6.600" r=".9"/><circle class="af" cx="13.400" cy="6.200" r=".8"/><circle class="af" cx="15.400" cy="6.900" r=".7"/><circle class="af" cx="16.900" cy="8.100" r=".6"/></svg></span><span class="n">Digital X-ray</span><span class="d">Instant, in-office imaging</span></div>
-      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M12 25c-3.500 0-4.800-3-4.300-6.500.4-3 2.600-4.800 2.400-7.800C9.900 8 8.500 6.500 9.500 4.500 10.500 2.800 13 2.500 15.500 3c3 .7 5 3 5 6.200 0 3.400-2 5.800-2.500 8.800-.4 2.500 0 4.500-1.500 5.800-1.200 1-2.800 1.200-4.500 1.200z"/><path class="a" d="M11.500 8h7.500M11.300 12h8.200M9.600 16h8.700M8.600 20h8.800" stroke-width="1.200"/></svg></span><span class="n"><a href="/orthotics.html">3D-printed custom orthotics</a></span><span class="d">Scanned &amp; built for your foot</span></div>
-      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 28 28"><circle class="af" cx="5.500" cy="14" r="2"/><path class="a" d="M10.500 9.500a7 7 0 0 1 0 9"/><path d="M15 6.500a11.500 11.500 0 0 1 0 15"/><path d="M19.500 3.500a16 16 0 0 1 0 21" opacity=".55"/></svg></span><span class="n">Shockwave therapy</span><span class="d">For chronic heel pain &amp; plantar fasciitis</span></div>
-      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="8.500"/><circle class="af" cx="14" cy="14" r="2.200"/><path class="a" d="M14 2.500v5M14 20.500v5M2.500 14h5M20.500 14h5"/></svg></span><span class="n">Wart treatment</span><span class="d">Topicals, debridement &amp; SWIFT</span></div>
-      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M7 26V13c0-5.500 3-9.500 7-9.500s7 4 7 9.500v13"/><path class="a" d="M10.500 13.500c0-3.800 1.500-6 3.500-6s3.500 2.200 3.500 6v2.300c0 .7-.5 1.200-1.200 1.200h-4.600c-.7 0-1.200-.5-1.200-1.200z"/></svg></span><span class="n">Nail care</span><span class="d">Ingrown, fungal &amp; routine care</span></div>
-      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M19 3.500l5.500 5.500M21.700 6.300l-3 3M15.500 6.500l6 6M17 8L7.500 17.500v3h3L20 11"/><path class="a" d="M7.500 20.500L3.500 24.500"/><path class="a" d="M12.500 12.500l1.800 1.800M10 15l1.800 1.800" stroke-width="1.200"/></svg></span><span class="n">Injections</span><span class="d">Targeted relief for joint &amp; soft-tissue pain</span></div>
-      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 28 28"><circle cx="11" cy="13" r="7.500"/><circle cx="11" cy="13" r="2.500"/><path class="a" d="M11 20.500h13.500v-6"/><path class="a" d="M20 20.500v-2M16 20.500v-2" stroke-width="1.200"/></svg></span><span class="n">Athletic taping</span><span class="d">Quick visits for active injuries</span></div>
+      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="5" y="27" width="38" height="12" rx="2.5"/><path d="M11 27v5M17 27v3.5M23 27v5M29 27v3.5M35 27v5" /><path class="a" stroke-width="2.6" d="M21 15h6"/><path class="a" d="M21 11.5v7M27 11.5v7"/></svg></span><span class="n">Minimally invasive surgery</span><span class="d">Bunions, hammertoes, heel spurs</span></div>
+      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="8" y="4.5" width="32" height="39" rx="3.5"/><path class="a" stroke-width="2.8" d="M17.5 37l-1.5-13M24 38V22M30.5 37l1.5-13"/><path class="a" stroke-width="2.4" d="M15.600 19.5l-.4-4M24 17.5v-4.5M32.4 19.5l.4-4"/><path class="a" stroke-width="2" d="M15 11.8v-1.3M24 9.3V8M33 11.8v-1.3"/></svg></span><span class="n">Digital X-ray</span><span class="d">Instant, in-office imaging</span></div>
+      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M21.5 44C15 44 12.5 38.5 13.3 32.5C14 27 18.5 23.5 18.2 17.5C18 12.5 13.5 10 14.5 6.5C16 3.2 21.5 2.8 26.5 3.8C32.5 5 36 9.5 36 15.5C36 22 32 26.5 31 32.5C30.3 37 31 40.5 28.3 42.8C26.5 44 24 44 21.5 44Z"/><path class="a" d="M17 14C22.5 16.5 29.5 16.5 35.5 13M18 21.5C22.5 23.5 28.5 23.5 33.5 21M15 28.5C20 30.5 26 30.5 31.5 28.5"/></svg></span><span class="n"><a href="/orthotics.html">3D-printed custom orthotics</a></span><span class="d">Scanned &amp; built for your foot</span></div>
+      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="3.5" y="16" width="15" height="16" rx="4"/><path d="M18.5 20h4.5v8h-4.5"/><path class="a" d="M28.5 17.5a9.5 9.5 0 0 1 0 13M34 13a16 16 0 0 1 0 22M39.5 8.5a22.5 22.5 0 0 1 0 31"/></svg></span><span class="n">Shockwave therapy</span><span class="d">For chronic heel pain &amp; plantar fasciitis</span></div>
+      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="13.5"/><circle class="a" cx="24" cy="24" r="5.5"/><path class="a" d="M24 3.5v8M24 36.5v8M3.5 24h8M36.5 24h8"/><circle class="af" cx="24" cy="24" r="1.5"/></svg></span><span class="n">Wart treatment</span><span class="d">Topicals, debridement &amp; SWIFT</span></div>
+      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M11 45V22C11 11.5 17 4.5 24 4.5S37 11.5 37 22v23"/><path class="a" d="M17 24c0-7 3-11 7-11s7 4 7 11v5.5c0 1.4-1.1 2.5-2.5 2.5h-9c-1.4 0-2.5-1.1-2.5-2.5Z"/><path d="M16 39.5c5-1.5 11-1.5 16 0"/></svg></span><span class="n">Nail care</span><span class="d">Ingrown, fungal &amp; routine care</span></div>
+      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M31 5l12 12M37 11l-5 5M26 10l12 12M28.5 12.5L11 30v7h7l17.5-17.5"/><path class="a" d="M11 37l-7 7"/><path class="a" d="M22 19l3.5 3.5M17.5 23.5l3.5 3.5"/></svg></span><span class="n">Injections</span><span class="d">Targeted relief for joint &amp; soft-tissue pain</span></div>
+      <div class="svc"><span class="svc-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="18" cy="22" r="13.5"/><circle cx="18" cy="22" r="5"/><path class="a" d="M18 35.5h26V25"/><path class="a" d="M36 35.5v-3.5M29 35.5v-3.5"/></svg></span><span class="n">Athletic taping</span><span class="d">Quick visits for active injuries</span></div>
     </div>
   </div>
 </section>
