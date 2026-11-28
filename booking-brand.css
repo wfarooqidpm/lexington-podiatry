@@ -1,6 +1,6 @@
-/* Booking shares the homepage's walnut/ivory contrast, pastel cards and circular
+/* Booking shares the homepage's palette (see the card-stock block at the end), tinted cards and circular
    arrows. Keep the active task visually stronger than status and practical details. */
-.booking-window{max-width:1060px;margin:30px auto 24px;border-radius:24px;border:1px solid rgba(43,33,24,.14);box-shadow:0 18px 50px -28px rgba(43,33,24,.28);background:var(--ivory)}
+.booking-window{max-width:1060px;margin:30px auto 24px;border-radius:24px;border:1px solid rgba(43,45,51,.14);box-shadow:0 18px 50px -28px rgba(43,45,51,.28);background:var(--ivory)}
 .booking-window .booking-hero{position:relative;overflow:hidden;background:var(--walnut);padding:30px 0 32px;color:var(--ivory)}
 .booking-window .booking-hero>.wrap,.booking-window .booking-main>.wrap{padding-left:38px;padding-right:38px}
 .booking-kicker{font:600 10px var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--champagne-soft);margin-bottom:13px}
@@ -35,9 +35,9 @@
 .booking-window #visitTypeQuestion:before,.booking-window #visitModeQuestion:before,.booking-window .booking-section:before{font:600 10px var(--sans);letter-spacing:.18em;color:var(--brass);margin-bottom:10px}
 .booking-window .booking-label,.booking-window .booking-section h2{font:400 29px/1.2 var(--serif);letter-spacing:-.02em;margin-bottom:20px}
 .booking-window .type-grid,.booking-window .mode-grid{gap:16px;grid-template-columns:1fr 1fr}
-.booking-window .type-card,.booking-window .mode-card{--choice-tint:#E6EAD9;--choice-accent:#40533D;background:radial-gradient(ellipse at 20% 100%,rgba(250,247,240,.64),transparent 75%),var(--choice-tint);border:1px solid transparent;border-radius:18px;min-height:146px;padding:22px 64px 23px 24px;position:relative;overflow:hidden;box-shadow:none;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
-.booking-window #cardReturning,.booking-window .mode-card[data-mode="Virtual"]{--choice-tint:#ECDDCB;--choice-accent:#795735}
-.booking-window .type-card:hover,.booking-window .mode-card:hover{background:radial-gradient(ellipse at 20% 100%,rgba(250,247,240,.64),transparent 75%),var(--choice-tint);transform:translateY(-2px);border-color:var(--choice-accent);box-shadow:0 8px 18px rgba(43,33,24,.07)}
+.booking-window .type-card,.booking-window .mode-card{--choice-tint:#EAF0F1;--choice-accent:#2F4A63;background:radial-gradient(ellipse at 20% 100%,rgba(250,247,240,.64),transparent 75%),var(--choice-tint);border:1px solid transparent;border-radius:18px;min-height:146px;padding:22px 64px 23px 24px;position:relative;overflow:hidden;box-shadow:none;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.booking-window #cardReturning,.booking-window .mode-card[data-mode="Virtual"]{--choice-tint:#EEF1F5;--choice-accent:#2F4A63}
+.booking-window .type-card:hover,.booking-window .mode-card:hover{background:radial-gradient(ellipse at 20% 100%,rgba(250,247,240,.64),transparent 75%),var(--choice-tint);transform:translateY(-2px);border-color:var(--choice-accent);box-shadow:0 8px 18px rgba(43,45,51,.07)}
 .booking-window .type-card:focus-visible,.booking-window .mode-card:focus-visible{outline:2px solid var(--choice-accent);outline-offset:3px}
 .booking-window .type-card:after,.booking-window .mode-card:after{content:'↗';display:flex;align-items:center;justify-content:center;width:34px;height:34px;right:20px;top:auto;bottom:23px;border:1px solid currentColor;border-radius:50%;font:400 21px var(--sans);color:var(--choice-accent);transition:background .2s,color .2s}
 .booking-window .type-card:hover:after,.booking-window .mode-card:hover:after{background:var(--choice-accent);color:var(--ivory)}
@@ -50,9 +50,9 @@
 .booking-window .path-caption span{color:var(--ink-soft)}
 .booking-window .path-bubble{background:var(--stone);border:1px solid var(--line-soft);font-size:12px;min-height:40px;padding:5px 12px}
 .booking-window .path-bubble small{font-size:9px;letter-spacing:.1em}
-.booking-window .path-bubble.current{background:#E6EAD9;border-color:#a5b098;color:#40533D}
-.booking-window input{background:#FFFDFA;border:1px solid rgba(43,33,24,.2);border-radius:10px;min-height:46px}
-.booking-window input:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(140,109,31,.1)}
+.booking-window .path-bubble.current{background:#EAF0F1;border-color:#9CC3CB;color:#2F4A63}
+.booking-window input{background:#FFFFFF;border:1px solid rgba(43,45,51,.2);border-radius:10px;min-height:46px}
+.booking-window input:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(46,125,140,.1)}
 .booking-window .form-group label{font-size:12px;font-weight:600;color:var(--ink-soft)}
 .booking-window .btn{border-radius:999px;min-height:46px;padding:12px 24px}
 .booking-window .btn-ink,.booking-window .booking-section #btnVerify{background:var(--ink);border-color:var(--ink);color:var(--ivory)}
@@ -62,7 +62,7 @@
 .practice-details{max-width:1060px;padding:0;margin:0 auto 34px;grid-template-columns:1.05fr 1fr 1.15fr;gap:16px;align-items:stretch}
 .practice-detail{border-radius:20px;padding:23px 24px;border:1px solid var(--line-soft);background:var(--stone)}
 .practice-detail h2{font:400 23px/1.2 var(--serif);letter-spacing:-.02em;margin-bottom:18px}
-.practice-detail:nth-child(2){background:#E6EAD9;border-color:transparent}.practice-insurers{gap:7px}.practice-insurers span{background:rgba(250,247,240,.62);border-color:rgba(64,83,61,.16);font-size:12px;padding:5px 10px}
+.practice-detail:nth-child(2){background:#EAF0F1;border-color:transparent}.practice-insurers{gap:7px}.practice-insurers span{background:rgba(250,247,240,.62);border-color:rgba(47,74,99,.16);font-size:12px;padding:5px 10px}
 .practice-detail:last-child{background:var(--walnut);border-color:var(--walnut);color:rgba(250,247,240,.73)}
 .practice-detail:last-child h2,.practice-detail:last-child .practice-address{color:var(--ivory)}.practice-detail:last-child a{color:var(--champagne-soft)}
 .practice-hours{font-size:12px;gap:6px 16px}.practice-hours dt{font-weight:500}.practice-detail address,.practice-detail p,.practice-contact{font-size:13px}
@@ -90,10 +90,38 @@ footer{border-top:1px solid var(--line-soft);padding:18px 12px}footer:after{cont
 
 /* Give the email handoff a clear next step and room around secondary actions. */
 #panel2Returning #verifyResult{margin-top:20px;line-height:1.65}
-.email-next-steps{max-width:560px;margin:18px 0 24px;padding:18px 20px;background:#e9ede4;border-radius:14px;color:#2b2118}
+.email-next-steps{max-width:560px;margin:18px 0 24px;padding:18px 20px;background:#EAF0F1;border-radius:14px;color:#2B2D33}
 .email-next-steps p{margin:0;line-height:1.65}
 .email-next-steps p+p{margin-top:12px}
-.email-edit{margin:12px 0 12px 16px;padding:10px 0;border:0;background:transparent;color:#594b3b;text-decoration:underline;text-underline-offset:4px;cursor:pointer;font:inherit}
-.email-help{margin:24px 0 0;padding-top:20px;border-top:1px solid #ded8cb;font-size:14px;line-height:1.7}
+.email-edit{margin:12px 0 12px 16px;padding:10px 0;border:0;background:transparent;color:#5B616B;text-decoration:underline;text-underline-offset:4px;cursor:pointer;font:inherit}
+.email-help{margin:24px 0 0;padding-top:20px;border-top:1px solid #E2E0DA;font-size:14px;line-height:1.7}
 .email-help a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:480px){.email-edit{margin-left:12px}.email-next-steps{padding:16px}}
+
+/* ===== Card-stock palette (matches the homepage): off-white, charcoal, slate blue, thin teal accent.
+   Appearance only. Nothing here changes what the booking flow does. ===== */
+body{background:var(--ivory)}
+.brand{gap:14px}
+.glyph{height:50px;width:auto;display:block;filter:brightness(0);opacity:.82}
+.brand-text{display:flex;flex-direction:column;gap:3px;font-family:var(--serif);text-transform:uppercase;line-height:1.2}
+.brand-text b{font-size:16.5px;font-weight:500;letter-spacing:.3em;color:var(--brass)}
+.brand-text i{font-style:normal;font-size:11px;letter-spacing:.3em;color:var(--ink-soft)}
+footer .glyph{height:40px}footer .brand-text b{font-size:14px}
+footer .brand{display:flex;align-items:center}
+.booking-window{border-radius:28px;border-color:rgba(43,45,51,.1);box-shadow:0 30px 60px -38px rgba(43,45,51,.45)}
+.booking-window .booking-hero{background:var(--stone);color:var(--ink);border-bottom:1px solid var(--line-soft)}
+.booking-kicker{font:500 11px var(--serif);letter-spacing:.32em;color:var(--brass)}
+.booking-window .booking-hero h1{color:var(--ink);font-weight:400;letter-spacing:-.005em}
+.booking-window .booking-hero h1 em{color:var(--brass);font-style:normal}
+.booking-welcome{color:var(--ink-soft)}
+.booking-calendar-art{filter:hue-rotate(150deg) saturate(.5)}
+.booking-window .booking-label,.booking-window .booking-section h2,.practice-detail h2,.booking-window .type-card .tc-title,.booking-window .mode-card{letter-spacing:-.005em}
+.booking-window .btn{border-radius:12px;font-family:var(--serif);font-weight:500;letter-spacing:.04em}
+.booking-window .btn-ink,.booking-window .booking-section #btnVerify{background:var(--brass);border-color:var(--brass);color:#fff}
+.booking-window .btn-ink:hover,.booking-window .booking-section #btnVerify:hover{background:var(--brass-deep)}
+.practice-detail:last-child{background:#fff;border-color:var(--line-soft);color:var(--ink-soft)}
+.practice-detail:last-child h2,.practice-detail:last-child .practice-address{color:var(--ink)}
+.practice-detail:last-child a{color:var(--brass)}
+footer{background:var(--stone);color:var(--ink-soft);border-top:1px solid var(--line-soft)}
+footer a{color:var(--ink-soft)}footer a:hover{color:var(--brass)}
+@media(max-width:560px){.glyph{height:42px}.brand{gap:10px}.brand-text b{font-size:13px;letter-spacing:.24em}.brand-text i{font-size:9.5px;letter-spacing:.22em}}
