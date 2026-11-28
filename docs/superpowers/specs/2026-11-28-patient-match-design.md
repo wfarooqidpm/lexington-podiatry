@@ -1,6 +1,6 @@
 # Automatic first visit / follow-up — backend work (2026-11-28)
 
-**Status (2026-11-28):** written, not deployed. OS2 router: wfarooqidpm/lexington-practice-os2
+**Status (2026-11-28):** OS2 router (@242) and gateway v0.27.0 (@39) deployed; website not yet merged. OS2 router: wfarooqidpm/lexington-practice-os2
 branch `website-patient-match`. Gateway v0.27.0: `releases/2026-11-28-patient-match/`.
 For website bookings, Sex now fills the existing Front Door `Sex` column, which OS2
 already sends to Charm.

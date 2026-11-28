@@ -34,7 +34,20 @@ until then this bridge action returns an error and the page asks patients to cal
 - Existing orthotics pickup gateway test also passes against this file.
 - All 17 website tests pass.
 
-## Deployment (not done)
-After the OS2 release: compare live gateway source with `before/` again, upload
-both files, then create a new web app deployment version for the existing URL.
-Then merge the website PR (wfarooqidpm/lexington-podiatry#55).
+## Deployment
+Deployed 2026-11-28 (owner approved in session), after OS2 router @242:
+- Fresh clone of live "Front Door" project matched `before/` exactly; manifest unchanged.
+- `clasp push` of these two files; read-back matched exactly.
+- Existing public endpoint `AKfycbxSHMx…HpF` moved from @38 to @39
+  ("Website patient match, follow-up gap, Sex · v0.27.0"). Rollback: redeploy @38
+  and push the `before/` files.
+- Live checks: `health` reports v0.27.0 and `websitePatientMatch: true`;
+  `booking-config` reports `returningGapMinutes: 15` (PROGRESSIVE_RETURNING is on;
+  with the gap it rarely releases :15/:45 follow-ups); new-patient slots load (30 min).
+- End-to-end from https://lexingtonpodiatry.nyc through the bridge to OS2 with
+  synthetic, non-matching details: `{success:true, matched:false}` in about 9 s.
+  This made one read-only Charm search and one "NO VERIFIED MATCH" verification row.
+- Not yet verified: a real matched follow-up and a booking with the gap hold
+  (happens with the first real patient after the website PR merges).
+
+Next: merge the website PR (wfarooqidpm/lexington-podiatry#55), which publishes the new booking page.
