@@ -1,0 +1,35 @@
+/* Dark mode. Applies only when the visitor turns it on (see theme.js). */
+html[data-theme="dark"]{color-scheme:dark;--paper:#1B140F;--card:#2A2018;--stone:#231B14;--tint:#32261C;--ink:#F6EFE4;--ink-soft:#CBBBA8;--slate:#DDC488;--slate-deep:#EBD9AC;--teal:#79B3BD;--gold:#DDC488;--accent:#E0976F;--line:rgba(250,247,240,.18);--line-soft:rgba(250,247,240,.11);}
+html[data-theme="dark"] body{background:var(--paper);color:var(--ink);}
+html[data-theme="dark"] :is(.topbar,.mis,.reviews,.final,footer){--card:#241B14;background:#100B08;}
+html[data-theme="dark"] header.nav{background:rgba(27,20,15,.95);}
+html[data-theme="dark"] .mobile-bar{background:rgba(27,20,15,.97);}
+html[data-theme="dark"] :is(.btn-ink,.btn-gold,.btn-brass,nav.links .btn){color:#2B2118;}
+html[data-theme="dark"] :is(.brand .glyph,.hero .watermark){filter:none;}
+/* illustrations stay on a soft parchment so the drawings read correctly */
+html[data-theme="dark"] .art{--tint:#E6D8C6;--card:#FFFDF9;--ink:#261E17;--ink-soft:#635649;--slate:#80591F;--slate-deep:#634416;--teal:#2E7D8C;--gold:#A87C24;--accent:#A85A38;--line:rgba(54,38,24,.14);--line-soft:rgba(54,38,24,.08);background:var(--tint);color:var(--ink);}
+
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;min-width:44px;padding:9px 14px;background:var(--card,#FFFDF9);border:1.5px solid var(--line);border-radius:12px;color:var(--ink);font-family:var(--display,var(--serif,sans-serif));font-size:14px;font-weight:500;white-space:nowrap;cursor:pointer;}
+.theme-toggle:hover{border-color:var(--slate);}
+.theme-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+header.nav .theme-toggle{margin-left:auto;margin-right:0;}
+header.nav .theme-toggle ~ nav.links{margin-left:24px;}
+@media (min-width:1021px){header.nav nav.links{order:1;margin-left:auto;gap:24px;}header.nav .theme-toggle{order:2;margin-left:18px;}}
+@media (max-width:1180px){.theme-toggle span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}.theme-toggle{padding:9px;}}
+header.nav .theme-toggle + .menu-toggle{margin-left:8px;}
+.theme-toggle.floating{position:fixed;right:16px;bottom:16px;z-index:70;}
+@media print{.theme-toggle{display:none;}}
+/* short pages (hours, location, not found) */
+html[data-theme="dark"]{--muted:#CBBBA8;}
+html[data-theme="dark"] .glyph{filter:none;}
+html[data-theme="dark"] :is(.button,body > header > a:last-child){color:#2B2118;}
+body > header:not(.nav) .theme-toggle{margin-left:auto;}
+/* phones: keep the practice name on one line beside the new button */
+@media (max-width:480px){
+  header.nav .brand-text b{font-size:11.5px;letter-spacing:.15em;white-space:nowrap;}
+  header.nav .brand-text i{font-size:8.5px;letter-spacing:.14em;white-space:nowrap;}
+  header.nav .brand{gap:8px;}
+  header.nav .glyph{height:38px;}
+  header.nav .menu-toggle{padding:9px 12px;}
+}
+@media (max-width:350px){header.nav .brand-text i{display:none;}}
