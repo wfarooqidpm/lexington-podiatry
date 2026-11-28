@@ -100,13 +100,19 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .art{position:relative;background:var(--tint);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
 .art::before{content:"";position:absolute;left:50%;bottom:-70px;width:250px;height:250px;margin-left:-125px;border-radius:50%;background:rgba(255,255,255,.75);}
 .art svg{position:relative;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-.ln{stroke:var(--ink);stroke-width:2.2;fill:#fff;}
-.dt{stroke:var(--ink);stroke-width:1.4;opacity:.45;fill:none;}
-.ac{stroke:var(--teal);stroke-width:2.4;fill:none;}
-.thin{stroke-width:1.5;opacity:.7;}
+.ln{stroke:var(--ink);stroke-width:1.5;fill:#fff;}
+.dt{stroke:var(--ink);stroke-width:1.1;opacity:.5;fill:none;}
+.bn{stroke:var(--ink);stroke-width:1.2;fill:#fff;}
+.bo{stroke:var(--ink);fill:none;}
+.bi{stroke:#fff;fill:none;}
+.ink{fill:var(--ink);stroke:none;}
+.ac{stroke:var(--teal);stroke-width:1.8;fill:none;}
+.thin{stroke-width:1.2;}
 .thick{stroke-width:4.5;}
-.dash{stroke-dasharray:3 5;}
+.dash{stroke-dasharray:2.5 4;}
 .acf{fill:var(--teal);stroke:none;}
+.tf{fill:rgba(46,125,140,.16);stroke:none;}
+.keep .ln{stroke-width:2.2;}.keep .dt{stroke-width:1.4;opacity:.45;}.keep .ac{stroke-width:2.4;}.keep .thin{stroke-width:1.5;opacity:.7;}.keep .thick{stroke-width:4.5;}.keep .dash{stroke-dasharray:3 5;}
 
 /* conditions */
 .cond-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;}
@@ -364,6 +370,14 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
   .glance{padding:26px 22px;}
   .path-card{padding:28px 24px;}
 }
+/* plates */
+.art img.plate{position:relative;display:block;width:auto;height:auto;}
+.cond .art::before,.plate-frame .art::before{background:rgba(255,255,255,.5);}
+.cond .art img.s{height:244px;}
+.cond .art img.l{width:94%;align-self:center;}
+.plate-frame .art img.s{height:290px;}
+.plate-frame .art img.l{width:92%;align-self:center;}
+@media (max-width:640px){.plate-frame .art img.s{height:232px;}}
 </style>
   <script type="application/ld+json">
   {
@@ -511,7 +525,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
       </div>
     </div>
     <div class="rise d3">
-      <div class="plate-frame"><div class="art"><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a forefoot with a bunion at the big toe joint"><path class="ln" d="M72 152C70 132 66 122 60 112C54 102 49 92 58 78C60 60 70 40 80 32C86 27 96 30 96 40C96 52 90 62 88 74C90 56 96 44 102 42C108 41 110 48 108 56C107 64 106 70 106 76C108 62 112 52 118 51C123 51 125 57 123 64C122 70 121 76 121 80C123 70 127 62 132 62C137 62 138 68 136 74C135 79 134 84 134 88C136 80 140 75 144 76C149 77 149 84 147 89C145 94 144 98 144 104C146 120 140 136 138 152"/><ellipse class="dt" cx="86" cy="41" rx="5.5" ry="6.5" transform="rotate(22 86 41)"/><ellipse class="dt" cx="103" cy="49" rx="3" ry="3.5"/><ellipse class="dt" cx="118" cy="58" rx="2.8" ry="3.2"/><ellipse class="dt" cx="132" cy="69" rx="2.6" ry="3"/><ellipse class="dt" cx="144" cy="83" rx="2.4" ry="2.8"/><path class="ac" d="M44 80C37 90 37 102 44 112"/><path class="ac thin" d="M34 74C24 88 24 104 34 118"/><circle class="acf" cx="61" cy="95" r="3.2"/></svg></div>
+      <div class="plate-frame"><div class="art"><img class="plate s" src="/images/plate-bunion.png" alt="Line drawing of a foot from above with a bump at the big-toe joint" width="400" height="400" decoding="async"></div>
         <span class="cap"><em>Hallux valgus</em></span>
       </div>
     </div>

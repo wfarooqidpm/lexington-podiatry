@@ -100,13 +100,19 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .art{position:relative;background:var(--tint);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
 .art::before{content:"";position:absolute;left:50%;bottom:-70px;width:250px;height:250px;margin-left:-125px;border-radius:50%;background:rgba(255,255,255,.75);}
 .art svg{position:relative;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-.ln{stroke:var(--ink);stroke-width:2.2;fill:#fff;}
-.dt{stroke:var(--ink);stroke-width:1.4;opacity:.45;fill:none;}
-.ac{stroke:var(--teal);stroke-width:2.4;fill:none;}
-.thin{stroke-width:1.5;opacity:.7;}
+.ln{stroke:var(--ink);stroke-width:1.5;fill:#fff;}
+.dt{stroke:var(--ink);stroke-width:1.1;opacity:.5;fill:none;}
+.bn{stroke:var(--ink);stroke-width:1.2;fill:#fff;}
+.bo{stroke:var(--ink);fill:none;}
+.bi{stroke:#fff;fill:none;}
+.ink{fill:var(--ink);stroke:none;}
+.ac{stroke:var(--teal);stroke-width:1.8;fill:none;}
+.thin{stroke-width:1.2;}
 .thick{stroke-width:4.5;}
-.dash{stroke-dasharray:3 5;}
+.dash{stroke-dasharray:2.5 4;}
 .acf{fill:var(--teal);stroke:none;}
+.tf{fill:rgba(46,125,140,.16);stroke:none;}
+.keep .ln{stroke-width:2.2;}.keep .dt{stroke-width:1.4;opacity:.45;}.keep .ac{stroke-width:2.4;}.keep .thin{stroke-width:1.5;opacity:.7;}.keep .thick{stroke-width:4.5;}.keep .dash{stroke-dasharray:3 5;}
 
 /* conditions */
 .cond-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;}
@@ -364,6 +370,14 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
   .glance{padding:26px 22px;}
   .path-card{padding:28px 24px;}
 }
+/* plates */
+.art img.plate{position:relative;display:block;width:auto;height:auto;}
+.cond .art::before,.plate-frame .art::before{background:rgba(255,255,255,.5);}
+.cond .art img.s{height:244px;}
+.cond .art img.l{width:94%;align-self:center;}
+.plate-frame .art img.s{height:290px;}
+.plate-frame .art img.l{width:92%;align-self:center;}
+@media (max-width:640px){.plate-frame .art img.s{height:232px;}}
 </style>
   <script type="application/ld+json">
   {
@@ -497,7 +511,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
 </header>
 
 <main id="top">
-<section class="c-hero"><div class="wrap"><div><p class="crumb rise d1"><a href="index.html#conditions">Conditions</a> &nbsp;/&nbsp; Routine foot care</p><p class="eyebrow rise d1">Nails · Calluses · Ongoing care</p><h1 class="rise d2">A little regular care.<br><em>A more comfortable step.</em></h1><p class="lede rise d3">You don't need to be in pain to come in. Whether reaching your feet has become difficult or you'd simply like someone to take care of your nails and calluses, you're welcome here. No judgment. Just thoughtful, ongoing care.</p><div class="cta-row rise d4"><a class="btn btn-ink" href="/booking">Book routine foot care</a><a class="call-link" href="tel:+12125108665">Call (212) 510-8665</a></div></div><div class="rise d3"><div class="plate-frame"><div class="art"><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a pair of well-kept feet"><g transform="translate(-34 12) scale(.86)"><path class="ln" d="M92 142C78 142 71 130 73 116C75 104 88 96 87 82C86 70 70 62 71 47C72 34 85 27 100 29C116 31 129 42 129 58C129 74 119 86 117 100C115 112 117 124 112 134C108 141 100 142 92 142Z"/><ellipse class="ln" cx="80" cy="17" rx="9" ry="11"/><ellipse class="ln" cx="100" cy="12" rx="6" ry="8"/><ellipse class="ln" cx="115" cy="17" rx="5.5" ry="7"/><ellipse class="ln" cx="126" cy="26" rx="5" ry="6.5"/><ellipse class="ln" cx="134" cy="38" rx="4.5" ry="6"/></g><g transform="translate(234 12) scale(-.86 .86)"><path class="ln" d="M92 142C78 142 71 130 73 116C75 104 88 96 87 82C86 70 70 62 71 47C72 34 85 27 100 29C116 31 129 42 129 58C129 74 119 86 117 100C115 112 117 124 112 134C108 141 100 142 92 142Z"/><ellipse class="ln" cx="80" cy="17" rx="9" ry="11"/><ellipse class="ln" cx="100" cy="12" rx="6" ry="8"/><ellipse class="ln" cx="115" cy="17" rx="5.5" ry="7"/><ellipse class="ln" cx="126" cy="26" rx="5" ry="6.5"/><ellipse class="ln" cx="134" cy="38" rx="4.5" ry="6"/></g><path class="acf" d="M100 6Q100 18 112 18Q100 18 100 30Q100 18 88 18Q100 18 100 6Z"/><path class="acf" d="M22 40Q22 48 30 48Q22 48 22 56Q22 48 14 48Q22 48 22 40Z"/><path class="acf" d="M180 34Q180 42 188 42Q180 42 180 50Q180 42 172 42Q180 42 180 34Z"/></svg></div><span class="cap"><em>Care you can feel comfortable asking for.</em></span></div></div></div></section>
+<section class="c-hero"><div class="wrap"><div><p class="crumb rise d1"><a href="index.html#conditions">Conditions</a> &nbsp;/&nbsp; Routine foot care</p><p class="eyebrow rise d1">Nails · Calluses · Ongoing care</p><h1 class="rise d2">A little regular care.<br><em>A more comfortable step.</em></h1><p class="lede rise d3">You don't need to be in pain to come in. Whether reaching your feet has become difficult or you'd simply like someone to take care of your nails and calluses, you're welcome here. No judgment. Just thoughtful, ongoing care.</p><div class="cta-row rise d4"><a class="btn btn-ink" href="/booking">Book routine foot care</a><a class="call-link" href="tel:+12125108665">Call (212) 510-8665</a></div></div><div class="rise d3"><div class="plate-frame"><div class="art"><img class="plate s" src="/images/plate-routine.png" alt="Line drawing of a healthy foot and ankle from the front" width="400" height="400" decoding="async"></div><span class="cap"><em>Care you can feel comfortable asking for.</em></span></div></div></div></section>
 <section class="signs"><div class="wrap"><div class="sec-head reveal"><p class="eyebrow">A helping hand</p><h2>When caring for your feet isn't <em>so simple.</em></h2><p>Getting down to your feet can be the hardest part. Limited flexibility, back or joint discomfort, reduced vision, or difficulty handling nail clippers can make a small task feel impossible. You don't have to struggle through it.</p></div><div class="reveal"><div class="sign-row"><span class="no">i.</span><span>You can't comfortably reach your feet or bend down for long</span></div><div class="sign-row"><span class="no">ii.</span><span>Your eyesight makes it difficult to see the nail edges clearly</span></div><div class="sign-row"><span class="no">iii.</span><span>Thick nails or hard calluses are difficult to manage at home</span></div><div class="sign-row"><span class="no">iv.</span><span>You want regular professional care to help keep your feet comfortable</span></div></div></div></section>
 <section><div class="wrap"><div class="sec-head reveal"><p class="eyebrow">What to expect</p><h2>Everyday care, with a <em>medical eye.</em></h2><p>For seniors and adults of any age. We'll look at your skin and nails, listen to what bothers you, and tailor your care to your feet.</p></div><div class="path-grid reveal"><div class="path-card"><span class="tag">At your visit</span><h3>Nail &amp; callus care</h3><p>Professional trimming and care for nails that are long, thick, or difficult to manage, plus careful reduction of calluses when appropriate.</p><ul><li>Comfortable nail trimming and smoothing</li><li>Attention to pressure points and troublesome nail edges</li><li>Advice on footwear and caring for your skin between visits</li></ul></div><div class="path-card"><span class="tag">Over time</span><h3>A routine that works for you</h3><p>We'll agree on how often you should come back based on nail growth, callus buildup, comfort, and your medical needs.</p><ul><li>Regular checks for changes you may not see yourself</li><li>A familiar place to ask questions</li><li>A care plan that adjusts as your needs change</li></ul></div></div></div></section>
 <section class="mis"><div class="wrap"><div class="copy reveal"><p class="eyebrow">Small problems deserve attention</p><h2>Comfort now. Care for <em>what comes next.</em></h2><p>Overgrown nails and calluses can put pressure on your toes and make walking uncomfortable. Professional care can help reduce discomfort and address nail edges before they become more troublesome.</p><p>When reaching or seeing your feet is difficult, small cuts, sore areas, or signs of infection can be easy to miss. Regular visits give us a chance to notice changes and address them early. If a nail is already ingrown or infected, we'll discuss the treatment it needs.</p><a class="btn btn-brass" href="/booking">Make foot care part of your routine</a></div><div class="reveal"><div class="scale-card"><div class="step-row"><span class="sn">i.</span><div class="st"><strong>Come as you are</strong><span>No need to trim or tidy your feet before your visit.</span></div></div><div class="step-row"><span class="sn">ii.</span><div class="st"><strong>Tell us what's difficult</strong><span>Reaching, seeing, trimming, or walking comfortably—we're here to help.</span></div></div><div class="step-row"><span class="sn">iii.</span><div class="st"><strong>Plan your next visit</strong><span>Ongoing care at an interval suited to you.</span></div></div></div></div></div></section>

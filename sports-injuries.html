@@ -100,13 +100,19 @@ nav.links .btn{color:#fff;min-height:44px;padding:9px 22px;}
 .art{position:relative;background:var(--tint);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
 .art::before{content:"";position:absolute;left:50%;bottom:-70px;width:250px;height:250px;margin-left:-125px;border-radius:50%;background:rgba(255,255,255,.75);}
 .art svg{position:relative;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-.ln{stroke:var(--ink);stroke-width:2.2;fill:#fff;}
-.dt{stroke:var(--ink);stroke-width:1.4;opacity:.45;fill:none;}
-.ac{stroke:var(--teal);stroke-width:2.4;fill:none;}
-.thin{stroke-width:1.5;opacity:.7;}
+.ln{stroke:var(--ink);stroke-width:1.5;fill:#fff;}
+.dt{stroke:var(--ink);stroke-width:1.1;opacity:.5;fill:none;}
+.bn{stroke:var(--ink);stroke-width:1.2;fill:#fff;}
+.bo{stroke:var(--ink);fill:none;}
+.bi{stroke:#fff;fill:none;}
+.ink{fill:var(--ink);stroke:none;}
+.ac{stroke:var(--teal);stroke-width:1.8;fill:none;}
+.thin{stroke-width:1.2;}
 .thick{stroke-width:4.5;}
-.dash{stroke-dasharray:3 5;}
+.dash{stroke-dasharray:2.5 4;}
 .acf{fill:var(--teal);stroke:none;}
+.tf{fill:rgba(46,125,140,.16);stroke:none;}
+.keep .ln{stroke-width:2.2;}.keep .dt{stroke-width:1.4;opacity:.45;}.keep .ac{stroke-width:2.4;}.keep .thin{stroke-width:1.5;opacity:.7;}.keep .thick{stroke-width:4.5;}.keep .dash{stroke-dasharray:3 5;}
 
 /* conditions */
 .cond-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;}
@@ -364,6 +370,14 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
   .glance{padding:26px 22px;}
   .path-card{padding:28px 24px;}
 }
+/* plates */
+.art img.plate{position:relative;display:block;width:auto;height:auto;}
+.cond .art::before,.plate-frame .art::before{background:rgba(255,255,255,.5);}
+.cond .art img.s{height:244px;}
+.cond .art img.l{width:94%;align-self:center;}
+.plate-frame .art img.s{height:290px;}
+.plate-frame .art img.l{width:92%;align-self:center;}
+@media (max-width:640px){.plate-frame .art img.s{height:232px;}}
 </style>
   <script type="application/ld+json">
   {
@@ -511,7 +525,7 @@ footer .fl{display:flex;gap:22px;flex-wrap:wrap;align-items:center;}
       </div>
     </div>
     <div class="rise d3">
-      <div class="plate-frame"><div class="art"><svg viewBox="0 0 200 150" role="img" aria-label="Line drawing of a foot and ankle wrapped in athletic tape"><g transform="translate(206 0) scale(-1 1)"><path class="ln" d="M58 8V78C58 92 46 100 46 116C46 128 54 134 66 134C82 134 90 127 104 127C122 127 132 134 150 134H164C172 134 176 128 172 122C168 117 158 114 148 110C130 103 108 96 98 82C90 72 86 60 86 44V8"/><circle class="ln" cx="73" cy="93" r="5"/><path class="ac" d="M58 50H86M58 61H87M58 72H90"/><path class="ac" d="M110 96L103 127M123 102L118 129M136 107L133 133"/><path class="ac thin" d="M60 80C74 100 92 112 104 127"/></g><path class="ac thin" d="M168 96H190M172 110H196M168 124H186"/></svg></div>
+      <div class="plate-frame"><div class="art"><img class="plate s" src="/images/plate-sports.png" alt="Line drawing of a foot and ankle from the front with the ankle marked" width="400" height="400" decoding="async"></div>
         <span class="cap"><em>Foot and ankle injuries</em></span>
       </div>
     </div>
