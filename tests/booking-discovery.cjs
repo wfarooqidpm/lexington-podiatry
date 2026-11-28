@@ -9,7 +9,7 @@ const catalog = JSON.parse(read('booking-options.json'));
 const controller = read('booking-single-page.js');
 const handoff = controller.slice(controller.indexOf('function applyBookingLinkPreferences'));
 
-test('catalog links use the real booking controls, while email links keep their own flow', () => {
+test('catalog links preselect only the visit mode; the record check decides first visit or follow-up', () => {
   const resolve = (search, continuation = false) => {
     const effects = [];
     vm.runInNewContext(handoff, {
@@ -19,22 +19,21 @@ test('catalog links use the real booking controls, while email links keep their 
       fd331El: id => id,
       fd331Approval: () => continuation,
       fd331Initialize: () => effects.push('initialized'),
-      fd331SelectType: type => effects.push(type),
       fd331SelectMode: selector => effects.push(selector),
     });
     return effects;
   };
-  for (const { bookingUrl, patientType, mode } of catalog.visitOptions) {
-    const type = patientType === 'new' ? 'cardNew' : 'cardReturning';
+  for (const { bookingUrl, mode } of catalog.visitOptions) {
     const value = mode === 'video' ? 'Virtual' : 'In Person';
-    assert.deepEqual(resolve(new URL(bookingUrl).search), ['initialized', type, `#newModeGrid [data-mode="${value}"]`]);
+    assert.deepEqual(resolve(new URL(bookingUrl).search), ['initialized', `#newModeGrid [data-mode="${value}"]`]);
     assert.deepEqual(resolve(new URL(bookingUrl).search, true), []);
   }
-  const firstVisitDefault = ['initialized', 'cardNew', '#newModeGrid [data-mode="In Person"]'];
-  assert.deepEqual(resolve(''), firstVisitDefault);
-  assert.deepEqual(resolve('?rwg_token=example'), firstVisitDefault);
+  // With no link preference the patient starts at the visit-mode question.
+  assert.deepEqual(resolve(''), ['initialized']);
+  assert.deepEqual(resolve('?rwg_token=example'), ['initialized']);
   assert.deepEqual(resolve('?visit=orthotics&mode=video'), ['initialized']);
-  assert.deepEqual(resolve('?visit=returning&mode=invalid'), ['initialized', 'cardReturning']);
+  assert.deepEqual(resolve('?visit=returning&mode=invalid'), ['initialized']);
+  assert.doesNotMatch(controller, /fd331SelectType|cardReturning/);
 });
 
 test('browser agent tools request only public first-visit slots and return approved fields', async () => {

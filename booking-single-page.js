@@ -1,50 +1,100 @@
-/* Approved single-page booker. Reuses the existing scheduling/booking gateway;
- * editing is local, and follow-up slots require possession of the registered email. */
+/* Approved single-page booker. Reuses the existing scheduling/booking gateway.
+ * Everyone enters the same details. The gateway checks them against the
+ * practice's patient records and answers only "matched" (follow-up, with a
+ * short-lived session) or "not matched" (first visit). No chart data reaches
+ * the browser. Emailed confirmation links from earlier bookings still work. */
 var fd332 = {edit:''};
-var fd331 = {generation:0, pending:null, emailSent:false, timer:null, busy:false, slotKey:'', sessionExpires:0};
+var fd331 = {generation:0, busy:false, slotKey:'', sessionExpires:0};
+// Patient-record check. status: '' (not checked) | checking | linked | new | error
+var fd333 = {status:'', key:'', generation:0, firstName:'', viaEmail:false, message:''};
+var FD333_DETAIL_IDS = ['npFirst','npLast','npDob','npPhone','npEmail'];
 function fd331El(id){return document.getElementById(id);}
-function fd331Identity(){return {firstName:fd331El('rpFirst').value.trim(),lastName:fd331El('rpLast').value.trim(),dob:fd331El('rpDob').value};}
-function fd331IdentityKey(){var p=fd331Identity();return [p.firstName,p.lastName,p.dob].join('|');}
 function fd331Verified(){return !!(state.verificationSession && fd331.sessionExpires>Date.now());}
 function fd331Pickup(){return state.bookingPurpose==='ORTHOTICS_PICKUP';}
-function fd331ValidNew(){return ['npFirst','npLast','npDob','npPhone','npEmail'].every(function(id){var e=fd331El(id);return !!e.value.trim()&&e.checkValidity();})&&validBookingPhone_();}
+function fd333Sex(){var picked=document.querySelector('input[name="npSex"]:checked');return picked?picked.value:'';}
+function fd331ValidNew(){return FD333_DETAIL_IDS.every(function(id){var e=fd331El(id);return !!e.value.trim()&&e.checkValidity();})&&!!fd333Sex()&&validBookingPhone_();}
+function fd333Details(){
+ return {firstName:fd331El('npFirst').value.trim(),lastName:fd331El('npLast').value.trim(),dob:fd331El('npDob').value,
+  sex:fd333Sex(),phone:bookingPhoneNumber_('E164')||fd331El('npPhone').value.trim(),email:fd331El('npEmail').value.trim().toLowerCase()};
+}
+function fd333Key(){var d=fd333Details();return [d.firstName,d.lastName,d.dob,d.sex,d.phone,d.email].join('|');}
+function fd333Matched(){return fd333.status==='linked'||fd333.status==='new';}
+function fd333DurationText(type){return bookingDurationLabel(type).replace(' min',' minutes');}
+
 function fd331CancelVerification(){
- fd331.generation++;clearTimeout(fd331.timer);fd331.pending=null;fd331.emailSent=false;fd331.busy=false;fd331.sessionExpires=0;
+ fd331.generation++;fd331.busy=false;fd331.sessionExpires=0;
  state.verificationSession=null;state.verifiedName=null;state.verifiedEmail=null;state.verifiedPhone=null;
  if(fd331Pickup()){state.bookingPurpose='';state.websiteBookingId=null;}
- fd331El('btnVerify').disabled=false;fd331El('btnVerify').textContent='🔒 Confirm identity';fd331El('verifyResult').textContent='';
 }
-function fd331EditIdentity(){fd331CancelVerification();fd332.edit='info';fd331Slots();}
+// Any change to the details forgets the previous answer, so a new check runs.
+function fd333Reset(){
+ fd333.generation++;fd333.status='';fd333.key='';fd333.firstName='';fd333.viaEmail=false;fd333.message='';
+ fd331CancelVerification();state.patientType=null;state.selectedSlot=null;state.bookingPayload=null;
+}
+
+async function fd333Check(){
+ if(fd333.status==='checking'||state.bookingBusy||state.bookingCommitted)return;
+ if(!state.visitMode){fd332.edit='mode';fd331Render();return;}
+ if(!fd331ValidNew()){fd333.message='Please complete every field, including sex, before continuing.';fd331Render();return;}
+ var details=fd333Details(),key=fd333Key(),generation=++fd333.generation;
+ fd333.status='checking';fd333.message='';fd331Render();
+ try{
+  var result=await call271(Object.assign({action:'patient-match'},details));
+  if(generation!==fd333.generation||key!==fd333Key())return;
+  if(!result||!result.success)throw new Error((result&&result.error)||'');
+  if(result.matched){
+   var expires=Date.parse(result.expiresAt);
+   if(!result.session||!isFinite(expires)||expires<=Date.now())throw new Error('');
+   state.patientType='returning';state.verificationSession=result.session;fd331.sessionExpires=expires;
+   state.verifiedName=details.firstName+' '+details.lastName;state.verifiedPhone=details.phone;state.verifiedEmail=details.email;
+   fd333.status='linked';fd333.firstName=details.firstName;
+  }else{
+   state.patientType='new';fd333.status='new';
+  }
+  fd333.key=key;fd332.edit='';if(state.patientType!=='new')linkedBookingSlot=null;fd331Slots();
+  var status=fd331El('patientMatchStatus');if(status&&status.focus)status.focus();
+ }catch(err){
+  if(generation!==fd333.generation)return;
+  fd333.status='error';
+  fd333.message=(err&&err.message)||'We couldn’t check your details just now. Please try again, or call (212) 510-8665 and we’ll book you.';
+  fd331Render();
+ }
+}
+
+function fd333RenderStatus(){
+ var box=fd331El('patientMatchStatus'),button=fd331El('btnFindRecord'),note=fd331El('matchMessage');
+ var checking=fd333.status==='checking';
+ button.disabled=checking||state.bookingBusy||!!state.bookingCommitted;
+ button.textContent=checking?'Checking our records…':fd333Matched()?'Update and check again':'Continue to appointment times';
+ note.textContent=fd333.status==='error'||!fd333Matched()?fd333.message:'';
+ box.hidden=!fd333Matched();
+ box.className='match-card '+(fd333.status==='linked'?'match-linked':'match-new');
+ if(fd333.status==='linked'){
+  fd331El('matchTitle').textContent=fd331Pickup()?'Patient record linked: orthotics pickup':'Patient found and linked';
+  fd331El('matchBody').textContent=(fd333.firstName?'Welcome back, '+fd333.firstName+'. ':'Welcome back. ')+
+   (fd333.viaEmail?'Your email confirmation linked this booking to your patient record. ':'Your details match your patient record, and this booking is linked to it. ')+
+   (fd331Pickup()?'You’re booking your orthotics pickup.':'You’re booking a follow-up visit ('+fd333DurationText('returning')+').');
+ }else if(fd333.status==='new'){
+  fd331El('matchTitle').textContent='Welcome to Lexington Podiatry';
+  fd331El('matchBody').textContent='You’re booking a first visit ('+fd333DurationText('new')+'). Seen Dr. Farooqi before? Check that your name, date of birth, phone and email are the ones we have on file, or call (212) 510-8665.';
+ }
+}
+
 function fd331Render(){
- var waiting=fd331.emailSent&&!fd331Verified();
- fd331El('returningIdentityTitle').textContent=waiting?'Check your email':'Confirm your identity';
- fd331El('returningVerifyInstructions').textContent=waiting?'If your details match your patient record, you’ll receive an email at your registered address.':'We’ll send a confirmation link to the email address on your patient record.';
- fd331El('returningIdentityFields').hidden=waiting;
- ['emailNextSteps','editIdentityDetails','emailIdentityHelp'].forEach(function(id){fd331El(id).hidden=!waiting;});
- var returning=state.patientType==='returning',verified=returning&&fd331Verified();
- fd331El('bookingIdentityIntro').hidden=!!state.patientType;
- fd331El('panel2New').hidden=state.patientType!=='new';fd331El('panel2Returning').hidden=!returning;
- fd331El('cardNew').setAttribute('aria-pressed',String(state.patientType==='new'));
- fd331El('cardReturning').setAttribute('aria-pressed',String(returning));
- fd331El('cardNew').classList.toggle('selected',state.patientType==='new');fd331El('cardReturning').classList.toggle('selected',returning);
+ var returning=state.patientType==='returning';
  document.querySelectorAll('#newModeGrid .mode-card, #bookingSlotModes button').forEach(function(b){var selected=b.getAttribute('data-mode')===state.visitMode;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected));});
- var ready=!!state.selectedSlot&&!!state.visitMode&&(returning?verified:state.patientType==='new'&&fd331ValidNew());
+ var ready=!!state.selectedSlot&&!!state.visitMode&&fd333Matched()&&(returning?fd331Verified():state.patientType==='new'&&fd331ValidNew());
  fd331El('btnSubmit').disabled=state.bookingBusy||(!state.bookingCommitted&&!ready);
- fd331El('bookingSelection').textContent=state.patientType?((fd331Pickup()?'Orthotics pickup':returning?'Follow-up':'First visit')+' · '+(state.visitMode||'Choose visit mode')+(state.selectedSlot?' · '+state.selectedSlot.label:'')):'Choose your visit details above.';
- if(verified){fd331El('btnVerify').textContent='🔓 Identity confirmed';fd331El('btnVerify').disabled=true;}
+ fd331El('bookingSelection').textContent=fd333Matched()?((fd331Pickup()?'Orthotics pickup':returning?'Follow-up':'First visit')+' · '+(state.visitMode||'Choose visit mode')+(state.selectedSlot?' · '+state.selectedSlot.label:'')):'Choose your visit details above.';
+ fd333RenderStatus();
  fd332Flow();
 }
 function fd331Slots(){
- var allowed=!!state.patientType&&!!state.visitMode&&(state.patientType==='new'||fd331Verified());
+ var allowed=fd333Matched()&&!!state.visitMode&&(state.patientType==='new'||fd331Verified());
  var key=allowed?[state.patientType,state.visitMode,state.verificationSession||''].join('|'):'';
- if(!allowed){++slotLoadGeneration;fd331.slotKey='';state.selectedSlot=null;fd331El('slotContainer').innerHTML='<p class="no-slots">'+(state.patientType==='returning'?'🔒 Confirm your identity to unlock appointment times.':'Choose your visit type and mode to see available times.')+'</p>';}
+ if(!allowed){++slotLoadGeneration;fd331.slotKey='';state.selectedSlot=null;fd331El('slotContainer').innerHTML='<p class="no-slots">Enter your details to see available times.</p>';}
  else if(key!==fd331.slotKey){fd331.slotKey=key;state.selectedSlot=null;loadSlots('slotContainer');}
  fd331Render();
-}
-function fd331SelectType(button){
- if(state.bookingBusy||state.bookingCommitted||fd331Pickup())return;
- var type=button.getAttribute('data-type');if(type!==state.patientType){fd331CancelVerification();linkedBookingSlot=null;state.selectedSlot=null;state.bookingPayload=null;fd331El('bookingSlotNotice').textContent='';}
- state.patientType=type;fd332.edit=state.visitMode?'':'mode';fd331Slots();
 }
 function fd331SelectMode(button){
  if(state.bookingBusy||state.bookingCommitted||fd331Pickup())return;
@@ -52,49 +102,12 @@ function fd331SelectMode(button){
  if(state.visitMode===mode){fd331Render();return;}
  if(state.visitMode){linkedBookingSlot=null;fd331El('bookingSlotNotice').textContent='';}
  state.visitMode=mode;state.selectedSlot=null;state.bookingPayload=null;fd331Slots();
+ if(!fd333Matched()){var first=fd331El('npFirst');if(first&&first.focus&&!first.value)first.focus();}
 }
-function fd331VerificationExpired(message){fd331CancelVerification();fd331El('verifyResult').textContent=message||'Your confirmation expired. Please request a new email.';fd331Slots();}
-async function fd331Confirm(){
- if(fd331.busy||state.bookingBusy||state.patientType!=='returning'||fd331Verified())return;
- var identity=fd331Identity();if(!identity.firstName||!identity.lastName||!identity.dob||!fd331El('rpDob').checkValidity()){fd331El('verifyResult').textContent='Enter your first name, last name and date of birth.';return;}
- var generation=fd331.generation,key=fd331IdentityKey();fd331.busy=true;fd331El('btnVerify').disabled=true;
- try{
-  var pending=fd331.pending;
-  // A retry after an uncertain send reuses the same key, preventing duplicate mail.
-  if(!pending||pending.sent&&Date.now()-pending.created>=60000){
-   var poll=random271(32),bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('POLL|'+poll));
-   if(generation!==fd331.generation)return;
-   var hash=Array.from(new Uint8Array(bytes),function(b){return b.toString(16).padStart(2,'0');}).join('');
-   pending={requestId:'VR-'+hash.slice(0,32),pollKey:poll,created:Date.now(),identity:key,sent:false};fd331.pending=pending;
-  }
-  if(pending.sent&&Date.now()-pending.created<60000){fd331El('verifyResult').textContent='Please check your email. You can request another link after one minute.';return;}
-  fd331El('verifyResult').textContent='Sending confirmation…';
-  var result=await call271(Object.assign({action:'magic-start',requestId:pending.requestId,pollKey:pending.pollKey,visitMode:state.visitMode},identity));
-  if(generation!==fd331.generation||fd331.pending!==pending||key!==fd331IdentityKey())return;
-  if(!result.success)throw new Error(result.error||'We could not send the confirmation. Please try again.');
-  pending.sent=true;fd332.edit='';fd331.emailSent=true;fd331El('btnVerify').textContent='Send again';fd331Render();
-  fd331El('verifyResult').textContent='You can request another link after one minute.';
-  fd331Poll();
- }catch(err){if(generation===fd331.generation)fd331El('verifyResult').textContent=err.message||'Please try again.';}
- finally{if(generation===fd331.generation){fd331.busy=false;fd331El('btnVerify').disabled=false;}}
-}
-async function fd331Poll(){
- clearTimeout(fd331.timer);var pending=fd331.pending,generation=fd331.generation;
- if(!pending||!pending.sent)return;
- if(Date.now()-pending.created>10*60000){fd331VerificationExpired('The link expired. Please request a new confirmation email.');return;}
- try{
-  var result=await call271({action:'magic-poll',requestId:pending.requestId,pollKey:pending.pollKey});
-  if(generation!==fd331.generation||fd331.pending!==pending||pending.identity!==fd331IdentityKey())return;
-  if(result.continued){fd331.pending=null;fd331El('verifyResult').textContent='Continue in the page opened from your email. You can close this tab.';return;}
-  if(result.expired){fd331VerificationExpired();return;}
-  if(!result.success)throw new Error(result.error||'The confirmation check could not complete.');
-  if(result.verified&&result.session){
-   var expires=Date.parse(result.expiresAt);if(!isFinite(expires)||expires<=Date.now())throw new Error('Please request a new confirmation.');
-   var identity=fd331Identity();state.verificationSession=result.session;state.verifiedName=identity.firstName+' '+identity.lastName;state.verifiedEmail='';state.verifiedPhone='';fd331.sessionExpires=expires;fd331.pending=null;
-   fd331El('verifyResult').textContent='🔓 Identity confirmed. Choose your appointment time.';fd331Slots();return;
-  }
- }catch(err){if(generation===fd331.generation&&fd331.pending===pending)fd331El('verifyResult').textContent=err.message+' We will check again while this page is open.';}
- if(generation===fd331.generation&&fd331.pending===pending)fd331.timer=setTimeout(fd331Poll,document.hidden?15000:7000);
+// A follow-up session that lapses (or a slot lookup that rejects it) sends the
+// patient back to their filled-in details for a fresh check.
+function fd331VerificationExpired(message){
+ fd333Reset();fd333.message=message||'Please confirm your details again to see follow-up times.';fd332.edit='';fd331Slots();
 }
 function fd331SetStep(n){
  state.currentStep=n;if(n===5){fd331El('bookingInputs').hidden=true;fd331El('bookingFinish').hidden=true;fd331El('panel5').hidden=false;}
@@ -104,7 +117,7 @@ function fd331Submit(){
  if(state.bookingBusy)return;
  if(!state.bookingCommitted){
   if(state.patientType==='returning'&&!fd331Verified()){fd331VerificationExpired();return;}
-  if(!state.selectedSlot||!state.visitMode||(state.patientType==='new'&&!fd331ValidNew())){fd331El('bookingMessage').textContent='Complete your details and choose an appointment time.';fd331Render();return;}
+  if(!fd333Matched()||!state.selectedSlot||!state.visitMode||(state.patientType==='new'&&!fd331ValidNew())){fd331El('bookingMessage').textContent='Complete your details and choose an appointment time.';fd331Render();return;}
  }
  state.bookingBusy=true;fd331El('bookingInputs').disabled=true;fd331El('btnSubmit').textContent=state.bookingCommitted?'Opening registration…':'Booking your appointment…';fd331El('bookingMessage').textContent='';fd331Render();
  if(!state.bookingPayload)state.bookingPayload=buildWebsiteBookingPayload();
@@ -113,9 +126,8 @@ function fd331Submit(){
   fd331El('bookingMessage').textContent=(err&&err.message)||'Unable to complete booking. Please try again or call the office.';
  }).finally(function(){state.bookingBusy=false;fd331El('bookingInputs').disabled=!!state.bookingCommitted;fd331El('btnSubmit').textContent=state.bookingCommitted?'Continue registration':'Book appointment';fd331Render();});
 }
-// Keep the real booking DOM intact: email confirmation opens scheduling in this tab.
-// Opening the email link confirms possession; tokens remain in memory only.
-// Reopening is bounded by the server expiry and uses one durable booking identity.
+// Emailed confirmation links (sent before this change, and orthotics pickup
+// invitations) open scheduling in this tab. Tokens remain in memory only.
 function fd331Approval(){
  var fragment=window.lexBookingVerificationFragment||location.hash;delete window.lexBookingVerificationFragment;
  var match=fragment.match(/^#verify=(VR-[a-f0-9]{32})\.([a-f0-9]{64})(?:\.(ip|vv))?$/);if(!match)return false;
@@ -134,16 +146,16 @@ function fd331Approval(){
    state.bookingPurpose=result.bookingPurpose||'';
    state.patientType='returning';state.visitMode=fd331Pickup()||match[3]==='ip'?'In Person':match[3]==='vv'?'Virtual':null;
    state.verificationSession=result.session;state.verifiedName=result.firstName+' '+result.lastName;state.verifiedEmail='';state.verifiedPhone='';fd331.sessionExpires=expiry;
-   fd331El('rpFirst').value=result.firstName;fd331El('rpLast').value=result.lastName;fd331El('rpDob').value=result.dob;
+   ['First','Last','Dob'].forEach(function(part){var value=part==='First'?result.firstName:part==='Last'?result.lastName:result.dob;fd331El('np'+part).value=value;fd331El('rp'+part).value=value;});
+   fd333.status='linked';fd333.viaEmail=true;fd333.firstName=result.firstName;fd333.key=fd333Key();
    fd331El('fd331Approval').hidden=true;document.querySelector('.booking-main').hidden=false;
-   fd331El('verifyResult').textContent='🔓 Identity confirmed. Choose your appointment time.';
    fd331Initialize();fd331Slots();
   }catch(err){fd331El('fd331OpeningNote').hidden=true;fd331El('fd331ApprovalStatus').textContent=err.message;button.disabled=false;button.hidden=false;}
  };
  fd331El('fd331Approve').onclick();
  return true;
 }
-// Bubble choices edit the existing draft; no writes, navigation, or new verification.
+// Bubble choices edit the existing draft; no writes or navigation.
 function fd332Edit(section){
  if(state.bookingBusy||state.bookingCommitted||(fd331Pickup()&&section!=='time'&&section!=='confirm'))return;
  if(section==='confirm'){
@@ -151,25 +163,25 @@ function fd332Edit(section){
  }
  fd332.edit=section;fd331Render();
 }
-function renderBookingProgress({type,mode,ready,showBooking,details,confirming,done}){
- // First visits start with a time. Follow-up times require email verification.
- var returning=type==='returning',pickup=fd331Pickup();
- var time={section:'time',text:state.selectedSlot?.label||'Choose a time',disabled:returning&&!ready,controls:'panel3'};
- var identity={section:'info',text:returning?(ready?'Identity confirmed':'Verify identity'):'Your details',disabled:pickup||(!returning&&!state.selectedSlot),controls:'identitySection'};
+function renderBookingProgress({type,mode,matched,ready,showBooking,details,confirming,done}){
+ // Details come first: they decide whether this is a first visit or a follow-up.
+ var pickup=fd331Pickup();
+ var identity={section:'info',text:!matched?'Your details':type==='returning'?'Record linked':'First visit',disabled:pickup,controls:'identitySection'};
+ var time={section:'time',text:state.selectedSlot?.label||'Choose a time',disabled:!matched,controls:'panel3'};
  var confirm={section:'confirm',disabled:!ready||!state.selectedSlot,controls:'bookingFinish'};
  var current=!showBooking?'':confirming?'confirm':details?'info':'time';
- var first=returning?identity:time,second=returning?time:identity;
 
- fd331El('bookingPath').hidden=!type||done;
+ fd331El('bookingPath').hidden=!mode||done;
  fd331El('pathTrack').hidden=!mode;
- fd331El('pathType').textContent=pickup?'Orthotics pickup':returning?'Returning patient':'First visit';
+ fd331El('pathType').hidden=!matched;
+ fd331El('pathType').textContent=pickup?'Orthotics pickup':type==='returning'?'Follow-up':'First visit';
+ fd331El('pathType').disabled=true;
  fd331El('pathMode').textContent=mode==='Virtual'?'Video visit':mode?'In person':'Choose visit mode';
- fd331El('pathType').disabled=pickup;
  fd331El('pathMode').disabled=pickup;
- fd331El('pathFirstText').textContent=first.text;
- fd331El('pathSecondText').textContent=second.text;
+ fd331El('pathFirstText').textContent=identity.text;
+ fd331El('pathSecondText').textContent=time.text;
 
- [['pathFirst',first],['pathSecond',second],['pathConfirm',confirm]].forEach(function([id,step]){
+ [['pathFirst',identity],['pathSecond',time],['pathConfirm',confirm]].forEach(function([id,step]){
   var button=fd331El(id);
   button.dataset.section=step.section;
   button.disabled=step.disabled;
@@ -179,40 +191,47 @@ function renderBookingProgress({type,mode,ready,showBooking,details,confirming,d
  });
 }
 function fd332Flow(){
- var done=state.currentStep===5,type=state.patientType,mode=state.visitMode;
- var ready=!!type&&!!mode&&(type==='returning'?fd331Verified():fd331ValidNew());
- var askType=!type||fd332.edit==='type';
- var askMode=!askType&&(!mode||fd332.edit==='mode');
- var showBooking=!askType&&!askMode&&!done;
- var details=type==='new'?!!state.selectedSlot&&fd332.edit!=='time':!ready||fd332.edit==='info';
- var showTimes=type==='new'?(!state.selectedSlot||fd332.edit==='time'):(ready&&fd332.edit!=='info');
- var showConfirmation=showBooking&&ready&&!!state.selectedSlot&&fd332.edit!=='time';
- fd331El('visitTypeQuestion').hidden=!askType;
+ var done=state.currentStep===5,type=state.patientType,mode=state.visitMode,matched=fd333Matched();
+ var ready=matched&&!!mode&&(type==='returning'?fd331Verified():fd331ValidNew());
+ var askMode=!mode||fd332.edit==='mode';
+ var showBooking=!askMode&&!done;
+ var details=!matched||fd332.edit==='info';
+ var showTimes=matched&&fd332.edit!=='info';
+ var showConfirmation=showBooking&&showTimes&&ready&&!!state.selectedSlot&&fd332.edit!=='time';
  fd331El('visitModeQuestion').hidden=!askMode;
- fd331El('bookingIdentityIntro').hidden=true;
  fd331El('identitySection').hidden=!showBooking||!details;
+ fd331El('panel2New').hidden=false;
+ fd331El('panel2Returning').hidden=true;
+ fd331El('patientMatchStatus').hidden=!showBooking||!matched;
  fd331El('panel3').hidden=!showBooking||!showTimes;
- fd331El('bookingSlotModes').hidden=type!=='new';
- fd331El('bookingFollowUpLink').hidden=type!=='new';
- fd331El('bookingSlotTimeZone').textContent=type==='new'?'First-visit times · Eastern time':'All times are Eastern.';
+ fd331El('bookingSlotModes').hidden=!matched||fd331Pickup();
+ fd331El('bookingSlotTimeZone').textContent=type==='new'?'First-visit times · Eastern time':type==='returning'?'Follow-up times · Eastern time':'All times are Eastern.';
  fd331El('bookingFinish').hidden=!showConfirmation;
- renderBookingProgress({type,mode,ready,showBooking,details,confirming:showConfirmation&&fd332.edit!=='info',done});
- fd331El('bookingConnectionStatus').hidden=askType||askMode;
+ renderBookingProgress({type,mode,matched,ready,showBooking,details,confirming:showConfirmation&&fd332.edit!=='info',done});
+ fd331El('bookingConnectionStatus').hidden=askMode;
 }
 // Compatibility hooks used by the shared slot renderer and booking response handler.
 renderBookingCards=fd331Render;setStep=fd331SetStep;showReturningVerification_=fd331VerificationExpired;updatePatientSummary=fd331Render;
 function fd331Initialize(){
- ['npFirst','npLast','npDob','npPhone','npEmail','rpFirst','rpLast','rpDob'].forEach(function(id){fd331El(id).addEventListener('input',function(){if(state.bookingBusy||state.bookingCommitted)return;state.bookingPayload=null;if(id.indexOf('rp')===0){fd331CancelVerification();fd331Slots();}else fd331Render();});});
+ FD333_DETAIL_IDS.concat(['rpFirst','rpLast','rpDob']).forEach(function(id){fd331El(id).addEventListener('input',fd333DetailsChanged);});
+ document.querySelectorAll('input[name="npSex"]').forEach(function(input){input.addEventListener('change',fd333DetailsChanged);});
  initialiseInternationalPhone_();loadBookingConfig();fd331Render();
 }
+function fd333DetailsChanged(){
+ if(state.bookingBusy||state.bookingCommitted)return;
+ state.bookingPayload=null;
+ if(fd333.status&&fd333.status!=='error'){fd333Reset();fd332.edit='info';fd331Slots();return;}
+ if(fd333.status==='error'){fd333.status='';fd333.message='';}
+ fd331Render();
+}
 
-// Shared booking links preselect public choices using the same controls as a patient.
+// Shared booking links preselect the visit mode. Whether the visit is a first
+// visit or a follow-up is decided by the record check, not by the link.
 function applyBookingLinkPreferences(search){
  const params=new URLSearchParams(search);
  const visit=params.get('visit')??'new';
  if(visit!=='new'&&visit!=='returning')return;
- fd331SelectType(fd331El(visit==='new'?'cardNew':'cardReturning'));
- const mode=params.get('mode')??(visit==='new'?'in-person':null);
+ const mode=params.get('mode');
  if(mode!=='in-person'&&mode!=='video')return;
  const slot=params.get('slot');
  if(visit==='new' && slot && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(slot)) linkedBookingSlot=Date.parse(slot)||null;

@@ -18,7 +18,7 @@
   "appointmentsUrl": "https://lexingtonpodiatry.nyc/booking",
   "bookingUrl": "https://lexingtonpodiatry.nyc/booking",
   "openApiUrl": "https://lexingtonpodiatry.nyc/booking-api.json",
-  "bookingCompletion": "The patient completes and confirms the appointment on the practice booking page. Returning patients verify through their registered email before viewing times.",
+  "bookingCompletion": "The patient enters their name, date of birth, sex, phone and email and confirms the appointment on the practice booking page. The page checks these details against practice records: patients already on file are booked a 15-minute follow-up, everyone else a 30-minute first visit.",
   "visitOptions": [
     {
       "patientType": "new",
